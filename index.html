@@ -26,10 +26,7 @@
 
     /* Pengaturan Khusus Halaman Print */
     @media print {
-      @page {
-        size: landscape;
-        margin: 10mm;
-      }
+      @page { size: landscape; margin: 10mm; }
       .no-print { display: none !important; }
       body { background-color: #ffffff !important; color: #000000 !important; padding: 0 !important; }
       .card-theme { border: none !important; box-shadow: none !important; background-color: transparent !important; padding: 0 !important; }
@@ -72,7 +69,7 @@
       </div>
     </div>
 
-    <!-- Stats Cards (Disembunyikan Saat Print) -->
+    <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 no-print" id="statsContainer">
       <div class="card-theme p-4 rounded-xl border shadow-sm">
         <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">TOTAL DATA</p>
@@ -116,7 +113,7 @@
       </div>
     </div>
 
-    <!-- Charts Section (Disembunyikan Saat Print) -->
+    <!-- Charts Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
@@ -155,7 +152,7 @@
       </div>
     </div>
 
-    <!-- Filter Section (Disembunyikan Saat Print) -->
+    <!-- Filter Section -->
     <div class="card-theme p-6 rounded-2xl shadow-sm border space-y-4 no-print">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div class="flex items-center gap-2 font-bold text-lg">
@@ -306,8 +303,11 @@
         .then(buffer => {
           const workbook = XLSX.read(buffer, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(firstSheet, { raw: false, defval: '' });
-          processData(json);
+          
+          // Membaca data sebagai matriks array (Baris & Kolom)
+          const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+          
+          processRawMatrix(sheetData);
         })
         .catch(err => {
           document.getElementById('lastUpdateText').innerText = 'Gagal memuat';
@@ -320,20 +320,8 @@
         });
     });
 
-    function cleanKey(obj, targetKeys) {
-      for (let k in obj) {
-        let cleanK = k.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-        for (let target of targetKeys) {
-          if (cleanK === target) return obj[k];
-        }
-      }
-      return '';
-    }
-
-    function cleanNumberOnly(val) {
-      if (!val) return '';
-      let str = String(val).replace(/[^0-9]/g, ''); 
-      return str ? parseInt(str, 10).toString() : String(val).trim();
+    function cleanString(val) {
+      return val ? String(val).trim() : '';
     }
 
     function normalizeStatus(val) {
@@ -343,6 +331,12 @@
       if (str.includes('SUDAH') || str.includes('KAWIN') || str === 'S' || str === '2' || str === 'K') return 'S';
       if (str.includes('PERNAH') || str.includes('JANDA') || str.includes('DUDA') || str === 'P' || str === '3') return 'P';
       return str;
+    }
+
+    function cleanNumberOnly(val) {
+      if (!val) return '';
+      let str = String(val).replace(/[^0-9]/g, ''); 
+      return str ? parseInt(str, 10).toString() : String(val).trim();
     }
 
     function cleanDateOnly(val) {
@@ -373,55 +367,98 @@
       return (yy > currentYY) ? (1900 + yy) : (2000 + yy);
     }
 
-    function processData(json) {
+    function processRawMatrix(matrix) {
+      if (!matrix || matrix.length === 0) return;
+
+      // 1. Cari Baris Mana yang Menjadi Header Utama
+      let headerRowIndex = -1;
+      let colIndices = {
+        dpid: -1, nkk: -1, nik: -1, nama: -1, tempat: -1, tgl: -1,
+        umur: -1, jk: -1, sts: -1, alamat: -1, rt: -1, tps: -1
+      };
+
+      for (let i = 0; i < Math.min(matrix.length, 15); i++) {
+        let row = matrix[i].map(c => String(c).toLowerCase().trim().replace(/[^a-z0-9]/g, ''));
+        
+        let hasNama = row.some(cell => cell.includes('nama'));
+        let hasNik = row.some(cell => cell.includes('nik'));
+
+        if (hasNama || hasNik) {
+          headerRowIndex = i;
+          
+          row.forEach((cell, colIdx) => {
+            if (cell.includes('dpid') || cell.includes('iddp') || cell.includes('idpemilih')) colIndices.dpid = colIdx;
+            else if (cell.includes('nkk') || cell.includes('nokk') || cell.includes('kk')) colIndices.nkk = colIdx;
+            else if (cell.includes('nik') || cell.includes('nomorinduk')) colIndices.nik = colIdx;
+            else if (cell.includes('nama')) colIndices.nama = colIdx;
+            else if (cell.includes('tempat')) colIndices.tempat = colIdx;
+            else if (cell.includes('tgl') || cell.includes('lahir')) colIndices.tgl = colIdx;
+            else if (cell.includes('umur') || cell.includes('usia') || cell.includes('thn')) colIndices.umur = colIdx;
+            else if (cell.includes('jk') || cell.includes('kelamin')) colIndices.jk = colIdx;
+            else if (cell.includes('sts') || cell.includes('status') || cell.includes('kawin')) colIndices.sts = colIdx;
+            else if (cell.includes('alamat') || cell.includes('dusun') || cell.includes('jalan') || cell.includes('jln') || cell.includes('lokasi') || cell.includes('domisili')) colIndices.alamat = colIdx;
+            else if (cell === 'rt' || cell.includes('rtrw')) colIndices.rt = colIdx;
+            else if (cell.includes('tps')) colIndices.tps = colIdx;
+          });
+          break;
+        }
+      }
+
+      // Fallback jika tidak terdeteksi header
+      if (headerRowIndex === -1) headerRowIndex = 0;
+
       const currentYear = new Date().getFullYear();
 
-      rawData = json.map(item => {
-        let dpid = cleanKey(item, ['dpid', 'dp_id', 'idpemilih', 'iddp']);
-        let nkk = cleanKey(item, ['nkk', 'nokk', 'nomorkk', 'kk']);
-        let nik = cleanKey(item, ['nik', 'nomorinduk']);
-        let nama = cleanKey(item, ['nama', 'namalengkap', 'namapemilih']);
-        let tempatLahir = cleanKey(item, ['tempatlahir', 'tempat']);
-        let rawTglLahir = cleanKey(item, ['tgllahir', 'tanggallahir', 'tgl', 'tgl_lahir']);
-        let rawUmur = cleanKey(item, ['umur', 'usia', 'thn', 'umurthn']);
-        let jk = cleanKey(item, ['jk', 'jeniskelamin', 'kelamin']);
-        let sts = cleanKey(item, ['sts', 'status', 'statuskawin', 'kawin', 'stskawin', 'statusperkawinan', 'st']);
-        
-        // Pencarian variasi header kolom alamat
-        let alamat = cleanKey(item, ['alamat', 'jalan', 'jln', 'dusun', 'desa', 'kelurahan', 'alamatlengkap', 'lokasi', 'domisili']);
-        
-        let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
-        let tps = cleanKey(item, ['tps', 'notps']);
+      // 2. Loop Mengambil Data Setelah Baris Header
+      rawData = [];
+      for (let r = headerRowIndex + 1; r < matrix.length; r++) {
+        let row = matrix[r];
+        if (!row || row.length === 0) continue;
+
+        let getVal = (idx) => (idx !== -1 && row[idx] !== undefined) ? cleanString(row[idx]) : '';
+
+        let dpid = getVal(colIndices.dpid);
+        let nkk = getVal(colIndices.nkk);
+        let nik = getVal(colIndices.nik);
+        let nama = getVal(colIndices.nama);
+        let tempatLahir = getVal(colIndices.tempat);
+        let rawTglLahir = getVal(colIndices.tgl);
+        let rawUmur = getVal(colIndices.umur);
+        let jk = getVal(colIndices.jk);
+        let sts = getVal(colIndices.sts);
+        let alamat = getVal(colIndices.alamat);
+        let rt = getVal(colIndices.rt);
+        let tps = getVal(colIndices.tps);
+
+        // Abaikan baris kosong total
+        if (!nama && !nik && !nkk && !dpid) continue;
 
         let parsedTgl = cleanDateOnly(rawTglLahir);
-        
         let finalUmur = '';
         if (rawUmur && !isNaN(parseInt(rawUmur))) {
           finalUmur = parseInt(rawUmur).toString();
         } else if (parsedTgl.year) {
           finalUmur = (currentYear - parsedTgl.year).toString();
         } else {
-          let yearFromNIK = getYearFromNIK(String(nik));
-          if (yearFromNIK) {
-            finalUmur = (currentYear - yearFromNIK).toString();
-          }
+          let yearFromNIK = getYearFromNIK(nik);
+          if (yearFromNIK) finalUmur = (currentYear - yearFromNIK).toString();
         }
 
-        return {
-          dpid: dpid ? String(dpid).trim() : '',
-          nkk: nkk ? String(nkk).trim() : '',
-          nik: nik ? String(nik).trim() : '',
-          nama: nama ? String(nama).trim() : '',
-          tempatLahir: tempatLahir ? String(tempatLahir).trim() : '',
+        rawData.push({
+          dpid: dpid,
+          nkk: nkk,
+          nik: nik,
+          nama: nama,
+          tempatLahir: tempatLahir,
           tglLahir: parsedTgl.text,
           umur: finalUmur,
-          jk: jk ? String(jk).toUpperCase().trim() : '',
+          jk: jk.toUpperCase(),
           sts: normalizeStatus(sts),
-          alamat: alamat ? String(alamat).trim() : '',
+          alamat: alamat,
           rt: cleanNumberOnly(rt),
           tps: cleanNumberOnly(tps)
-        };
-      });
+        });
+      }
 
       populateDropdowns();
       applyFilter();
@@ -473,28 +510,20 @@
       const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
-        }
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
       };
 
       if (chartJKInst) chartJKInst.destroy();
       chartJKInst = new Chart(document.getElementById('chartJK'), {
         type: 'pie',
-        data: {
-          labels: ['Laki-Laki', 'Perempuan'],
-          datasets: [{ data: [laki, perempuan], backgroundColor: ['#3b82f6', '#ec4899'] }]
-        },
+        data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [laki, perempuan], backgroundColor: ['#3b82f6', '#ec4899'] }] },
         options: chartOptions
       });
 
       if (chartStatusInst) chartStatusInst.destroy();
       chartStatusInst = new Chart(document.getElementById('chartStatus'), {
         type: 'doughnut',
-        data: {
-          labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'],
-          datasets: [{ data: [sudah, belum, pernah], backgroundColor: ['#14b8a6', '#f59e0b', '#a855f7'] }]
-        },
+        data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [sudah, belum, pernah], backgroundColor: ['#14b8a6', '#f59e0b', '#a855f7'] }] },
         options: chartOptions
       });
 
@@ -512,10 +541,7 @@
       if (chartUmurInst) chartUmurInst.destroy();
       chartUmurInst = new Chart(document.getElementById('chartUmur'), {
         type: 'bar',
-        data: {
-          labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'],
-          datasets: [{ label: 'Orang', data: [u17, u30, u50, uTua], backgroundColor: '#f59e0b' }]
-        },
+        data: { labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'], datasets: [{ label: 'Orang', data: [u17, u30, u50, uTua], backgroundColor: '#f59e0b' }] },
         options: { ...chartOptions, plugins: { legend: { display: false } } }
       });
 
@@ -527,10 +553,7 @@
       if (chartTPSInst) chartTPSInst.destroy();
       chartTPSInst = new Chart(document.getElementById('chartTPS'), {
         type: 'bar',
-        data: {
-          labels: tpsLabels.length ? tpsLabels : ['-'],
-          datasets: [{ label: 'Pemilih', data: tpsCounts.length ? tpsCounts : [0], backgroundColor: '#8b5cf6' }]
-        },
+        data: { labels: tpsLabels.length ? tpsLabels : ['-'], datasets: [{ label: 'Pemilih', data: tpsCounts.length ? tpsCounts : [0], backgroundColor: '#8b5cf6' }] },
         options: { ...chartOptions, plugins: { legend: { display: false } } }
       });
     }
@@ -599,7 +622,7 @@
               </span>
             </td>
             <td class="p-3 text-center font-bold text-indigo-500">${d.sts || '-'}</td>
-            <td class="p-3 opacity-80 whitespace-normal">${d.alamat || '-'}</td>
+            <td class="p-3 opacity-80 whitespace-normal font-semibold">${d.alamat || '-'}</td>
             <td class="p-3 text-center font-semibold">${d.rt || '-'}</td>
             <td class="p-3 text-center whitespace-nowrap">
               <span class="inline-block min-w-[65px] px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-500 font-bold text-xs text-center">
