@@ -203,7 +203,7 @@
           return res.arrayBuffer();
         })
         .then(buffer => {
-          const workbook = XLSX.read(buffer, { type: 'array' });
+          const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
           processData(json);
@@ -218,7 +218,6 @@
         });
     });
 
-    // Pencari Nama Kolom Lebih Fleksibel
     function cleanKey(obj, targetKeys) {
       for (let k in obj) {
         let cleanK = k.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -235,7 +234,6 @@
       return str ? parseInt(str, 10).toString() : String(val).trim();
     }
 
-    // Pembersih Kode Status Kawin (Memastikan output S, B, atau P)
     function normalizeStatus(val) {
       if (!val) return '-';
       let str = String(val).trim().toUpperCase();
@@ -245,27 +243,80 @@
       return str;
     }
 
+    // Konversi Angka Date Seri Excel ke Tanggal Asli (DD/MM/YYYY) & Hitung Umur
+    function parseExcelDate(val) {
+      if (!val) return { text: '', year: null };
+      
+      // Jika angka date serial Excel (misal: 32787)
+      if (typeof val === 'number' || (!isNaN(val) && String(val).length <= 5)) {
+        let dateObj = new Date(Math.round((val - 25569) * 86400 * 1000));
+        if (!isNaN(dateObj.getTime())) {
+          let day = String(dateObj.getDate()).padStart(2, '0');
+          let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+          let year = dateObj.getFullYear();
+          return { text: `${day}/${month}/${year}`, year: year };
+        }
+      }
+
+      // Jika format teks standar
+      let strVal = String(val).trim();
+      let matchYear = strVal.match(/\b(19\d\d|20\d\d)\b/);
+      let year = matchYear ? parseInt(matchYear[1]) : null;
+      
+      return { text: strVal, year: year };
+    }
+
+    // Ekstrak Tahun Lahir dari NIK
+    function getYearFromNIK(nik) {
+      if (!nik || nik.length < 12) return null;
+      let rawTgl = nik.substring(6, 12); // Format DDMMYY
+      if (!/^\d{6}$/.test(rawTgl)) return null;
+      
+      let yy = parseInt(rawTgl.substring(4, 6));
+      let currentYY = new Date().getFullYear() % 100;
+      let fullYear = (yy > currentYY) ? (1900 + yy) : (2000 + yy);
+      return fullYear;
+    }
+
     function processData(json) {
+      const currentYear = new Date().getFullYear();
+
       rawData = json.map(item => {
         let nkk = cleanKey(item, ['nkk', 'nokk', 'nomorkk', 'kk']);
         let nik = cleanKey(item, ['nik', 'nomorinduk']);
         let nama = cleanKey(item, ['nama', 'namalengkap', 'namapemilih']);
         let tempatLahir = cleanKey(item, ['tempatlahir', 'tempat']);
-        let tglLahir = cleanKey(item, ['tgllahir', 'tanggallahir', 'tgl']);
-        let umur = cleanKey(item, ['umur', 'usia']);
+        let rawTglLahir = cleanKey(item, ['tgllahir', 'tanggallahir', 'tgl', 'tgl_lahir']);
+        let rawUmur = cleanKey(item, ['umur', 'usia', 'thn', 'umurthn']);
         let jk = cleanKey(item, ['jk', 'jeniskelamin', 'kelamin']);
         let sts = cleanKey(item, ['sts', 'status', 'statuskawin', 'kawin', 'stskawin', 'statusperkawinan', 'st']);
         let alamat = cleanKey(item, ['alamat', 'jalan', 'dusun']);
         let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
         let tps = cleanKey(item, ['tps', 'notps']);
 
+        // Parsing Tanggal Lahir
+        let parsedTgl = parseExcelDate(rawTglLahir);
+        
+        // Hitung Umur
+        let finalUmur = '';
+        if (rawUmur && !isNaN(parseInt(rawUmur))) {
+          finalUmur = parseInt(rawUmur).toString();
+        } else if (parsedTgl.year) {
+          finalUmur = (currentYear - parsedTgl.year).toString();
+        } else {
+          let yearFromNIK = getYearFromNIK(String(nik));
+          if (yearFromNIK) {
+            finalUmur = (currentYear - yearFromNIK).toString();
+          }
+        }
+
         return {
           nkk: nkk ? String(nkk).trim() : '',
           nik: nik ? String(nik).trim() : '',
           nama: nama ? String(nama).trim() : '',
           tempatLahir: tempatLahir ? String(tempatLahir).trim() : '',
-          tglLahir: tglLahir ? String(tglLahir).trim() : '',
-          umur: umur ? String(umur).trim() : '',
+          tglLahir: parsedTgl.text,
+          umur: finalUmur,
           jk: jk ? String(jk).toUpperCase().trim() : '',
           sts: normalizeStatus(sts),
           alamat: alamat ? String(alamat).trim() : '',
@@ -371,7 +422,7 @@
             <td class="p-3 font-mono font-bold">${d.nik || '-'}</td>
             <td class="p-3 font-extrabold">${d.nama || '-'}</td>
             <td class="p-3 opacity-80">${ttl}</td>
-            <td class="p-3 text-center font-medium">${d.umur || '-'}</td>
+            <td class="p-3 text-center font-bold text-indigo-500">${d.umur || '-'}</td>
             <td class="p-3 text-center">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.jk.startsWith('L') ? 'bg-blue-500/20 text-blue-500' : 'bg-pink-500/20 text-pink-500'}">
                 ${d.jk || '-'}
