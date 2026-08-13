@@ -21,70 +21,92 @@
         }
         .card-custom {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             background: #ffffff;
             margin-bottom: 20px;
         }
-        .filter-header {
-            color: #1e293b;
-            font-weight: 700;
-            font-size: 1.1rem;
+        .header-title {
+            font-weight: 800;
+            color: #0f172a;
         }
+        
+        /* STAT CARDS */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border: 1px solid #f1f5f9;
+            height: 100%;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .val-total { color: #4f46e5; }
+        .val-kk { color: #059669; }
+        .val-nik { color: #2563eb; }
+        .val-l { color: #2563eb; }
+        .val-p { color: #db2777; }
+        .val-sudah { color: #16a34a; }
+        .val-belum { color: #d97706; }
+        .val-pernah { color: #9333ea; }
+
+        /* CHART BOX */
+        .chart-box {
+            position: relative;
+            height: 200px;
+        }
+
+        /* TABLE STYLES */
         .table-container {
             overflow-x: auto;
         }
         .table th {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: #475569;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #cbd5e1;
+            border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
+            padding: 12px 10px;
         }
         .table td {
             font-size: 0.85rem;
             vertical-align: middle;
             white-space: nowrap;
             border-top: 1px solid #f1f5f9;
+            padding: 10px;
         }
         
-        /* CLASS PEMISAH KELUARGA / NKK BARU */
+        /* PEMISAH NKK / KELUARGA */
         .nkk-group-border td {
-            border-top: 2.5px solid #0f172a !important; /* Garis tebal pemisah NKK */
+            border-top: 2.5px solid #0f172a !important;
         }
 
-        .badge-jk-l { background-color: #dbeafe; color: #1e40af; }
-        .badge-jk-p { background-color: #fce7f3; color: #9d174d; }
-        .badge-sts { background-color: #f3e8ff; color: #6b21a8; }
-        .text-dp-id { color: #ef4444; font-weight: 600; }
-        .chart-box {
-            position: relative;
-            height: 220px;
-        }
+        .badge-jk-l { background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 4px 8px; }
+        .badge-jk-p { background-color: #fce7f3; color: #9d174d; font-weight: 600; padding: 4px 8px; }
+        .text-dp-id { color: #ef4444; font-weight: 700; }
 
-        /* STYLES TAMPILAN KHUSUS SAAT CETAK / PRINT */
+        /* PRINT STYLES */
         @media print {
-            .no-print, .card-custom:first-child, .card-custom:nth-child(2), .pagination, #pageSize, .d-flex.justify-content-between {
+            .no-print, .pagination, #pageSize {
                 display: none !important;
             }
-            body {
-                background: #fff;
-                padding: 0 !important;
-            }
-            .card-custom {
-                box-shadow: none !important;
-                padding: 0 !important;
-            }
-            .table th {
-                background-color: #e2e8f0 !important;
-                -webkit-print-color-adjust: exact;
-                color: #000 !important;
-            }
-            .nkk-group-border td {
-                border-top: 2px solid #000 !important; /* Garis cetak hitam tegas */
-            }
+            body { background: #fff; padding: 0 !important; }
+            .card-custom { box-shadow: none !important; padding: 0 !important; }
+            .table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; color: #000 !important; }
+            .nkk-group-border td { border-top: 2px solid #000 !important; }
         }
     </style>
 </head>
@@ -92,11 +114,75 @@
 
     <div class="container-fluid px-4">
         
-        <!-- DASHBOARD RINGKASAN DATA (3 GRAFIK UTAMA) -->
-        <div class="row no-print">
+        <!-- HEADER UTAMA -->
+        <div class="card card-custom p-4 no-print">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="header-title m-0">Dashboard & Filter Data Pemilih</h3>
+                    <small class="text-muted">Daftar Pemilih Sementara (DPS)</small>
+                </div>
+                <div>
+                    <button class="btn btn-success btn-sm text-white me-1" onclick="window.print()">
+                        <i class="fa-solid fa-print me-1"></i> Cetak / Print PDF
+                    </button>
+                    <button class="btn btn-primary btn-sm me-1" onclick="exportExcel()">
+                        <i class="fa-solid fa-file-excel me-1"></i> Export Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAT CARDS (RINGKASAN DATA) -->
+        <div class="row g-2 mb-3 no-print">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL DATA</div>
+                    <div class="stat-value val-total" id="stTotal">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">JUMLAH KK</div>
+                    <div class="stat-value val-kk" id="stKK">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">LAKI-LAKI (L)</div>
+                    <div class="stat-value val-l" id="stL">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">PEREMPUAN (P)</div>
+                    <div class="stat-value val-p" id="stP">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">SUDAH KAWIN (S)</div>
+                    <div class="stat-value val-sudah" id="stSudah">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">BELUM KAWIN (B)</div>
+                    <div class="stat-value val-belum" id="stBelum">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-12 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">PERNAH KAWIN (P)</div>
+                    <div class="stat-value val-pernah" id="stPernah">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFIK VISUAL (3 GRAFIK) -->
+        <div class="row g-3 mb-4 no-print">
             <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
-                    <h6 class="text-muted fw-bold mb-2">Jenis Kelamin</h6>
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-venus-mars me-1"></i> GENDER PEMILIH</h6>
                     <div class="chart-box">
                         <canvas id="chartJK"></canvas>
                     </div>
@@ -104,7 +190,7 @@
             </div>
             <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
-                    <h6 class="text-muted fw-bold mb-2">Status Perkawinan</h6>
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-ring me-1"></i> STATUS KAWIN</h6>
                     <div class="chart-box">
                         <canvas id="chartStatus"></canvas>
                     </div>
@@ -112,7 +198,7 @@
             </div>
             <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
-                    <h6 class="text-muted fw-bold mb-2">Kelompok Usia</h6>
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-chart-column me-1"></i> KELOMPOK UMUR</h6>
                     <div class="chart-box">
                         <canvas id="chartUmur"></canvas>
                     </div>
@@ -122,15 +208,7 @@
 
         <!-- PANEL FILTER -->
         <div class="card card-custom p-4 no-print">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="filter-header"><i class="fa-solid fa-filter text-primary me-2"></i>Filter Data Pemilih</span>
-                <div>
-                    <button class="btn btn-dark btn-sm me-1" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> Cetak / Print PDF</button>
-                    <button class="btn btn-success btn-sm me-1" onclick="exportExcel()"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
-                    <button class="btn btn-info btn-sm text-white" onclick="exportCSV()"><i class="fa-solid fa-file-csv me-1"></i> Export CSV</button>
-                </div>
-            </div>
-
+            <h6 class="fw-bold mb-3 text-slate-700"><i class="fa-solid fa-filter me-2 text-primary"></i>Filter Data Pemilih</h6>
             <div class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label text-muted small fw-bold">CARI (NAMA/NIK/NKK/ALAMAT/DP-ID)</label>
@@ -160,7 +238,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
+                    <button class="btn btn-secondary btn-sm w-100" style="background-color: #64748b; border:none;" onclick="resetFilter()">Reset Filter</button>
                 </div>
             </div>
         </div>
@@ -169,7 +247,7 @@
         <div class="card card-custom p-4">
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                 <div class="d-flex align-items-center">
-                    <span class="me-2 text-muted small">Baris per halaman:</span>
+                    <span class="me-2 text-muted small fw-bold">Baris per halaman:</span>
                     <select id="pageSize" class="form-select form-select-sm" style="width: 80px;" onchange="changePageSize()">
                         <option value="10">10</option>
                         <option value="50">50</option>
@@ -196,7 +274,7 @@
                             <th class="text-center">STS</th>
                             <th>ALAMAT</th>
                             <th class="text-center">RT</th>
-                            <th class="text-center">KETERANGAN</th>
+                            <th class="text-center" style="min-width: 120px;">KETERANGAN</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -288,8 +366,19 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
+                    let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
                     
+                    // PROSES PENGURUTAN BERDASARKAN RT (1, 2, 3...) KEMUDIAN NKK
+                    rawData = loadedData.sort((a, b) => {
+                        let rtA = parseInt(getValue(a, 'RT', 'RT KTP')) || 999;
+                        let rtB = parseInt(getValue(b, 'RT', 'RT KTP')) || 999;
+                        if (rtA !== rtB) return rtA - rtB;
+
+                        let nkkA = String(getValue(a, 'NKK')).trim();
+                        let nkkB = String(getValue(b, 'NKK')).trim();
+                        return nkkA.localeCompare(nkkB);
+                    });
+
                     initDropdowns();
                     applyFilter();
                     initCharts();
@@ -306,10 +395,9 @@
 
         function initDropdowns() {
             const rtSet = new Set();
-
             rawData.forEach(row => {
                 let rt = getValue(row, 'RT', 'RT KTP');
-                if (rt) rtSet.add(String(rt).trim());
+                if (rt) rtSet.add(parseInt(rt) || String(rt).trim());
             });
 
             const filterRT = document.getElementById('filterRT');
@@ -352,7 +440,36 @@
 
             currentPage = 1;
             renderTable();
+            updateStats();
             updateCharts();
+        }
+
+        function updateStats() {
+            const total = filteredData.length;
+            const kkSet = new Set();
+            let l = 0, p = 0, s = 0, b = 0, pr = 0;
+
+            filteredData.forEach(row => {
+                const nkk = getValue(row, 'NKK');
+                if (nkk) kkSet.add(String(nkk).trim());
+
+                const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
+                if (jk === 'L') l++;
+                else if (jk === 'P') p++;
+
+                const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
+                if (sts === 'S') s++;
+                else if (sts === 'B') b++;
+                else if (sts === 'P') pr++;
+            });
+
+            document.getElementById('stTotal').innerText = total.toLocaleString('id-ID');
+            document.getElementById('stKK').innerText = kkSet.size.toLocaleString('id-ID');
+            document.getElementById('stL').innerText = l.toLocaleString('id-ID');
+            document.getElementById('stP').innerText = p.toLocaleString('id-ID');
+            document.getElementById('stSudah').innerText = s.toLocaleString('id-ID');
+            document.getElementById('stBelum').innerText = b.toLocaleString('id-ID');
+            document.getElementById('stPernah').innerText = pr.toLocaleString('id-ID');
         }
 
         function renderTable() {
@@ -390,7 +507,6 @@
 
                 const tr = document.createElement('tr');
 
-                // PEMISAH DENGAN GARIS TEBAL JIKA BEDA NKK
                 if (lastNKK !== null && nkk !== lastNKK) {
                     tr.classList.add('nkk-group-border');
                 }
@@ -403,12 +519,12 @@
                     <td>${nik}</td>
                     <td class="fw-bold">${nama}</td>
                     <td>${ttl}</td>
-                    <td class="text-center">${umur}</td>
+                    <td class="text-center">${umur} thn</td>
                     <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
-                    <td class="text-center"><span class="badge badge-sts">${sts}</span></td>
+                    <td class="text-center">${sts}</td>
                     <td>${alamat}</td>
-                    <td class="text-center">${rt}</td>
-                    <td></td> <!-- KOLOM KETERANGAN KOSONG -->
+                    <td class="text-center fw-bold">${rt}</td>
+                    <td></td> <!-- KETERANGAN KOSONG -->
                 `;
                 tbody.appendChild(tr);
             });
@@ -462,19 +578,7 @@
             const ws = XLSX.utils.json_to_sheet(filteredData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Data_Pemilih");
-            XLSX.writeFile(wb, "Data_Pemilih_Filtered.xlsx");
-        }
-
-        function exportCSV() {
-            const ws = XLSX.utils.json_to_sheet(filteredData);
-            const csv = XLSX.utils.sheet_to_csv(ws);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", "Data_Pemilih_Filtered.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            XLSX.writeFile(wb, "Data_Pemilih_Sorted_RT.xlsx");
         }
 
         function initCharts() {
@@ -492,7 +596,7 @@
 
             chartUmurObj = new Chart(document.getElementById('chartUmur'), {
                 type: 'bar',
-                data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Jumlah', data: [0,0,0,0], backgroundColor: '#10b981' }] },
+                data: { labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'], datasets: [{ label: 'Pemilih', data: [0,0,0,0], backgroundColor: '#f59e0b' }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
@@ -513,17 +617,17 @@
             chartStatusObj.data.datasets[0].data = [s, b, pr];
             chartStatusObj.update();
 
-            let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
+            let u17 = 0, u30 = 0, u50 = 0, uOld = 0;
             filteredData.forEach(d => {
                 let u = parseInt(getValue(d, 'USIA', 'UMUR'));
                 if (!isNaN(u)) {
-                    if (u < 20) u20++;
-                    else if (u < 40) u40++;
-                    else if (u < 60) u60++;
+                    if (u < 17) u17++;
+                    else if (u <= 30) u30++;
+                    else if (u <= 50) u50++;
                     else uOld++;
                 }
             });
-            chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
+            chartUmurObj.data.datasets[0].data = [u17, u30, u50, uOld];
             chartUmurObj.update();
         }
     </script>
