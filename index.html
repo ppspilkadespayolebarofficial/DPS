@@ -45,9 +45,9 @@
                 <button onclick="cetakSemuaData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center gap-2 cursor-pointer">
                     🖨️ Cetak / Print PDF
                 </button>
-                <!-- Tombol Import Excel -->
+                <!-- Tombol Import Excel (Opsional jika ingin ganti file) -->
                 <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition shadow-sm inline-block">
-                    📂 Import File Excel (.xlsx)
+                    📂 Import File Baru (.xlsx)
                     <input type="file" id="excelFile" accept=".xlsx, .xls" class="hidden">
                 </label>
             </div>
@@ -167,7 +167,7 @@
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700">
                         <tr>
-                            <td colspan="11" class="p-8 text-center text-slate-400">Silakan upload file Excel untuk melihat data.</td>
+                            <td colspan="11" class="p-8 text-center text-slate-400">Memuat data otomatis...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -191,8 +191,25 @@
         let rowsPerPage = 100;
         let isPrintingAll = false;
 
-        // Tanggal Patokan Perhitungan Umur: 29 Oktober 2026
         const TARGET_DATE = new Date(2026, 9, 29);
+
+        // Opsi otomatis mengambil file data.xlsx yang di-upload bersama di GitHub
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('data.xlsx')
+                .then(res => {
+                    if (!res.ok) throw new Error("File data.xlsx tidak ditemukan");
+                    return res.arrayBuffer();
+                })
+                .then(ab => {
+                    const workbook = XLSX.read(new Uint8Array(ab), {type: 'array', cellDates: true});
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    processExcelData(json);
+                })
+                .catch(err => {
+                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="p-8 text-center text-slate-400">Silakan upload file data.xlsx di GitHub atau klik tombol import di atas.</td></tr>';
+                });
+        });
 
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -202,9 +219,7 @@
             reader.onload = function(evt) {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, {type: 'array', cellDates: true});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
                 processExcelData(json);
             };
@@ -213,14 +228,10 @@
 
         function calculateAge(birthDateObj) {
             if (!birthDateObj || isNaN(birthDateObj.getTime())) return '-';
-            
             let age = TARGET_DATE.getFullYear() - birthDateObj.getFullYear();
             const monthDiff = TARGET_DATE.getMonth() - birthDateObj.getMonth();
             const dayDiff = TARGET_DATE.getDate() - birthDateObj.getDate();
-
-            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-                age--;
-            }
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
             return age >= 0 ? age : 0;
         }
 
@@ -248,8 +259,6 @@
                     birthObj = new Date(tglLahirStr);
                 }
 
-                const calculatedAge = calculateAge(birthObj);
-
                 rawData.push({
                     no: row[0] || '',
                     nkk: row[1] ? String(row[1]) : '',
@@ -257,7 +266,7 @@
                     nama: nama,
                     tempatLahir: row[4] || '',
                     tglLahir: tglLahirStr,
-                    umur: calculatedAge,
+                    umur: calculateAge(birthObj),
                     statusKawin: row[7] ? String(row[7]).trim() : '',
                     kelamin: row[8] ? String(row[8]).trim() : '',
                     alamat: row[9] || '',
@@ -271,7 +280,6 @@
         }
 
         function populateDropdowns() {
-            // Dropdown TPS
             const tpsSet = new Set(rawData.map(d => d.tps).filter(t => t !== ''));
             const tpsSelect = document.getElementById('filterTPS');
             tpsSelect.innerHTML = '<option value="">-- Semua TPS --</option>';
@@ -282,7 +290,6 @@
                 tpsSelect.appendChild(opt);
             });
 
-            // Dropdown RT
             const rtSet = new Set(rawData.map(d => d.rt).filter(r => r !== ''));
             const rtSelect = document.getElementById('filterRT');
             rtSelect.innerHTML = '<option value="">-- Semua RT --</option>';
@@ -331,7 +338,6 @@
             }
 
             let displayData = filteredData;
-            
             if (!isPrintingAll) {
                 const start = (currentPage - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
@@ -339,7 +345,6 @@
             }
 
             const fragment = document.createDocumentFragment();
-
             displayData.forEach((d, idx) => {
                 const globalIndex = isPrintingAll ? idx + 1 : ((currentPage - 1) * rowsPerPage) + idx + 1;
                 const tr = document.createElement('tr');
@@ -380,7 +385,6 @@
         function cetakSemuaData() {
             isPrintingAll = true;
             renderTable();
-
             setTimeout(() => {
                 window.print();
                 isPrintingAll = false;
@@ -389,18 +393,12 @@
         }
 
         document.getElementById('btnPrev').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-            }
+            if (currentPage > 1) { currentPage--; renderTable(); }
         });
 
         document.getElementById('btnNext').addEventListener('click', () => {
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderTable();
-            }
+            if (currentPage < totalPages) { currentPage++; renderTable(); }
         });
 
         document.getElementById('pageSize').addEventListener('change', (e) => {
@@ -410,27 +408,19 @@
         });
 
         function updateStats() {
-            // Total Data
             document.getElementById('statTotal').textContent = filteredData.length.toLocaleString('id-ID');
-            
-            // Hitung Jumlah KK Unik
             const uniqueKK = new Set(filteredData.map(d => d.nkk).filter(k => k !== ''));
             document.getElementById('statKK').textContent = uniqueKK.size.toLocaleString('id-ID');
-
-            // Hitung Jumlah NIK Unik/Valid
             const validNIK = filteredData.filter(d => d.nik !== '');
             document.getElementById('statNIK').textContent = validNIK.length.toLocaleString('id-ID');
 
-            // Jenis Kelamin
             document.getElementById('statLaki').textContent = filteredData.filter(d => d.kelamin === 'L').length.toLocaleString('id-ID');
             document.getElementById('statPerempuan').textContent = filteredData.filter(d => d.kelamin === 'P').length.toLocaleString('id-ID');
 
-            // Status Perkawinan
             document.getElementById('statSudahKawin').textContent = filteredData.filter(d => d.statusKawin === 'S').length.toLocaleString('id-ID');
             document.getElementById('statBelumKawin').textContent = filteredData.filter(d => d.statusKawin === 'B').length.toLocaleString('id-ID');
             document.getElementById('statPernahKawin').textContent = filteredData.filter(d => d.statusKawin === 'P').length.toLocaleString('id-ID');
 
-            // TPS
             const uniqueTPS = new Set(filteredData.map(d => d.tps).filter(t => t !== ''));
             document.getElementById('statTPS').textContent = uniqueTPS.size;
 
