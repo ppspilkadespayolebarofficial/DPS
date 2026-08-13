@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SheetJS (XLSX) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Chart.js (Untuk Grafik) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -85,6 +87,51 @@
         <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">JUMLAH TPS</p>
         <p class="text-2xl font-black mt-1 text-violet-500" id="statTPS">0</p>
       </div>
+    </div>
+
+    <!-- Charts Section (GRAFIK VIZUAL) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Chart 1: Gender -->
+      <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
+          <i class="fa-solid fa-venus-mars mr-1 text-indigo-500"></i> Gender Pemilih
+        </h3>
+        <div class="w-full h-48 relative flex justify-center items-center">
+          <canvas id="chartJK"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Status Kawin -->
+      <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
+          <i class="fa-solid fa-ring mr-1 text-teal-500"></i> Status Kawin
+        </h3>
+        <div class="w-full h-48 relative flex justify-center items-center">
+          <canvas id="chartStatus"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: Kelompok Umur -->
+      <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
+          <i class="fa-solid fa-cake-candles mr-1 text-amber-500"></i> Kelompok Umur
+        </h3>
+        <div class="w-full h-48 relative flex justify-center items-center">
+          <canvas id="chartUmur"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 4: Pemilih Per TPS -->
+      <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
+          <i class="fa-solid fa-box-archive mr-1 text-violet-500"></i> Pemilih per TPS
+        </h3>
+        <div class="w-full h-48 relative flex justify-center items-center">
+          <canvas id="chartTPS"></canvas>
+        </div>
+      </div>
+
     </div>
 
     <!-- Filter Section -->
@@ -187,6 +234,12 @@
     let filteredData = [];
     let currentPage = 1;
 
+    // Object Referensi Chart.js
+    let chartJKInst = null;
+    let chartStatusInst = null;
+    let chartUmurInst = null;
+    let chartTPSInst = null;
+
     function changeTheme(themeName) {
       document.body.className = themeName + ' min-h-screen p-4 md:p-8';
       localStorage.setItem('selectedTheme', themeName);
@@ -243,13 +296,10 @@
       return str;
     }
 
-    // Pembersih Tanggal Lahir (Mengubah Date String ke DD/MM/YYYY)
     function cleanDateOnly(val) {
       if (!val) return { text: '', year: null };
-
       let strVal = String(val).trim();
 
-      // Jika format Date Javascript Bawaan (misal: "Sat Aug 12 1972 23:59:48 GMT...")
       let parsedDate = new Date(strVal);
       if (!isNaN(parsedDate.getTime()) && strVal.length > 15) {
         let day = String(parsedDate.getDate()).padStart(2, '0');
@@ -258,7 +308,6 @@
         return { text: `${day}/${month}/${year}`, year: year };
       }
 
-      // Ambil Tahun untuk Perhitungan Umur
       let matchYear = strVal.match(/\b(19\d\d|20\d\d)\b/);
       let year = matchYear ? parseInt(matchYear[1]) : null;
 
@@ -291,10 +340,8 @@
         let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
         let tps = cleanKey(item, ['tps', 'notps']);
 
-        // Pembersihan Tanggal Lahir
         let parsedTgl = cleanDateOnly(rawTglLahir);
         
-        // Hitung Umur
         let finalUmur = '';
         if (rawUmur && !isNaN(parseInt(rawUmur))) {
           finalUmur = parseInt(rawUmur).toString();
@@ -340,7 +387,7 @@
         tpss.map(t => `<option value="${t}" class="text-slate-800">TPS ${t}</option>`).join('');
     }
 
-    function updateStats() {
+    function updateStatsAndCharts() {
       document.getElementById('statTotal').innerText = filteredData.length.toLocaleString('id-ID');
       
       let uniqueKK = new Set(filteredData.map(d => d.nkk).filter(Boolean)).size;
@@ -362,6 +409,101 @@
       document.getElementById('statBelumKawin').innerText = belum.toLocaleString('id-ID');
       document.getElementById('statPernahKawin').innerText = pernah.toLocaleString('id-ID');
       document.getElementById('statTPS').innerText = uniqueTPS.toLocaleString('id-ID');
+
+      // --- RENDER/UPDATE GRAFIK ---
+      renderCharts(laki, perempuan, sudah, belum, pernah);
+    }
+
+    function renderCharts(laki, perempuan, sudah, belum, pernah) {
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+        }
+      };
+
+      // 1. Chart JK
+      if (chartJKInst) chartJKInst.destroy();
+      chartJKInst = new Chart(document.getElementById('chartJK'), {
+        type: 'pie',
+        data: {
+          labels: ['Laki-Laki', 'Perempuan'],
+          datasets: [{
+            data: [laki, perempuan],
+            backgroundColor: ['#3b82f6', '#ec4899']
+          }]
+        },
+        options: chartOptions
+      });
+
+      // 2. Chart Status Kawin
+      if (chartStatusInst) chartStatusInst.destroy();
+      chartStatusInst = new Chart(document.getElementById('chartStatus'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'],
+          datasets: [{
+            data: [sudah, belum, pernah],
+            backgroundColor: ['#14b8a6', '#f59e0b', '#a855f7']
+          }]
+        },
+        options: chartOptions
+      });
+
+      // 3. Chart Kelompok Umur
+      let u17 = 0, u30 = 0, u50 = 0, uTua = 0;
+      filteredData.forEach(d => {
+        let u = parseInt(d.umur);
+        if(!isNaN(u)) {
+          if (u < 17) u17++;
+          else if (u <= 30) u30++;
+          else if (u <= 50) u50++;
+          else uTua++;
+        }
+      });
+
+      if (chartUmurInst) chartUmurInst.destroy();
+      chartUmurInst = new Chart(document.getElementById('chartUmur'), {
+        type: 'bar',
+        data: {
+          labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'],
+          datasets: [{
+            label: 'Orang',
+            data: [u17, u30, u50, uTua],
+            backgroundColor: '#f59e0b'
+          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // 4. Chart Per TPS
+      let tpsMap = {};
+      filteredData.forEach(d => {
+        if(d.tps) tpsMap[d.tps] = (tpsMap[d.tps] || 0) + 1;
+      });
+      let tpsLabels = Object.keys(tpsMap).sort((a,b)=>Number(a)-Number(b)).map(t => 'TPS ' + t);
+      let tpsCounts = Object.keys(tpsMap).sort((a,b)=>Number(a)-Number(b)).map(t => tpsMap[t]);
+
+      if (chartTPSInst) chartTPSInst.destroy();
+      chartTPSInst = new Chart(document.getElementById('chartTPS'), {
+        type: 'bar',
+        data: {
+          labels: tpsLabels.length ? tpsLabels : ['-'],
+          datasets: [{
+            label: 'Pemilih',
+            data: tpsCounts.length ? tpsCounts : [0],
+            backgroundColor: '#8b5cf6'
+          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: { legend: { display: false } }
+        }
+      });
     }
 
     function applyFilter() {
@@ -387,7 +529,7 @@
       });
 
       currentPage = 1;
-      updateStats();
+      updateStatsAndCharts();
       renderTable();
     }
 
