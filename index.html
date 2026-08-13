@@ -74,7 +74,7 @@
         </div>
         <div class="col-md-3">
             <div class="card p-3 text-center">
-                <h6>Status Perkwinan</h6>
+                <h6>Status Perkawinan</h6>
                 <div class="chart-container">
                     <canvas id="chartStatus"></canvas>
                 </div>
@@ -202,30 +202,45 @@
     let currentPage = 1;
     let pageSize = 100;
 
-    // FUNGSI UTAMA: Konversi Serial Number Date Excel ke Format Tanggal DD/MM/YYYY
-    function formatExcelDate(excelDate) {
-        if (!excelDate) return '-';
+    // FUNGSI KHUSUS MENGUBAH ANGKA SERIAL EXCEL MENJADI TANGGAL DD/MM/YYYY
+    function convertSerialToDate(serial) {
+        let num = Number(serial);
+        if (isNaN(num) || num < 1000) return serial;
         
-        // Jika data berupa string yang sudah ada garing atau strip (misal "15/06/1990" atau "1990-06-15")
-        if (typeof excelDate === 'string' && (excelDate.includes('/') || excelDate.includes('-'))) {
-            return excelDate.replace(/-/g, '/');
-        }
-        
-        // Jika data berupa angka serial number Excel (misal 24327, 38167)
-        let num = Number(excelDate);
-        if (!isNaN(num) && num > 1000) {
-            // Formula konversi serial date Excel ke JavaScript Date
-            let date = new Date((num - (25567 + 2)) * 86400 * 1000);
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-        
-        return excelDate;
+        // Formula konversi Serial Number Excel ke Tanggal JS
+        let date = new Date((num - (25567 + 2)) * 86400 * 1000);
+        let day = String(date.getDate()).padStart(2, '0');
+        let month = String(date.getMonth() + 1).padStart(2, '0');
+        let year = date.getFullYear();
+        return `${day}/${month}/${year}`;
     }
 
-    // Mengambil file data.xlsx saat halaman dimuat
+    // FUNGSI MEMPROSES TEKS "TEMPAT, 24305" BEBAS SERIAL NUMBER
+    function parseTempatTglLahir(val) {
+        if (!val) return '-';
+        let str = String(val).trim();
+
+        // 1. Jika ada koma, misal "JAWA TIMUR, 24305"
+        if (str.includes(',')) {
+            let parts = str.split(',');
+            let tempat = parts[0].trim();
+            let tglPart = parts[1].trim();
+
+            // Jika bagian setelah koma adalah angka 5 digit (serial Excel)
+            if (/^\d{4,5}$/.test(tglPart)) {
+                return `${tempat}, ${convertSerialToDate(tglPart)}`;
+            }
+            return `${tempat}, ${tglPart.replace(/-/g, '/')}`;
+        }
+
+        // 2. Jika seluruh isi cell hanya angka serial Excel
+        if (/^\d{4,5}$/.test(str)) {
+            return convertSerialToDate(str);
+        }
+
+        return str.replace(/-/g, '/');
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         fetch('data.xlsx')
             .then(res => res.arrayBuffer())
@@ -234,7 +249,6 @@
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 
-                // Mengonversi worksheet ke JSON
                 rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
                 
                 initDropdowns();
@@ -315,12 +329,9 @@
         const pageData = filteredData.slice(startIdx, endIdx);
 
         pageData.forEach((row, index) => {
-            const tempat = row.TEMPAT_LAHIR || row.TEMPAT || '';
-            const rawTgl = row.TGL_LAHIR || row.TANGGAL_LAHIR || '';
-            
-            // Menggunakan Fungsi Format Tanggal
-            const tglFormatted = formatExcelDate(rawTgl);
-            const tempatTgl = tempat ? `${tempat}, ${tglFormatted}` : tglFormatted;
+            // Mengambil data dari berbagai kemungkinan nama kolom di Excel
+            const rawTempatTgl = row['TEMPAT / TGL LAHIR'] || row['TEMPAT/TGL LAHIR'] || row['TEMPAT_TGL_LAHIR'] || row['TEMPAT LAHIR'] || '';
+            const tempatTglFormatted = parseTempatTglLahir(rawTempatTgl);
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -329,7 +340,7 @@
                 <td>${row.NKK || '-'}</td>
                 <td>${row.NIK || '-'}</td>
                 <td class="fw-bold">${row.NAMA || '-'}</td>
-                <td>${tempatTgl}</td>
+                <td>${tempatTglFormatted}</td>
                 <td class="text-center">${row.UMUR || '-'}</td>
                 <td class="text-center"><span class="badge ${row.JK === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${row.JK || '-'}</span></td>
                 <td class="text-center"><span class="badge badge-sts">${row.STS || '-'}</span></td>
@@ -406,7 +417,6 @@
     }
 
     function initCharts() {
-        // Chart JK
         new Chart(document.getElementById('chartJK'), {
             type: 'doughnut',
             data: {
@@ -422,7 +432,6 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Chart Status
         new Chart(document.getElementById('chartStatus'), {
             type: 'doughnut',
             data: {
