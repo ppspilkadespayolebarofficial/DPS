@@ -26,11 +26,17 @@
 
     /* Pengaturan Khusus Halaman Print */
     @media print {
+      @page {
+        size: landscape;
+        margin: 10mm;
+      }
       .no-print { display: none !important; }
       body { background-color: #ffffff !important; color: #000000 !important; padding: 0 !important; }
-      .card-theme { border: none !important; shadow: none !important; background-color: transparent !important; }
-      table { width: 100% !important; font-size: 10px !important; border-collapse: collapse !important; }
-      th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+      .card-theme { border: none !important; box-shadow: none !important; background-color: transparent !important; padding: 0 !important; }
+      .overflow-x-auto { overflow: visible !important; }
+      table { width: 100% !important; font-size: 9px !important; border-collapse: collapse !important; table-layout: auto !important; }
+      th, td { border: 1px solid #94a3b8 !important; padding: 4px 6px !important; color: #000 !important; }
+      th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -48,7 +54,7 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
         <!-- Badge Waktu Update -->
         <div class="flex items-center gap-2 card-theme px-3 py-2 rounded-xl border text-xs font-semibold opacity-80">
-          <i class="fa-regular fa-clock text-indigo-500"></i>
+          <i class="fa-regular fa-clock text-indigo-500 no-print"></i>
           <span>Update: <strong id="lastUpdateText" class="text-indigo-500">Memuat...</strong></span>
         </div>
 
@@ -66,8 +72,8 @@
       </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="statsContainer">
+    <!-- Stats Cards (Disembunyikan Saat Print) -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 no-print" id="statsContainer">
       <div class="card-theme p-4 rounded-xl border shadow-sm">
         <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">TOTAL DATA</p>
         <p class="text-2xl font-black mt-1 text-indigo-500" id="statTotal">0</p>
@@ -110,7 +116,7 @@
       </div>
     </div>
 
-    <!-- Charts Section -->
+    <!-- Charts Section (Disembunyikan Saat Print) -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
@@ -149,7 +155,7 @@
       </div>
     </div>
 
-    <!-- Filter Section & Tombol Aksi Export/Print -->
+    <!-- Filter Section (Disembunyikan Saat Print) -->
     <div class="card-theme p-6 rounded-2xl shadow-sm border space-y-4 no-print">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div class="flex items-center gap-2 font-bold text-lg">
@@ -157,7 +163,6 @@
           <h2>Filter Data Pemilih</h2>
         </div>
 
-        <!-- Tombol Print dan Export Data -->
         <div class="flex flex-wrap items-center gap-2">
           <button onclick="printData()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-print"></i> Cetak / Print PDF
@@ -275,7 +280,6 @@
       localStorage.setItem('selectedTheme', themeName);
     }
 
-    // Fungsi Format Tanggal & Jam Update
     function setLastUpdateHeader(lastModifiedHeader) {
       let updateDate = lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
       let day = String(updateDate.getDate()).padStart(2, '0');
@@ -295,10 +299,8 @@
       fetch('data.xlsx')
         .then(res => {
           if(!res.ok) throw new Error('File data.xlsx tidak ditemukan');
-          
           let lastMod = res.headers.get('Last-Modified');
           setLastUpdateHeader(lastMod);
-
           return res.arrayBuffer();
         })
         .then(buffer => {
@@ -478,10 +480,7 @@
         type: 'pie',
         data: {
           labels: ['Laki-Laki', 'Perempuan'],
-          datasets: [{
-            data: [laki, perempuan],
-            backgroundColor: ['#3b82f6', '#ec4899']
-          }]
+          datasets: [{ data: [laki, perempuan], backgroundColor: ['#3b82f6', '#ec4899'] }]
         },
         options: chartOptions
       });
@@ -491,10 +490,7 @@
         type: 'doughnut',
         data: {
           labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'],
-          datasets: [{
-            data: [sudah, belum, pernah],
-            backgroundColor: ['#14b8a6', '#f59e0b', '#a855f7']
-          }]
+          datasets: [{ data: [sudah, belum, pernah], backgroundColor: ['#14b8a6', '#f59e0b', '#a855f7'] }]
         },
         options: chartOptions
       });
@@ -515,22 +511,13 @@
         type: 'bar',
         data: {
           labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'],
-          datasets: [{
-            label: 'Orang',
-            data: [u17, u30, u50, uTua],
-            backgroundColor: '#f59e0b'
-          }]
+          datasets: [{ label: 'Orang', data: [u17, u30, u50, uTua], backgroundColor: '#f59e0b' }]
         },
-        options: {
-          ...chartOptions,
-          plugins: { legend: { display: false } }
-        }
+        options: { ...chartOptions, plugins: { legend: { display: false } } }
       });
 
       let tpsMap = {};
-      filteredData.forEach(d => {
-        if(d.tps) tpsMap[d.tps] = (tpsMap[d.tps] || 0) + 1;
-      });
+      filteredData.forEach(d => { if(d.tps) tpsMap[d.tps] = (tpsMap[d.tps] || 0) + 1; });
       let tpsLabels = Object.keys(tpsMap).sort((a,b)=>Number(a)-Number(b)).map(t => 'TPS ' + t);
       let tpsCounts = Object.keys(tpsMap).sort((a,b)=>Number(a)-Number(b)).map(t => tpsMap[t]);
 
@@ -539,16 +526,9 @@
         type: 'bar',
         data: {
           labels: tpsLabels.length ? tpsLabels : ['-'],
-          datasets: [{
-            label: 'Pemilih',
-            data: tpsCounts.length ? tpsCounts : [0],
-            backgroundColor: '#8b5cf6'
-          }]
+          datasets: [{ label: 'Pemilih', data: tpsCounts.length ? tpsCounts : [0], backgroundColor: '#8b5cf6' }]
         },
-        options: {
-          ...chartOptions,
-          plugins: { legend: { display: false } }
-        }
+        options: { ...chartOptions, plugins: { legend: { display: false } } }
       });
     }
 
@@ -616,7 +596,7 @@
               </span>
             </td>
             <td class="p-3 text-center font-bold text-indigo-500">${d.sts || '-'}</td>
-            <td class="p-3 opacity-80">${d.alamat || '-'}</td>
+            <td class="p-3 opacity-80 whitespace-normal">${d.alamat || '-'}</td>
             <td class="p-3 text-center font-semibold">${d.rt || '-'}</td>
             <td class="p-3 text-center whitespace-nowrap">
               <span class="inline-block min-w-[65px] px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-500 font-bold text-xs text-center">
@@ -643,7 +623,6 @@
       renderTable();
     }
 
-    // Fungsi Export Ke Excel
     function exportToExcel() {
       if (!filteredData.length) return alert('Tidak ada data yang dapat di-export!');
       const exportFormat = filteredData.map((d, index) => ({
@@ -667,7 +646,6 @@
       XLSX.writeFile(wb, `Data_Pemilih_Terfilter_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
-    // Fungsi Export Ke CSV
     function exportToCSV() {
       if (!filteredData.length) return alert('Tidak ada data yang dapat di-export!');
       const exportFormat = filteredData.map((d, index) => ({
@@ -697,7 +675,6 @@
       document.body.removeChild(link);
     }
 
-    // Fungsi Print Halaman
     function printData() {
       window.print();
     }
