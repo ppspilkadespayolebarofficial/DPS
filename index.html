@@ -3,359 +3,528 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Data Kependudukan</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS (XLSX) untuk membaca file Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- FontAwesome untuk Icon -->
+    <title>Dashboard & Filter Data Pemilih</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Font Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* Custom Theme Styles */
-        body.theme-light { background-color: #f3f4f6; color: #1f2937; }
-        body.theme-dark { background-color: #111827; color: #f9fafb; }
-        body.theme-dark .bg-card { background-color: #1f2937; color: #f9fafb; border-color: #374151; }
-        body.theme-dark table th { background-color: #374151; color: #f9fafb; }
-        body.theme-dark table td { border-color: #374151; }
-        body.theme-dark input, body.theme-dark select { background-color: #374151; color: #fff; border-color: #4b5563; }
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: #ffffff;
+            margin-bottom: 20px;
+        }
+        .filter-header {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #cbd5e1;
+            white-space: nowrap;
+        }
+        .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+            white-space: nowrap;
+            border-top: 1px solid #f1f5f9;
+        }
         
-        body.theme-emerald { background-color: #ecfdf5; color: #064e3b; }
-        body.theme-emerald .bg-card { background-color: #ffffff; color: #064e3b; border-color: #a7f3d0; }
-        body.theme-emerald table th { background-color: #059669; color: #ffffff; }
+        /* CLASS PEMISAH KELUARGA / NKK BARU */
+        .nkk-group-border td {
+            border-top: 2.5px solid #0f172a !important; /* Garis tebal pemisah NKK */
+        }
 
-        /* Print Styling */
+        .badge-jk-l { background-color: #dbeafe; color: #1e40af; }
+        .badge-jk-p { background-color: #fce7f3; color: #9d174d; }
+        .badge-sts { background-color: #f3e8ff; color: #6b21a8; }
+        .text-dp-id { color: #ef4444; font-weight: 600; }
+        .chart-box {
+            position: relative;
+            height: 220px;
+        }
+
+        /* STYLES TAMPILAN KHUSUS SAAT CETAK / PRINT */
         @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; color: black !important; }
-            .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
-            .shadow, .shadow-lg { box-shadow: none !important; }
-            table { width: 100% !important; border-collapse: collapse !important; font-size: 10pt; }
-            th, td { border: 1px solid #000 !important; padding: 4px 8px !important; }
+            .no-print, .card-custom:first-child, .card-custom:nth-child(2), .pagination, #pageSize, .d-flex.justify-content-between {
+                display: none !important;
+            }
+            body {
+                background: #fff;
+                padding: 0 !important;
+            }
+            .card-custom {
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+            .table th {
+                background-color: #e2e8f0 !important;
+                -webkit-print-color-adjust: exact;
+                color: #000 !important;
+            }
+            .nkk-group-border td {
+                border-top: 2px solid #000 !important; /* Garis cetak hitam tegas */
+            }
         }
     </style>
 </head>
-<body class="theme-light transition-colors duration-200 min-h-screen">
+<body class="py-4">
 
-    <div class="container mx-auto px-4 py-6">
-        <!-- Header & Theme Selector -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 no-print">
-            <div>
-                <h1 class="text-2xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-users-rectangle text-blue-600"></i>
-                    Aplikasi Data Kependudukan
-                </h1>
-                <p class="text-sm opacity-75">Kelola, Filter, Review, dan Export Data Kependudukan</p>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <label for="themeSelect" class="text-sm font-medium"><i class="fa-solid fa-palette"></i> Tema:</label>
-                <select id="themeSelect" onchange="changeTheme(this.value)" class="p-2 rounded-lg border text-sm focus:ring">
-                    <option value="theme-light">Light (Terang)</option>
-                    <option value="theme-dark">Dark (Gelap)</option>
-                    <option value="theme-emerald">Emerald (Hijau)</option>
-                </select>
-            </div>
-        </header>
-
-        <!-- Stats Widget (No Print) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
-            <div class="bg-card p-4 rounded-xl shadow border">
-                <p class="text-xs opacity-75 font-semibold">Total Data Tampil</p>
-                <h3 id="statTotal" class="text-2xl font-bold">0</h3>
-            </div>
-            <div class="bg-card p-4 rounded-xl shadow border">
-                <p class="text-xs opacity-75 font-semibold">Laki-Laki (L)</p>
-                <h3 id="statLaki" class="text-2xl font-bold text-blue-500">0</h3>
-            </div>
-            <div class="bg-card p-4 rounded-xl shadow border">
-                <p class="text-xs opacity-75 font-semibold">Perempuan (P)</p>
-                <h3 id="statPerempuan" class="text-2xl font-bold text-pink-500">0</h3>
-            </div>
-            <div class="bg-card p-4 rounded-xl shadow border">
-                <p class="text-xs opacity-75 font-semibold">Jumlah RT Terdata</p>
-                <h3 id="statRT" class="text-2xl font-bold text-emerald-500">0</h3>
-            </div>
-        </div>
-
-        <!-- Toolbar: Upload & Controls -->
-        <div class="bg-card p-5 rounded-xl shadow border mb-6 no-print">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <!-- File Upload -->
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-1">Upload File Excel (data.xlsx)</label>
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border rounded-lg"/>
-                </div>
-
-                <!-- Global Search -->
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-1">Cari Data</label>
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="Cari Nama, NIK, NKK, Dusun..." oninput="applyFilters()" class="w-full p-2 pl-8 text-sm rounded-lg border focus:outline-none">
-                        <i class="fa-solid fa-search absolute left-2.5 top-3 text-gray-400 text-xs"></i>
+    <div class="container-fluid px-4">
+        
+        <!-- DASHBOARD RINGKASAN DATA (3 GRAFIK UTAMA) -->
+        <div class="row no-print">
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold mb-2">Jenis Kelamin</h6>
+                    <div class="chart-box">
+                        <canvas id="chartJK"></canvas>
                     </div>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-end gap-2">
-                    <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <i class="fa-solid fa-print"></i> Cetak
-                    </button>
-                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i> Export Excel
-                    </button>
-                    <button onclick="exportToCSV()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <i class="fa-solid fa-file-csv"></i> Export CSV
-                    </button>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold mb-2">Status Perkawinan</h6>
+                    <div class="chart-box">
+                        <canvas id="chartStatus"></canvas>
+                    </div>
                 </div>
             </div>
-
-            <!-- Detailed Filters -->
-            <div class="pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Filter RT:</label>
-                    <select id="filterRT" onchange="applyFilters()" class="w-full p-2 text-sm rounded-lg border">
-                        <option value="">Semua RT</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Filter Jenis Kelamin:</label>
-                    <select id="filterJK" onchange="applyFilters()" class="w-full p-2 text-sm rounded-lg border">
-                        <option value="">Semua Jenis Kelamin</option>
-                        <option value="L">Laki-Laki (L)</option>
-                        <option value="P">Perempuan (P)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Filter Status Kawin:</label>
-                    <select id="filterKawin" onchange="applyFilters()" class="w-full p-2 text-sm rounded-lg border">
-                        <option value="">Semua Status</option>
-                        <option value="S">Sudah Kawin (S)</option>
-                        <option value="B">Belum Kawin (B)</option>
-                        <option value="P">Janda/Duda (P)</option>
-                    </select>
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold mb-2">Kelompok Usia</h6>
+                    <div class="chart-box">
+                        <canvas id="chartUmur"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Title for Print View Only -->
-        <div class="hidden print:block text-center mb-4">
-            <h2 class="text-xl font-bold uppercase">Laporan Data Kependudukan</h2>
-            <p class="text-xs">Dicetak pada: <span id="printDate"></span></p>
+        <!-- PANEL FILTER -->
+        <div class="card card-custom p-4 no-print">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="filter-header"><i class="fa-solid fa-filter text-primary me-2"></i>Filter Data Pemilih</span>
+                <div>
+                    <button class="btn btn-dark btn-sm me-1" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> Cetak / Print PDF</button>
+                    <button class="btn btn-success btn-sm me-1" onclick="exportExcel()"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</button>
+                    <button class="btn btn-info btn-sm text-white" onclick="exportCSV()"><i class="fa-solid fa-file-csv me-1"></i> Export CSV</button>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-bold">CARI (NAMA/NIK/NKK/ALAMAT/DP-ID)</label>
+                    <input type="text" id="filterCari" class="form-control form-control-sm" placeholder="Ketik kata kunci..." oninput="applyFilter()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">JENIS KELAMIN</label>
+                    <select id="filterJK" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua --</option>
+                        <option value="L">Laki-Laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">PILIH RT</label>
+                    <select id="filterRT" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua RT --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">STATUS KAWIN</label>
+                    <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua Status --</option>
+                        <option value="S">Sudah (S)</option>
+                        <option value="B">Belum (B)</option>
+                        <option value="P">Pernah (P)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Data Table -->
-        <div class="bg-card rounded-xl shadow border overflow-x-auto">
-            <table class="w-full text-xs text-left border-collapse">
-                <thead class="bg-gray-100 uppercase font-semibold">
-                    <tr>
-                        <th class="p-3 border">NO</th>
-                        <th class="p-3 border">RT</th>
-                        <th class="p-3 border">DP-ID</th>
-                        <th class="p-3 border">NKK</th>
-                        <th class="p-3 border">NIK</th>
-                        <th class="p-3 border">NAMA</th>
-                        <th class="p-3 border">L/P</th>
-                        <th class="p-3 border">USIA</th>
-                        <th class="p-3 border">DUSUN / ALAMAT</th>
-                        <th class="p-3 border text-center no-print">AKSI</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="10" class="p-6 text-center text-gray-500">
-                            Silakan upload file <code class="bg-gray-200 text-red-600 px-1 rounded">data.xlsx</code> untuk menampilkan data.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- TABEL DATA -->
+        <div class="card card-custom p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <div class="d-flex align-items-center">
+                    <span class="me-2 text-muted small">Baris per halaman:</span>
+                    <select id="pageSize" class="form-select form-select-sm" style="width: 80px;" onchange="changePageSize()">
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="500">500</option>
+                        <option value="10000">Semua Data (Cetak)</option>
+                    </select>
+                </div>
+                <div id="paginationInfo" class="text-muted small">Memuat data...</div>
+            </div>
+
+            <div class="table-container">
+                <table class="table align-middle" id="dpsTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">NO</th>
+                            <th>DP-ID</th>
+                            <th>NKK</th>
+                            <th>NIK</th>
+                            <th>NAMA</th>
+                            <th>TEMPAT / TGL LAHIR</th>
+                            <th class="text-center">UMUR</th>
+                            <th class="text-center">JK</th>
+                            <th class="text-center">STS</th>
+                            <th>ALAMAT</th>
+                            <th class="text-center">RT</th>
+                            <th class="text-center">KETERANGAN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="12" class="text-center py-4 text-muted">
+                                <i class="fa-solid fa-spinner fa-spin me-2"></i> Sedang mengambil data Excel...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3 no-print">
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </div>
         </div>
+
     </div>
 
-    <!-- Modal Review Detail Data (No Print) -->
-    <div id="reviewModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 no-print">
-        <div class="bg-card rounded-2xl max-w-xl w-full p-6 shadow-2xl relative border">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-lg font-bold border-b pb-3 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-id-card text-blue-500"></i> Detail Data Kependudukan
-            </h3>
-            <div id="modalContent" class="space-y-3 text-sm">
-                <!-- Dynamic Content inserted via JS -->
-            </div>
-            <div class="mt-6 flex justify-end gap-2 border-t pt-4">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm">Tutup</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT UTAMA -->
     <script>
         let rawData = [];
         let filteredData = [];
+        let currentPage = 1;
+        let pageSize = 100;
+        let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
 
-        // Set Print Date
-        document.getElementById('printDate').innerText = new Date().toLocaleDateString('id-ID', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-
-        // Theme Switcher
-        function changeTheme(themeClass) {
-            document.body.className = themeClass + " transition-colors duration-200 min-h-screen";
-            localStorage.setItem('selected_theme', themeClass);
+        function getValue(row, ...possibleKeys) {
+            if (!row) return '';
+            const keys = Object.keys(row);
+            for (let targetKey of possibleKeys) {
+                const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+                for (let k of keys) {
+                    const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (cleanK === cleanTarget) {
+                        let val = row[k];
+                        return (val !== undefined && val !== null) ? val : '';
+                    }
+                }
+            }
+            return '';
         }
 
-        // Restore saved theme on load
-        const savedTheme = localStorage.getItem('selected_theme') || 'theme-light';
-        document.getElementById('themeSelect').value = savedTheme;
-        changeTheme(savedTheme);
+        function formatTanggal(val) {
+            if (!val) return '';
+            if (val instanceof Date) {
+                let d = String(val.getDate()).padStart(2, '0');
+                let m = String(val.getMonth() + 1).padStart(2, '0');
+                let y = val.getFullYear();
+                return `${d}/${m}/${y}`;
+            }
+            let str = String(val).trim();
+            if (str.includes('-') || str.includes('/')) {
+                if (str.includes('T')) str = str.split('T')[0];
+                let parts = str.split(/[-/]/);
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) {
+                        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+                    }
+                }
+                return str.replace(/-/g, '/');
+            }
+            let num = Number(str);
+            if (!isNaN(num) && num > 1000 && num < 60000) {
+                if (window.XLSX && XLSX.SSF) {
+                    return XLSX.SSF.format("dd/mm/yyyy", num);
+                }
+            }
+            return str;
+        }
 
-        // Upload & Process Excel
-        document.getElementById('excelFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        function formatTTL(tempat, tgl) {
+            let tglFormatted = formatTanggal(tgl);
+            let tempatStr = String(tempat || '').trim();
+            if (tempatStr && tglFormatted) {
+                return `${tempatStr}, ${tglFormatted}`;
+            }
+            return tempatStr || tglFormatted || '-';
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                
-                rawData = XLSX.utils.sheet_to_json(worksheet, {defval: ""});
-                populateRTFilter();
-                applyFilters();
-            };
-            reader.readAsArrayBuffer(file);
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('data.xlsx')
+                .then(res => {
+                    if (!res.ok) throw new Error('File not found');
+                    return res.arrayBuffer();
+                })
+                .then(buffer => {
+                    const workbook = XLSX.read(buffer, { type: 'array', cellDates: true, cellNF: true });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
+                    
+                    initDropdowns();
+                    applyFilter();
+                    initCharts();
+                })
+                .catch(err => {
+                    document.getElementById('tableBody').innerHTML = `
+                        <tr>
+                            <td colspan="12" class="text-center text-danger py-4">
+                                <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
+                            </td>
+                        </tr>`;
+                });
         });
 
-        // Populate Dropdown Filter RT
-        function populateRTFilter() {
-            const rtSelect = document.getElementById('filterRT');
-            rtSelect.innerHTML = '<option value="">Semua RT</option>';
-            
-            const uniqueRT = [...new Set(rawData.map(item => item['RT']))].filter(Boolean).sort((a, b) => a - b);
-            uniqueRT.forEach(rt => {
-                const opt = document.createElement('option');
-                opt.value = rt;
-                opt.textContent = `RT ${rt}`;
-                rtSelect.appendChild(opt);
+        function initDropdowns() {
+            const rtSet = new Set();
+
+            rawData.forEach(row => {
+                let rt = getValue(row, 'RT', 'RT KTP');
+                if (rt) rtSet.add(String(rt).trim());
+            });
+
+            const filterRT = document.getElementById('filterRT');
+            filterRT.innerHTML = '<option value="">-- Semua RT --</option>';
+            Array.from(rtSet).sort((a,b)=>a-b).forEach(rt => {
+                filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
             });
         }
 
-        // Filter Logic
-        function applyFilters() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const filterRT = document.getElementById('filterRT').value;
-            const filterJK = document.getElementById('filterJK').value;
-            const filterKawin = document.getElementById('filterKawin').value;
+        function applyFilter() {
+            const cari = document.getElementById('filterCari').value.toLowerCase();
+            const jk = document.getElementById('filterJK').value.toUpperCase();
+            const rt = document.getElementById('filterRT').value;
+            const status = document.getElementById('filterStatus').value.toUpperCase();
 
-            filteredData = rawData.filter(item => {
-                const matchSearch = !search || 
-                    String(item['NAMA'] || '').toLowerCase().includes(search) ||
-                    String(item['NIK'] || '').toLowerCase().includes(search) ||
-                    String(item['NKK'] || '').toLowerCase().includes(search) ||
-                    String(item['DUSUN/ALAMAT'] || '').toLowerCase().includes(search);
+            filteredData = rawData.filter(row => {
+                const rowNama = String(getValue(row, 'NAMA')).toLowerCase();
+                const rowNik = String(getValue(row, 'NIK')).toLowerCase();
+                const rowNkk = String(getValue(row, 'NKK')).toLowerCase();
+                const rowAlamat = String(getValue(row, 'DUSUN/ALAMAT', 'ALAMAT')).toLowerCase();
+                const rowDpId = String(getValue(row, 'DP-ID', 'DP_ID', 'DPID', 'NO DP')).toLowerCase();
 
-                const matchRT = !filterRT || String(item['RT']) === String(filterRT);
-                const matchJK = !filterJK || String(item['JENIS KELAMIN']) === String(filterJK);
-                const matchKawin = !filterKawin || String(item['STS KAWIN']) === String(filterKawin);
+                const matchesCari = !cari || 
+                    rowNama.includes(cari) ||
+                    rowNik.includes(cari) ||
+                    rowNkk.includes(cari) ||
+                    rowAlamat.includes(cari) ||
+                    rowDpId.includes(cari);
 
-                return matchSearch && matchRT && matchJK && matchKawin;
+                const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
+                const rowRT = String(getValue(row, 'RT', 'RT KTP')).trim();
+                const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
+
+                const matchesJK = !jk || rowJK === jk;
+                const matchesRT = !rt || rowRT === rt;
+                const matchesStatus = !status || rowStatus === status;
+
+                return matchesCari && matchesJK && matchesRT && matchesStatus;
             });
 
+            currentPage = 1;
             renderTable();
-            updateStats();
+            updateCharts();
         }
 
-        // Render Table Data
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-gray-500">Data tidak ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
+                document.getElementById('paginationInfo').innerText = 'Menampilkan 0 data';
+                document.getElementById('pagination').innerHTML = '';
                 return;
             }
 
-            filteredData.forEach((row, index) => {
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIdx, endIdx);
+
+            let lastNKK = null;
+
+            pageData.forEach((row, index) => {
+                const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
+                const nkk = String(getValue(row, 'NKK') || '-').trim();
+                const nik = getValue(row, 'NIK') || '-';
+                const nama = getValue(row, 'NAMA') || '-';
+                
+                const tempatLahir = getValue(row, 'TEMPAT LAHIR', 'TEMPAT_LAHIR');
+                const tglLahir = getValue(row, 'TANGGAL LAHIR', 'TANGGAL_LAHIR', 'TGL LAHIR');
+                const ttl = formatTTL(tempatLahir, tglLahir);
+
+                const umur = getValue(row, 'USIA', 'UMUR') || '-';
+                const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase() || '-';
+                const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() || '-';
+                const alamat = getValue(row, 'DUSUN/ALAMAT', 'ALAMAT') || '-';
+                const rt = getValue(row, 'RT', 'RT KTP') || '-';
+
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-black/5 transition";
+
+                // PEMISAH DENGAN GARIS TEBAL JIKA BEDA NKK
+                if (lastNKK !== null && nkk !== lastNKK) {
+                    tr.classList.add('nkk-group-border');
+                }
+                lastNKK = nkk;
+
                 tr.innerHTML = `
-                    <td class="p-3 border text-center">${index + 1}</td>
-                    <td class="p-3 border text-center">${row['RT'] || '-'}</td>
-                    <td class="p-3 border">${row['DP-ID'] || '-'}</td>
-                    <td class="p-3 border">${row['NKK'] || '-'}</td>
-                    <td class="p-3 border">${row['NIK'] || '-'}</td>
-                    <td class="p-3 border font-semibold">${row['NAMA'] || '-'}</td>
-                    <td class="p-3 border text-center">${row['JENIS KELAMIN'] || '-'}</td>
-                    <td class="p-3 border text-center">${row['USIA'] || '-'}</td>
-                    <td class="p-3 border">${row['DUSUN/ALAMAT'] || '-'}</td>
-                    <td class="p-3 border text-center no-print">
-                        <button onclick="reviewRow(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
-                            <i class="fa-solid fa-eye"></i> Detail
-                        </button>
-                    </td>
+                    <td class="text-center text-muted">${startIdx + index + 1}</td>
+                    <td class="text-dp-id">${dpId}</td>
+                    <td class="fw-bold text-dark">${nkk}</td>
+                    <td>${nik}</td>
+                    <td class="fw-bold">${nama}</td>
+                    <td>${ttl}</td>
+                    <td class="text-center">${umur}</td>
+                    <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
+                    <td class="text-center"><span class="badge badge-sts">${sts}</span></td>
+                    <td>${alamat}</td>
+                    <td class="text-center">${rt}</td>
+                    <td></td> <!-- KOLOM KETERANGAN KOSONG -->
                 `;
                 tbody.appendChild(tr);
             });
+
+            document.getElementById('paginationInfo').innerText = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${filteredData.length} data`;
+            renderPagination();
         }
 
-        // Update Statistics
-        function updateStats() {
-            document.getElementById('statTotal').innerText = filteredData.length;
-            document.getElementById('statLaki').innerText = filteredData.filter(d => d['JENIS KELAMIN'] === 'L').length;
-            document.getElementById('statPerempuan').innerText = filteredData.filter(d => d['JENIS KELAMIN'] === 'P').length;
-            
-            const rts = new Set(filteredData.map(d => d['RT']).filter(Boolean));
-            document.getElementById('statRT').innerText = rts.size;
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            let prevClass = currentPage === 1 ? 'disabled' : '';
+            pagination.innerHTML += `<li class="page-item ${prevClass}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Prev</a></li>`;
+
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                let activeClass = currentPage === i ? 'active' : '';
+                pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+            }
+
+            let nextClass = currentPage === totalPages ? 'disabled' : '';
+            pagination.innerHTML += `<li class="page-item ${nextClass}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a></li>`;
         }
 
-        // Review Modal
-        function reviewRow(index) {
-            const row = filteredData[index];
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = `
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>NO / DP-ID:</strong> <span>${row['NO'] || '-'} / ${row['DP-ID'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>NKK:</strong> <span>${row['NKK'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>NIK:</strong> <span>${row['NIK'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Nama Lengkap:</strong> <span class="font-bold">${row['NAMA'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Tempat, Tgl Lahir:</strong> <span>${row['TEMPAT LAHIR'] || '-'}, ${row['TANGGAL LAHIR'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Usia:</strong> <span>${row['USIA'] || '-'} Tahun</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Jenis Kelamin:</strong> <span>${row['JENIS KELAMIN'] === 'L' ? 'Laki-Laki' : 'Perempuan'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Status Kawin:</strong> <span>${row['STS KAWIN'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>RT / RT KTP:</strong> <span>RT ${row['RT'] || '-'} / RT ${row['RT KTP'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2 border-b pb-2"><strong>Dusun/Alamat:</strong> <span>${row['DUSUN/ALAMAT'] || '-'}</span></div>
-                <div class="grid grid-cols-2 gap-2"><strong>Keterangan:</strong> <span>${row['KETERANGAN'] || '-'}</span></div>
-            `;
-            document.getElementById('reviewModal').classList.remove('hidden');
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+            }
         }
 
-        function closeModal() {
-            document.getElementById('reviewModal').classList.add('hidden');
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
+            renderTable();
         }
 
-        // Export Functions
-        function exportToExcel() {
-            if (filteredData.length === 0) return alert('Tidak ada data untuk di-export!');
+        function resetFilter() {
+            document.getElementById('filterCari').value = '';
+            document.getElementById('filterJK').value = '';
+            document.getElementById('filterRT').value = '';
+            document.getElementById('filterStatus').value = '';
+            applyFilter();
+        }
+
+        function exportExcel() {
             const ws = XLSX.utils.json_to_sheet(filteredData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data_Filtered");
-            XLSX.writeFile(wb, "Data_Kependudukan_Filtered.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Data_Pemilih");
+            XLSX.writeFile(wb, "Data_Pemilih_Filtered.xlsx");
         }
 
-        function exportToCSV() {
-            if (filteredData.length === 0) return alert('Tidak ada data untuk di-export!');
+        function exportCSV() {
             const ws = XLSX.utils.json_to_sheet(filteredData);
             const csv = XLSX.utils.sheet_to_csv(ws);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", "Data_Kependudukan_Filtered.csv");
+            link.setAttribute("download", "Data_Pemilih_Filtered.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function initCharts() {
+            chartJKObj = new Chart(document.getElementById('chartJK'), {
+                type: 'doughnut',
+                data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [0, 0], backgroundColor: ['#3b82f6', '#ec4899'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            chartStatusObj = new Chart(document.getElementById('chartStatus'), {
+                type: 'doughnut',
+                data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            chartUmurObj = new Chart(document.getElementById('chartUmur'), {
+                type: 'bar',
+                data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Jumlah', data: [0,0,0,0], backgroundColor: '#10b981' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            updateCharts();
+        }
+
+        function updateCharts() {
+            if (!chartJKObj) return;
+
+            let l = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'L').length;
+            let p = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'P').length;
+            chartJKObj.data.datasets[0].data = [l, p];
+            chartJKObj.update();
+
+            let s = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'S').length;
+            let b = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'B').length;
+            let pr = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'P').length;
+            chartStatusObj.data.datasets[0].data = [s, b, pr];
+            chartStatusObj.update();
+
+            let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
+            filteredData.forEach(d => {
+                let u = parseInt(getValue(d, 'USIA', 'UMUR'));
+                if (!isNaN(u)) {
+                    if (u < 20) u20++;
+                    else if (u < 40) u40++;
+                    else if (u < 60) u60++;
+                    else uOld++;
+                }
+            });
+            chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
+            chartUmurObj.update();
         }
     </script>
 </body>
