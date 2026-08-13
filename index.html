@@ -97,12 +97,23 @@
         .badge-jk-p { background-color: #fce7f3; color: #9d174d; font-weight: 600; padding: 4px 8px; }
         .text-dp-id { color: #ef4444; font-weight: 700; }
 
+        /* HEADER PRINT (DEFAULT UNTUK LAYAR: SEMBUNYI) */
+        .print-only-header {
+            display: none;
+        }
+
         /* ========================================== */
         /* STYLES KHUSUS CETAK / PRINT (PAS A4 LANSKAP) */
         /* ========================================== */
         @media print {
             .no-print, .pagination, #pageSize, .d-flex.justify-content-between {
                 display: none !important;
+            }
+            .print-only-header {
+                display: block !important;
+                margin-bottom: 12px;
+                border-bottom: 2px solid #0f172a;
+                padding-bottom: 6px;
             }
             @page {
                 size: A4 landscape;
@@ -157,7 +168,7 @@
 
     <div class="container-fluid px-4">
         
-        <!-- HEADER UTAMA -->
+        <!-- HEADER UTAMA WEB -->
         <div class="card card-custom p-4 no-print">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -165,7 +176,7 @@
                     <small class="text-muted">Daftar Pemilih Sementara (DPS)</small>
                 </div>
                 <div>
-                    <button class="btn btn-dark btn-sm me-1" onclick="window.print()">
+                    <button class="btn btn-dark btn-sm me-1" onclick="cetakLaporan()">
                         <i class="fa-solid fa-print me-1"></i> Cetak / Print PDF
                     </button>
                     <button class="btn btn-success btn-sm me-1" onclick="exportExcel()">
@@ -288,6 +299,16 @@
 
         <!-- TABEL DATA -->
         <div class="card card-custom p-4">
+            
+            <!-- HEADER KHUSUS YANG HANYA MUNCUL SAAT CETAK / PRINT -->
+            <div class="print-only-header text-center">
+                <h4 class="fw-bold m-0 text-uppercase">Cetak Daftar Pemilih Sementara</h4>
+                <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 9pt;">
+                    <div><strong>Wilayah:</strong> <span id="printRtInfo">Semua RT</span></div>
+                    <div><strong>Waktu Cetak:</strong> <span id="printTimeInfo">-</span></div>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                 <div class="d-flex align-items-center">
                     <span class="me-2 text-muted small fw-bold">Baris per halaman:</span>
@@ -411,7 +432,7 @@
                     
                     let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
                     
-                    // PENGURUTAN OTOMATIS BERDASARKAN RT (1, 2, 3...) KEMUDIAN NKK
+                    // PENGURUTAN OTOMATIS BERDASARKAN RT KEMUDIAN NKK
                     rawData = loadedData.sort((a, b) => {
                         let rtA = parseInt(getValue(a, 'RT', 'RT KTP')) || 999;
                         let rtB = parseInt(getValue(b, 'RT', 'RT KTP')) || 999;
@@ -615,6 +636,29 @@
             document.getElementById('filterRT').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
+        }
+
+        /* FUNGSINYA DITEMPATKAN DI SINI UNTUK CETAK DENGAN HEADER */
+        function cetakLaporan() {
+            const rtVal = document.getElementById('filterRT').value;
+            const printRtInfo = document.getElementById('printRtInfo');
+            const printTimeInfo = document.getElementById('printTimeInfo');
+
+            // Update Info RT
+            if (rtVal) {
+                printRtInfo.innerText = "RT " + rtVal;
+            } else {
+                printRtInfo.innerText = "Semua RT";
+            }
+
+            // Update Waktu Realtime
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            printTimeInfo.innerText = `${dateStr}, ${timeStr} WIB`;
+
+            // Buka Jendela Cetak
+            window.print();
         }
 
         function exportExcel() {
