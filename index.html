@@ -40,22 +40,51 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid #cbd5e1;
             white-space: nowrap;
         }
         .table td {
             font-size: 0.85rem;
             vertical-align: middle;
             white-space: nowrap;
+            border-top: 1px solid #f1f5f9;
         }
+        
+        /* CLASS PEMISAH KELUARGA / NKK BARU */
+        .nkk-group-border td {
+            border-top: 2.5px solid #0f172a !important; /* Garis tebal pemisah NKK */
+        }
+
         .badge-jk-l { background-color: #dbeafe; color: #1e40af; }
         .badge-jk-p { background-color: #fce7f3; color: #9d174d; }
         .badge-sts { background-color: #f3e8ff; color: #6b21a8; }
-        .badge-ket { background-color: #e0e7ff; color: #3730a3; }
         .text-dp-id { color: #ef4444; font-weight: 600; }
         .chart-box {
             position: relative;
             height: 220px;
+        }
+
+        /* STYLES TAMPILAN KHUSUS SAAT CETAK / PRINT */
+        @media print {
+            .no-print, .card-custom:first-child, .card-custom:nth-child(2), .pagination, #pageSize, .d-flex.justify-content-between {
+                display: none !important;
+            }
+            body {
+                background: #fff;
+                padding: 0 !important;
+            }
+            .card-custom {
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+            .table th {
+                background-color: #e2e8f0 !important;
+                -webkit-print-color-adjust: exact;
+                color: #000 !important;
+            }
+            .nkk-group-border td {
+                border-top: 2px solid #000 !important; /* Garis cetak hitam tegas */
+            }
         }
     </style>
 </head>
@@ -63,9 +92,9 @@
 
     <div class="container-fluid px-4">
         
-        <!-- DASHBOARD RINGKASAN DATA (CHARTS) -->
-        <div class="row">
-            <div class="col-md-3">
+        <!-- DASHBOARD RINGKASAN DATA (3 GRAFIK UTAMA) -->
+        <div class="row no-print">
+            <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
                     <h6 class="text-muted fw-bold mb-2">Jenis Kelamin</h6>
                     <div class="chart-box">
@@ -73,7 +102,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
                     <h6 class="text-muted fw-bold mb-2">Status Perkawinan</h6>
                     <div class="chart-box">
@@ -81,7 +110,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
                     <h6 class="text-muted fw-bold mb-2">Kelompok Usia</h6>
                     <div class="chart-box">
@@ -89,18 +118,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card card-custom p-3 text-center">
-                    <h6 class="text-muted fw-bold mb-2">Sebaran TPS</h6>
-                    <div class="chart-box">
-                        <canvas id="chartKet"></canvas>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- PANEL FILTER -->
-        <div class="card card-custom p-4">
+        <div class="card card-custom p-4 no-print">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="filter-header"><i class="fa-solid fa-filter text-primary me-2"></i>Filter Data Pemilih</span>
                 <div>
@@ -130,12 +151,6 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label text-muted small fw-bold">PILIH TPS</label>
-                    <select id="filterKet" class="form-select form-select-sm" onchange="applyFilter()">
-                        <option value="">-- Semua TPS --</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
                     <label class="form-label text-muted small fw-bold">STATUS KAWIN</label>
                     <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilter()">
                         <option value="">-- Semua Status --</option>
@@ -144,7 +159,7 @@
                         <option value="P">Pernah (P)</option>
                     </select>
                 </div>
-                <div class="col-md-1 d-flex align-items-end">
+                <div class="col-md-3 d-flex align-items-end">
                     <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
                 </div>
             </div>
@@ -152,21 +167,22 @@
 
         <!-- TABEL DATA -->
         <div class="card card-custom p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                 <div class="d-flex align-items-center">
                     <span class="me-2 text-muted small">Baris per halaman:</span>
-                    <select id="pageSize" class="form-select form-select-sm style-select" style="width: 80px;" onchange="changePageSize()">
+                    <select id="pageSize" class="form-select form-select-sm" style="width: 80px;" onchange="changePageSize()">
                         <option value="10">10</option>
                         <option value="50">50</option>
                         <option value="100" selected>100</option>
                         <option value="500">500</option>
+                        <option value="10000">Semua Data (Cetak)</option>
                     </select>
                 </div>
                 <div id="paginationInfo" class="text-muted small">Memuat data...</div>
             </div>
 
             <div class="table-container">
-                <table class="table table-hover align-middle">
+                <table class="table align-middle" id="dpsTable">
                     <thead>
                         <tr>
                             <th class="text-center">NO</th>
@@ -180,7 +196,7 @@
                             <th class="text-center">STS</th>
                             <th>ALAMAT</th>
                             <th class="text-center">RT</th>
-                            <th class="text-center">TPS</th>
+                            <th class="text-center">KETERANGAN</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -193,20 +209,20 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-3 no-print">
                 <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
             </div>
         </div>
 
     </div>
 
-    <!-- SCRIPT UTAMA METODE PEMBACAAN DAN AKURASI TANGGAL EXCEL -->
+    <!-- SCRIPT UTAMA -->
     <script>
         let rawData = [];
         let filteredData = [];
         let currentPage = 1;
         let pageSize = 100;
-        let chartJKObj = null, chartStatusObj = null, chartUmurObj = null, chartKetObj = null;
+        let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
 
         function getValue(row, ...possibleKeys) {
             if (!row) return '';
@@ -224,19 +240,15 @@
             return '';
         }
 
-        // KONVERSI TANGGAL EXCEL SERIAL (AKURAT BAZAAR SHEETJS / JS DATE)
         function formatTanggal(val) {
             if (!val) return '';
-
             if (val instanceof Date) {
                 let d = String(val.getDate()).padStart(2, '0');
                 let m = String(val.getMonth() + 1).padStart(2, '0');
                 let y = val.getFullYear();
                 return `${d}/${m}/${y}`;
             }
-
             let str = String(val).trim();
-
             if (str.includes('-') || str.includes('/')) {
                 if (str.includes('T')) str = str.split('T')[0];
                 let parts = str.split(/[-/]/);
@@ -247,21 +259,18 @@
                 }
                 return str.replace(/-/g, '/');
             }
-
             let num = Number(str);
             if (!isNaN(num) && num > 1000 && num < 60000) {
                 if (window.XLSX && XLSX.SSF) {
                     return XLSX.SSF.format("dd/mm/yyyy", num);
                 }
             }
-
             return str;
         }
 
         function formatTTL(tempat, tgl) {
             let tglFormatted = formatTanggal(tgl);
             let tempatStr = String(tempat || '').trim();
-            
             if (tempatStr && tglFormatted) {
                 return `${tempatStr}, ${tglFormatted}`;
             }
@@ -269,50 +278,38 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const fileNames = ['data.xlsx', 'data_2.xlsx'];
-            
-            function tryFetch(index) {
-                if (index >= fileNames.length) {
+            fetch('data.xlsx')
+                .then(res => {
+                    if (!res.ok) throw new Error('File not found');
+                    return res.arrayBuffer();
+                })
+                .then(buffer => {
+                    const workbook = XLSX.read(buffer, { type: 'array', cellDates: true, cellNF: true });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
+                    
+                    initDropdowns();
+                    applyFilter();
+                    initCharts();
+                })
+                .catch(err => {
                     document.getElementById('tableBody').innerHTML = `
                         <tr>
                             <td colspan="12" class="text-center text-danger py-4">
-                                <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code> di repository.
+                                <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
                             </td>
                         </tr>`;
-                    return;
-                }
-
-                fetch(fileNames[index])
-                    .then(res => {
-                        if (!res.ok) throw new Error('File not found');
-                        return res.arrayBuffer();
-                    })
-                    .then(buffer => {
-                        const workbook = XLSX.read(buffer, { type: 'array', cellDates: true, cellNF: true });
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        
-                        rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
-                        
-                        initDropdowns();
-                        applyFilter();
-                        initCharts();
-                    })
-                    .catch(() => tryFetch(index + 1));
-            }
-
-            tryFetch(0);
+                });
         });
 
         function initDropdowns() {
             const rtSet = new Set();
-            const tpsSet = new Set();
 
             rawData.forEach(row => {
                 let rt = getValue(row, 'RT', 'RT KTP');
-                let tps = getValue(row, 'TPS', 'KETERANGAN', 'KET');
                 if (rt) rtSet.add(String(rt).trim());
-                if (tps) tpsSet.add(String(tps).trim());
             });
 
             const filterRT = document.getElementById('filterRT');
@@ -320,19 +317,12 @@
             Array.from(rtSet).sort((a,b)=>a-b).forEach(rt => {
                 filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
             });
-
-            const filterKet = document.getElementById('filterKet');
-            filterKet.innerHTML = '<option value="">-- Semua TPS --</option>';
-            Array.from(tpsSet).sort((a,b)=>a-b).forEach(tps => {
-                filterKet.innerHTML += `<option value="${tps}">TPS ${tps}</option>`;
-            });
         }
 
         function applyFilter() {
             const cari = document.getElementById('filterCari').value.toLowerCase();
             const jk = document.getElementById('filterJK').value.toUpperCase();
             const rt = document.getElementById('filterRT').value;
-            const tps = document.getElementById('filterKet').value;
             const status = document.getElementById('filterStatus').value.toUpperCase();
 
             filteredData = rawData.filter(row => {
@@ -351,15 +341,13 @@
 
                 const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
                 const rowRT = String(getValue(row, 'RT', 'RT KTP')).trim();
-                const rowTPS = String(getValue(row, 'TPS', 'KETERANGAN', 'KET')).trim();
                 const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
 
                 const matchesJK = !jk || rowJK === jk;
                 const matchesRT = !rt || rowRT === rt;
-                const matchesTPS = !tps || rowTPS === tps;
                 const matchesStatus = !status || rowStatus === status;
 
-                return matchesCari && matchesJK && matchesRT && matchesTPS && matchesStatus;
+                return matchesCari && matchesJK && matchesRT && matchesStatus;
             });
 
             currentPage = 1;
@@ -382,9 +370,11 @@
             const endIdx = Math.min(startIdx + pageSize, filteredData.length);
             const pageData = filteredData.slice(startIdx, endIdx);
 
+            let lastNKK = null;
+
             pageData.forEach((row, index) => {
                 const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
-                const nkk = getValue(row, 'NKK') || '-';
+                const nkk = String(getValue(row, 'NKK') || '-').trim();
                 const nik = getValue(row, 'NIK') || '-';
                 const nama = getValue(row, 'NAMA') || '-';
                 
@@ -397,13 +387,19 @@
                 const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() || '-';
                 const alamat = getValue(row, 'DUSUN/ALAMAT', 'ALAMAT') || '-';
                 const rt = getValue(row, 'RT', 'RT KTP') || '-';
-                const tps = getValue(row, 'TPS', 'KETERANGAN', 'KET') || '-';
 
                 const tr = document.createElement('tr');
+
+                // PEMISAH DENGAN GARIS TEBAL JIKA BEDA NKK
+                if (lastNKK !== null && nkk !== lastNKK) {
+                    tr.classList.add('nkk-group-border');
+                }
+                lastNKK = nkk;
+
                 tr.innerHTML = `
                     <td class="text-center text-muted">${startIdx + index + 1}</td>
                     <td class="text-dp-id">${dpId}</td>
-                    <td>${nkk}</td>
+                    <td class="fw-bold text-dark">${nkk}</td>
                     <td>${nik}</td>
                     <td class="fw-bold">${nama}</td>
                     <td>${ttl}</td>
@@ -412,7 +408,7 @@
                     <td class="text-center"><span class="badge badge-sts">${sts}</span></td>
                     <td>${alamat}</td>
                     <td class="text-center">${rt}</td>
-                    <td class="text-center"><span class="badge badge-ket">TPS ${tps}</span></td>
+                    <td></td> <!-- KOLOM KETERANGAN KOSONG -->
                 `;
                 tbody.appendChild(tr);
             });
@@ -458,7 +454,6 @@
             document.getElementById('filterCari').value = '';
             document.getElementById('filterJK').value = '';
             document.getElementById('filterRT').value = '';
-            document.getElementById('filterKet').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
         }
@@ -501,12 +496,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            chartKetObj = new Chart(document.getElementById('chartKet'), {
-                type: 'bar',
-                data: { labels: [], datasets: [{ label: 'Jumlah', data: [], backgroundColor: '#6366f1' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-
             updateCharts();
         }
 
@@ -536,18 +525,6 @@
             });
             chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
             chartUmurObj.update();
-
-            let tpsCounts = {};
-            filteredData.forEach(d => {
-                let tps = getValue(d, 'TPS', 'KETERANGAN', 'KET');
-                if (tps) {
-                    let label = "TPS " + String(tps).trim();
-                    tpsCounts[label] = (tpsCounts[label] || 0) + 1;
-                }
-            });
-            chartKetObj.data.labels = Object.keys(tpsCounts);
-            chartKetObj.data.datasets[0].data = Object.values(tpsCounts);
-            chartKetObj.update();
         }
     </script>
 </body>
