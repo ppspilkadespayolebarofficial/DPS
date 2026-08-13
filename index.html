@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard & Filter Data Pemilih</title>
@@ -55,7 +54,6 @@
         }
         .val-total { color: #4f46e5; }
         .val-kk { color: #059669; }
-        .val-nik { color: #2563eb; }
         .val-l { color: #2563eb; }
         .val-p { color: #db2777; }
         .val-sudah { color: #16a34a; }
@@ -99,15 +97,59 @@
         .badge-jk-p { background-color: #fce7f3; color: #9d174d; font-weight: 600; padding: 4px 8px; }
         .text-dp-id { color: #ef4444; font-weight: 700; }
 
-        /* PRINT STYLES */
+        /* ========================================== */
+        /* STYLES KHUSUS CETAK / PRINT (PAS A4 LANSKAP) */
+        /* ========================================== */
         @media print {
-            .no-print, .pagination, #pageSize {
+            .no-print, .pagination, #pageSize, .d-flex.justify-content-between {
                 display: none !important;
             }
-            body { background: #fff; padding: 0 !important; }
-            .card-custom { box-shadow: none !important; padding: 0 !important; }
-            .table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; color: #000 !important; }
-            .nkk-group-border td { border-top: 2px solid #000 !important; }
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .card-custom {
+                box-shadow: none !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            .table-container {
+                overflow: visible !important;
+            }
+            table.table {
+                width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+            }
+            table.table th, table.table td {
+                padding: 4px 3px !important;
+                font-size: 7.5pt !important;
+                word-wrap: break-word !important;
+                white-space: normal !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            /* Pembagian Lebar Kolom saat Print */
+            table.table th:nth-child(1), table.table td:nth-child(1) { width: 4%; }  /* NO */
+            table.table th:nth-child(2), table.table td:nth-child(2) { width: 7%; }  /* DP-ID */
+            table.table th:nth-child(3), table.table td:nth-child(3) { width: 12%; } /* NKK */
+            table.table th:nth-child(4), table.table td:nth-child(4) { width: 12%; } /* NIK */
+            table.table th:nth-child(5), table.table td:nth-child(5) { width: 14%; } /* NAMA */
+            table.table th:nth-child(6), table.table td:nth-child(6) { width: 14%; } /* TTL */
+            table.table th:nth-child(7), table.table td:nth-child(7) { width: 5%; }  /* UMUR */
+            table.table th:nth-child(8), table.table td:nth-child(8) { width: 3%; }  /* JK */
+            table.table th:nth-child(9), table.table td:nth-child(9) { width: 4%; }  /* STS */
+            table.table th:nth-child(10), table.table td:nth-child(10) { width: 13%; } /* ALAMAT */
+            table.table th:nth-child(11), table.table td:nth-child(11) { width: 4%; } /* RT */
+            table.table th:nth-child(12), table.table td:nth-child(12) { width: 8%; } /* KETERANGAN */
+
+            .nkk-group-border td {
+                border-top: 2px solid #000 !important;
+            }
         }
     </style>
 </head>
@@ -123,17 +165,17 @@
                     <small class="text-muted">Daftar Pemilih Sementara (DPS)</small>
                 </div>
                 <div>
-                    <button class="btn btn-success btn-sm text-white me-1" onclick="window.print()">
+                    <button class="btn btn-dark btn-sm me-1" onclick="window.print()">
                         <i class="fa-solid fa-print me-1"></i> Cetak / Print PDF
                     </button>
-                    <button class="btn btn-primary btn-sm me-1" onclick="exportExcel()">
+                    <button class="btn btn-success btn-sm me-1" onclick="exportExcel()">
                         <i class="fa-solid fa-file-excel me-1"></i> Export Excel
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- STAT CARDS (RINGKASAN DATA) -->
+        <!-- STAT CARDS (RINGKASAN ANGKA) -->
         <div class="row g-2 mb-3 no-print">
             <div class="col-md-3 col-6">
                 <div class="stat-card">
@@ -239,7 +281,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn btn-secondary btn-sm w-100" style="background-color: #64748b; border:none;" onclick="resetFilter()">Reset Filter</button>
+                    <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
                 </div>
             </div>
         </div>
@@ -275,7 +317,7 @@
                             <th class="text-center">STS</th>
                             <th>ALAMAT</th>
                             <th class="text-center">RT</th>
-                            <th class="text-center" style="min-width: 120px;">KETERANGAN</th>
+                            <th class="text-center">KETERANGAN</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -369,7 +411,7 @@
                     
                     let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
                     
-                    // PROSES PENGURUTAN BERDASARKAN RT (1, 2, 3...) KEMUDIAN NKK
+                    // PENGURUTAN OTOMATIS BERDASARKAN RT (1, 2, 3...) KEMUDIAN NKK
                     rawData = loadedData.sort((a, b) => {
                         let rtA = parseInt(getValue(a, 'RT', 'RT KTP')) || 999;
                         let rtB = parseInt(getValue(b, 'RT', 'RT KTP')) || 999;
@@ -525,7 +567,7 @@
                     <td class="text-center">${sts}</td>
                     <td>${alamat}</td>
                     <td class="text-center fw-bold">${rt}</td>
-                    <td></td> <!-- KETERANGAN KOSONG -->
+                    <td></td> <!-- KETERANGAN -->
                 `;
                 tbody.appendChild(tr);
             });
@@ -597,7 +639,7 @@
 
             chartUmurObj = new Chart(document.getElementById('chartUmur'), {
                 type: 'bar',
-                data: { labels: ['<17 th', '17-30 th', '31-50 th', '>50 th'], datasets: [{ label: 'Pemilih', data: [0,0,0,0], backgroundColor: '#f59e0b' }] },
+                data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Pemilih', data: [0,0,0,0], backgroundColor: '#10b981' }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
@@ -618,17 +660,17 @@
             chartStatusObj.data.datasets[0].data = [s, b, pr];
             chartStatusObj.update();
 
-            let u17 = 0, u30 = 0, u50 = 0, uOld = 0;
+            let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
             filteredData.forEach(d => {
                 let u = parseInt(getValue(d, 'USIA', 'UMUR'));
                 if (!isNaN(u)) {
-                    if (u < 17) u17++;
-                    else if (u <= 30) u30++;
-                    else if (u <= 50) u50++;
+                    if (u < 20) u20++;
+                    else if (u < 40) u40++;
+                    else if (u < 60) u60++;
                     else uOld++;
                 }
             });
-            chartUmurObj.data.datasets[0].data = [u17, u30, u50, uOld];
+            chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
             chartUmurObj.update();
         }
     </script>
