@@ -203,9 +203,9 @@
           return res.arrayBuffer();
         })
         .then(buffer => {
-          const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
+          const workbook = XLSX.read(buffer, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+          const json = XLSX.utils.sheet_to_json(firstSheet, { raw: false, defval: '' });
           processData(json);
         })
         .catch(err => {
@@ -243,39 +243,36 @@
       return str;
     }
 
-    // Konversi Angka Date Seri Excel ke Tanggal Asli (DD/MM/YYYY) & Hitung Umur
-    function parseExcelDate(val) {
+    // Pembersih Tanggal Lahir (Mengubah Date String ke DD/MM/YYYY)
+    function cleanDateOnly(val) {
       if (!val) return { text: '', year: null };
-      
-      // Jika angka date serial Excel (misal: 32787)
-      if (typeof val === 'number' || (!isNaN(val) && String(val).length <= 5)) {
-        let dateObj = new Date(Math.round((val - 25569) * 86400 * 1000));
-        if (!isNaN(dateObj.getTime())) {
-          let day = String(dateObj.getDate()).padStart(2, '0');
-          let month = String(dateObj.getMonth() + 1).padStart(2, '0');
-          let year = dateObj.getFullYear();
-          return { text: `${day}/${month}/${year}`, year: year };
-        }
+
+      let strVal = String(val).trim();
+
+      // Jika format Date Javascript Bawaan (misal: "Sat Aug 12 1972 23:59:48 GMT...")
+      let parsedDate = new Date(strVal);
+      if (!isNaN(parsedDate.getTime()) && strVal.length > 15) {
+        let day = String(parsedDate.getDate()).padStart(2, '0');
+        let month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+        let year = parsedDate.getFullYear();
+        return { text: `${day}/${month}/${year}`, year: year };
       }
 
-      // Jika format teks standar
-      let strVal = String(val).trim();
+      // Ambil Tahun untuk Perhitungan Umur
       let matchYear = strVal.match(/\b(19\d\d|20\d\d)\b/);
       let year = matchYear ? parseInt(matchYear[1]) : null;
-      
+
       return { text: strVal, year: year };
     }
 
-    // Ekstrak Tahun Lahir dari NIK
     function getYearFromNIK(nik) {
       if (!nik || nik.length < 12) return null;
-      let rawTgl = nik.substring(6, 12); // Format DDMMYY
+      let rawTgl = nik.substring(6, 12);
       if (!/^\d{6}$/.test(rawTgl)) return null;
       
       let yy = parseInt(rawTgl.substring(4, 6));
       let currentYY = new Date().getFullYear() % 100;
-      let fullYear = (yy > currentYY) ? (1900 + yy) : (2000 + yy);
-      return fullYear;
+      return (yy > currentYY) ? (1900 + yy) : (2000 + yy);
     }
 
     function processData(json) {
@@ -294,8 +291,8 @@
         let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
         let tps = cleanKey(item, ['tps', 'notps']);
 
-        // Parsing Tanggal Lahir
-        let parsedTgl = parseExcelDate(rawTglLahir);
+        // Pembersihan Tanggal Lahir
+        let parsedTgl = cleanDateOnly(rawTglLahir);
         
         // Hitung Umur
         let finalUmur = '';
@@ -431,8 +428,8 @@
             <td class="p-3 text-center font-bold text-indigo-500">${d.sts || '-'}</td>
             <td class="p-3 opacity-80">${d.alamat || '-'}</td>
             <td class="p-3 text-center font-semibold">${d.rt || '-'}</td>
-            <td class="p-3 text-center">
-              <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-400 font-bold text-xs">
+            <td class="p-3 text-center whitespace-nowrap">
+              <span class="inline-block min-w-[65px] px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-500 font-bold text-xs text-center">
                 TPS ${d.tps || '-'}
               </span>
             </td>
