@@ -23,29 +23,46 @@
 
     body { background-color: var(--bg-main); color: var(--text-main); }
     .card-theme { background-color: var(--card-bg); border-color: var(--border-color); }
+
+    /* Pengaturan Khusus Halaman Print */
+    @media print {
+      .no-print { display: none !important; }
+      body { background-color: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+      .card-theme { border: none !important; shadow: none !important; background-color: transparent !important; }
+      table { width: 100% !important; font-size: 10px !important; border-collapse: collapse !important; }
+      th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+    }
   </style>
 </head>
 <body class="theme-indigo min-h-screen p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Header + Theme Selector -->
-    <div class="card-theme p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Header + Theme Selector & Waktu Update -->
+    <div class="card-theme p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <h1 class="text-2xl font-extrabold tracking-tight">Dashboard & Filter Data Pemilih</h1>
         <p class="text-sm opacity-70 mt-1">Daftar Pemilih Sementara (DPS)</p>
       </div>
 
-      <!-- Pilihan Tema -->
-      <div class="flex items-center gap-2 card-theme p-2 rounded-xl border">
-        <i class="fa-solid fa-palette text-indigo-500 ml-2"></i>
-        <span class="text-xs font-semibold uppercase tracking-wider mr-1">Tema:</span>
-        <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-transparent text-xs font-bold focus:outline-none cursor-pointer pr-2">
-          <option value="theme-indigo" class="text-slate-800">✨ Modern Indigo</option>
-          <option value="theme-dark" class="text-slate-800">🌙 Dark Mode</option>
-          <option value="theme-emerald" class="text-slate-800">🍃 Emerald Green</option>
-          <option value="theme-navy" class="text-slate-800">🌊 Ocean Navy</option>
-        </select>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+        <!-- Badge Waktu Update -->
+        <div class="flex items-center gap-2 card-theme px-3 py-2 rounded-xl border text-xs font-semibold opacity-80">
+          <i class="fa-regular fa-clock text-indigo-500"></i>
+          <span>Update: <strong id="lastUpdateText" class="text-indigo-500">Memuat...</strong></span>
+        </div>
+
+        <!-- Pilihan Tema -->
+        <div class="flex items-center gap-2 card-theme p-2 rounded-xl border no-print">
+          <i class="fa-solid fa-palette text-indigo-500 ml-2"></i>
+          <span class="text-xs font-semibold uppercase tracking-wider mr-1">Tema:</span>
+          <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-transparent text-xs font-bold focus:outline-none cursor-pointer pr-2">
+            <option value="theme-indigo" class="text-slate-800">✨ Modern Indigo</option>
+            <option value="theme-dark" class="text-slate-800">🌙 Dark Mode</option>
+            <option value="theme-emerald" class="text-slate-800">🍃 Emerald Green</option>
+            <option value="theme-navy" class="text-slate-800">🌊 Ocean Navy</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -83,16 +100,18 @@
         <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">PERNAH KAWIN (P)</p>
         <p class="text-2xl font-black mt-1 text-purple-500" id="statPernahKawin">0</p>
       </div>
-      <div class="card-theme p-4 rounded-xl border shadow-sm col-span-2 md:col-span-2">
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">DP-ID</p>
+        <p class="text-2xl font-black mt-1 text-rose-500" id="statDPID">0</p>
+      </div>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
         <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">JUMLAH TPS</p>
         <p class="text-2xl font-black mt-1 text-violet-500" id="statTPS">0</p>
       </div>
     </div>
 
-    <!-- Charts Section (GRAFIK VIZUAL) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- Chart 1: Gender -->
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
           <i class="fa-solid fa-venus-mars mr-1 text-indigo-500"></i> Gender Pemilih
@@ -102,7 +121,6 @@
         </div>
       </div>
 
-      <!-- Chart 2: Status Kawin -->
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
           <i class="fa-solid fa-ring mr-1 text-teal-500"></i> Status Kawin
@@ -112,7 +130,6 @@
         </div>
       </div>
 
-      <!-- Chart 3: Kelompok Umur -->
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
           <i class="fa-solid fa-cake-candles mr-1 text-amber-500"></i> Kelompok Umur
@@ -122,7 +139,6 @@
         </div>
       </div>
 
-      <!-- Chart 4: Pemilih Per TPS -->
       <div class="card-theme p-5 rounded-2xl shadow-sm border flex flex-col items-center">
         <h3 class="text-xs font-bold uppercase tracking-wider opacity-70 mb-3 w-full text-left">
           <i class="fa-solid fa-box-archive mr-1 text-violet-500"></i> Pemilih per TPS
@@ -131,19 +147,33 @@
           <canvas id="chartTPS"></canvas>
         </div>
       </div>
-
     </div>
 
-    <!-- Filter Section -->
-    <div class="card-theme p-6 rounded-2xl shadow-sm border space-y-4">
-      <div class="flex items-center gap-2 font-bold text-lg">
-        <i class="fa-solid fa-filter text-indigo-500"></i>
-        <h2>Filter Data Pemilih</h2>
+    <!-- Filter Section & Tombol Aksi Export/Print -->
+    <div class="card-theme p-6 rounded-2xl shadow-sm border space-y-4 no-print">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div class="flex items-center gap-2 font-bold text-lg">
+          <i class="fa-solid fa-filter text-indigo-500"></i>
+          <h2>Filter Data Pemilih</h2>
+        </div>
+
+        <!-- Tombol Print dan Export Data -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="printData()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-print"></i> Cetak / Print PDF
+          </button>
+          <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+          </button>
+          <button onclick="exportToCSV()" class="bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+        </div>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <div>
-          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">CARI (NAMA/NIK/NKK/ALAMAT)</label>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">CARI (NAMA/NIK/NKK/ALAMAT/DP-ID)</label>
           <input type="text" id="searchInput" placeholder="Ketik kata kunci..." class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
@@ -200,6 +230,7 @@
           <thead>
             <tr class="border-b font-bold uppercase tracking-wider opacity-80">
               <th class="p-3 text-center">NO</th>
+              <th class="p-3">DP-ID</th>
               <th class="p-3">NKK</th>
               <th class="p-3">NIK</th>
               <th class="p-3">NAMA</th>
@@ -214,14 +245,14 @@
           </thead>
           <tbody id="dataTable" class="divide-y divide-slate-500/10">
             <tr>
-              <td colspan="11" class="p-8 text-center opacity-60">Memuat data otomatis...</td>
+              <td colspan="12" class="p-8 text-center opacity-60">Memuat data otomatis...</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Pagination Footer -->
-      <div class="p-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-xs opacity-70">
+      <div class="p-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-xs opacity-70 no-print">
         <div id="pageInfo">Menampilkan 0 dari 0 data</div>
         <div class="flex gap-1" id="pagination"></div>
       </div>
@@ -234,7 +265,6 @@
     let filteredData = [];
     let currentPage = 1;
 
-    // Object Referensi Chart.js
     let chartJKInst = null;
     let chartStatusInst = null;
     let chartUmurInst = null;
@@ -245,6 +275,18 @@
       localStorage.setItem('selectedTheme', themeName);
     }
 
+    // Fungsi Format Tanggal & Jam Update
+    function setLastUpdateHeader(lastModifiedHeader) {
+      let updateDate = lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
+      let day = String(updateDate.getDate()).padStart(2, '0');
+      let month = String(updateDate.getMonth() + 1).padStart(2, '0');
+      let year = updateDate.getFullYear();
+      let hours = String(updateDate.getHours()).padStart(2, '0');
+      let minutes = String(updateDate.getMinutes()).padStart(2, '0');
+      
+      document.getElementById('lastUpdateText').innerText = `${day}/${month}/${year} ${hours}:${minutes} WIB`;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('selectedTheme') || 'theme-indigo';
       document.getElementById('themeSelect').value = savedTheme;
@@ -253,6 +295,10 @@
       fetch('data.xlsx')
         .then(res => {
           if(!res.ok) throw new Error('File data.xlsx tidak ditemukan');
+          
+          let lastMod = res.headers.get('Last-Modified');
+          setLastUpdateHeader(lastMod);
+
           return res.arrayBuffer();
         })
         .then(buffer => {
@@ -262,9 +308,10 @@
           processData(json);
         })
         .catch(err => {
+          document.getElementById('lastUpdateText').innerText = 'Gagal memuat';
           document.getElementById('dataTable').innerHTML = `
             <tr>
-              <td colspan="11" class="p-8 text-center text-rose-500 font-semibold">
+              <td colspan="12" class="p-8 text-center text-rose-500 font-semibold">
                 Gagal memuat data. Pastikan file <b>data.xlsx</b> sudah di-upload ke repository GitHub.
               </td>
             </tr>`;
@@ -328,6 +375,7 @@
       const currentYear = new Date().getFullYear();
 
       rawData = json.map(item => {
+        let dpid = cleanKey(item, ['dpid', 'dp_id', 'idpemilih', 'iddp']);
         let nkk = cleanKey(item, ['nkk', 'nokk', 'nomorkk', 'kk']);
         let nik = cleanKey(item, ['nik', 'nomorinduk']);
         let nama = cleanKey(item, ['nama', 'namalengkap', 'namapemilih']);
@@ -355,6 +403,7 @@
         }
 
         return {
+          dpid: dpid ? String(dpid).trim() : '',
           nkk: nkk ? String(nkk).trim() : '',
           nik: nik ? String(nik).trim() : '',
           nama: nama ? String(nama).trim() : '',
@@ -398,6 +447,7 @@
       let sudah = filteredData.filter(d => d.sts === 'S').length;
       let belum = filteredData.filter(d => d.sts === 'B').length;
       let pernah = filteredData.filter(d => d.sts === 'P').length;
+      let dpidCount = filteredData.filter(d => d.dpid !== '').length;
       
       let uniqueTPS = new Set(filteredData.map(d => d.tps).filter(Boolean)).size;
 
@@ -408,9 +458,9 @@
       document.getElementById('statSudahKawin').innerText = sudah.toLocaleString('id-ID');
       document.getElementById('statBelumKawin').innerText = belum.toLocaleString('id-ID');
       document.getElementById('statPernahKawin').innerText = pernah.toLocaleString('id-ID');
+      document.getElementById('statDPID').innerText = dpidCount.toLocaleString('id-ID');
       document.getElementById('statTPS').innerText = uniqueTPS.toLocaleString('id-ID');
 
-      // --- RENDER/UPDATE GRAFIK ---
       renderCharts(laki, perempuan, sudah, belum, pernah);
     }
 
@@ -423,7 +473,6 @@
         }
       };
 
-      // 1. Chart JK
       if (chartJKInst) chartJKInst.destroy();
       chartJKInst = new Chart(document.getElementById('chartJK'), {
         type: 'pie',
@@ -437,7 +486,6 @@
         options: chartOptions
       });
 
-      // 2. Chart Status Kawin
       if (chartStatusInst) chartStatusInst.destroy();
       chartStatusInst = new Chart(document.getElementById('chartStatus'), {
         type: 'doughnut',
@@ -451,7 +499,6 @@
         options: chartOptions
       });
 
-      // 3. Chart Kelompok Umur
       let u17 = 0, u30 = 0, u50 = 0, uTua = 0;
       filteredData.forEach(d => {
         let u = parseInt(d.umur);
@@ -480,7 +527,6 @@
         }
       });
 
-      // 4. Chart Per TPS
       let tpsMap = {};
       filteredData.forEach(d => {
         if(d.tps) tpsMap[d.tps] = (tpsMap[d.tps] || 0) + 1;
@@ -518,6 +564,7 @@
           item.nama.toLowerCase().includes(search) || 
           item.nik.toLowerCase().includes(search) || 
           item.nkk.toLowerCase().includes(search) || 
+          item.dpid.toLowerCase().includes(search) || 
           item.alamat.toLowerCase().includes(search);
 
         let matchJK = !jk || item.jk.startsWith(jk);
@@ -539,7 +586,7 @@
       let pageSize = pageSizeVal === 'all' ? filteredData.length : parseInt(pageSizeVal);
       
       if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center opacity-60">Data tidak ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="p-8 text-center opacity-60">Data tidak ditemukan.</td></tr>`;
         document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
         document.getElementById('pagination').innerHTML = '';
         return;
@@ -557,6 +604,7 @@
         return `
           <tr class="hover:bg-indigo-500/10 transition border-b border-slate-500/10">
             <td class="p-3 text-center font-medium opacity-50">${start + index + 1}</td>
+            <td class="p-3 font-mono opacity-80 text-rose-500 font-semibold">${d.dpid || '-'}</td>
             <td class="p-3 font-mono opacity-80">${d.nkk || '-'}</td>
             <td class="p-3 font-mono font-bold">${d.nik || '-'}</td>
             <td class="p-3 font-extrabold">${d.nama || '-'}</td>
@@ -593,6 +641,65 @@
     function changePage(page) {
       currentPage = page;
       renderTable();
+    }
+
+    // Fungsi Export Ke Excel
+    function exportToExcel() {
+      if (!filteredData.length) return alert('Tidak ada data yang dapat di-export!');
+      const exportFormat = filteredData.map((d, index) => ({
+        'NO': index + 1,
+        'DP-ID': d.dpid,
+        'NKK': d.nkk,
+        'NIK': d.nik,
+        'NAMA': d.nama,
+        'TEMPAT LAHIR': d.tempatLahir,
+        'TGL LAHIR': d.tglLahir,
+        'UMUR': d.umur,
+        'JK': d.jk,
+        'STS': d.sts,
+        'ALAMAT': d.alamat,
+        'RT': d.rt,
+        'TPS': d.tps
+      }));
+      const ws = XLSX.utils.json_to_sheet(exportFormat);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Data_Pemilih");
+      XLSX.writeFile(wb, `Data_Pemilih_Terfilter_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    // Fungsi Export Ke CSV
+    function exportToCSV() {
+      if (!filteredData.length) return alert('Tidak ada data yang dapat di-export!');
+      const exportFormat = filteredData.map((d, index) => ({
+        'NO': index + 1,
+        'DP-ID': d.dpid,
+        'NKK': d.nkk,
+        'NIK': d.nik,
+        'NAMA': d.nama,
+        'TEMPAT LAHIR': d.tempatLahir,
+        'TGL LAHIR': d.tglLahir,
+        'UMUR': d.umur,
+        'JK': d.jk,
+        'STS': d.sts,
+        'ALAMAT': d.alamat,
+        'RT': d.rt,
+        'TPS': d.tps
+      }));
+      const ws = XLSX.utils.json_to_sheet(exportFormat);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Data_Pemilih_Terfilter_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Fungsi Print Halaman
+    function printData() {
+      window.print();
     }
 
     document.getElementById('searchInput').addEventListener('input', applyFilter);
