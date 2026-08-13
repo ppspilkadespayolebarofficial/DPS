@@ -88,7 +88,7 @@
             padding: 10px;
         }
         
-        /* PEMISAH NKK / KELUARGA */
+        /* PEMISAH NKK / KK (GARIS PEMBATAS TEBAL) */
         .nkk-group-border td {
             border-top: 2.5px solid #0f172a !important;
         }
@@ -158,8 +158,9 @@
             table.table th:nth-child(11), table.table td:nth-child(11) { width: 4%; } /* RT */
             table.table th:nth-child(12), table.table td:nth-child(12) { width: 8%; } /* KETERANGAN */
 
+            /* Pemisah KK Tebal Hitam Saat Diprint */
             .nkk-group-border td {
-                border-top: 2px solid #000 !important;
+                border-top: 2.5px solid #000 !important;
             }
         }
     </style>
@@ -232,7 +233,7 @@
             </div>
         </div>
 
-        <!-- GRAFIK VISUAL (3 GRAFIK) -->
+        <!-- GRAFIK VISUAL -->
         <div class="row g-3 mb-4 no-print">
             <div class="col-md-4">
                 <div class="card card-custom p-3 text-center">
@@ -300,7 +301,7 @@
         <!-- TABEL DATA -->
         <div class="card card-custom p-4">
             
-            <!-- HEADER KHUSUS YANG HANYA MUNCUL SAAT CETAK / PRINT -->
+            <!-- HEADER KHUSUS CETAK / PRINT -->
             <div class="print-only-header text-center">
                 <h4 class="fw-bold m-0 text-uppercase">Cetak Daftar Pemilih Sementara</h4>
                 <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 9pt;">
@@ -432,7 +433,7 @@
                     
                     let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
                     
-                    // PENGURUTAN OTOMATIS BERDASARKAN RT KEMUDIAN NKK
+                    // URUTKAN BERDASARKAN RT LALU NKK
                     rawData = loadedData.sort((a, b) => {
                         let rtA = parseInt(getValue(a, 'RT', 'RT KTP')) || 999;
                         let rtB = parseInt(getValue(b, 'RT', 'RT KTP')) || 999;
@@ -571,6 +572,7 @@
 
                 const tr = document.createElement('tr');
 
+                // CEK PEMISAH NKK: Jika NKK berbeda dari baris sebelumnya, tambahkan kelas pembatas
                 if (lastNKK !== null && nkk !== lastNKK) {
                     tr.classList.add('nkk-group-border');
                 }
@@ -588,7 +590,7 @@
                     <td class="text-center">${sts}</td>
                     <td>${alamat}</td>
                     <td class="text-center fw-bold">${rt}</td>
-                    <td></td> <!-- KETERANGAN -->
+                    <td></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -638,26 +640,22 @@
             applyFilter();
         }
 
-        /* FUNGSINYA DITEMPATKAN DI SINI UNTUK CETAK DENGAN HEADER */
         function cetakLaporan() {
             const rtVal = document.getElementById('filterRT').value;
             const printRtInfo = document.getElementById('printRtInfo');
             const printTimeInfo = document.getElementById('printTimeInfo');
 
-            // Update Info RT
             if (rtVal) {
                 printRtInfo.innerText = "RT " + rtVal;
             } else {
                 printRtInfo.innerText = "Semua RT";
             }
 
-            // Update Waktu Realtime
             const now = new Date();
             const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             printTimeInfo.innerText = `${dateStr}, ${timeStr} WIB`;
 
-            // Buka Jendela Cetak
             window.print();
         }
 
