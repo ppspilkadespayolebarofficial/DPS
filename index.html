@@ -88,9 +88,9 @@
             padding: 10px;
         }
         
-        /* PEMISAH NKK / KK (GARIS PEMBATAS TEBAL) */
-        .nkk-group-border td {
-            border-top: 2.5px solid #0f172a !important;
+        /* PEMISAH NKK / KK DI TAMPILAN MONITOR */
+        tr.nkk-group-border td {
+            border-top: 3px solid #0f172a !important;
         }
 
         .badge-jk-l { background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 4px 8px; }
@@ -137,13 +137,24 @@
                 table-layout: fixed !important;
                 border-collapse: collapse !important;
             }
+            
+            /* Garis Standar Tabel saat Print */
             table.table th, table.table td {
                 padding: 4px 3px !important;
                 font-size: 7.5pt !important;
                 word-wrap: break-word !important;
                 white-space: normal !important;
-                border: 1px solid #cbd5e1 !important;
+                border-left: 1px solid #cbd5e1 !important;
+                border-right: 1px solid #cbd5e1 !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+                border-top: 1px solid #cbd5e1;
             }
+
+            /* GARIS PEMBATAS KELUARGA (KK) TEBAL SAAT DIPRINT */
+            table.table tr.nkk-group-border td {
+                border-top: 3px solid #000000 !important;
+            }
+
             /* Pembagian Lebar Kolom saat Print */
             table.table th:nth-child(1), table.table td:nth-child(1) { width: 4%; }  /* NO */
             table.table th:nth-child(2), table.table td:nth-child(2) { width: 7%; }  /* DP-ID */
@@ -157,11 +168,6 @@
             table.table th:nth-child(10), table.table td:nth-child(10) { width: 13%; } /* ALAMAT */
             table.table th:nth-child(11), table.table td:nth-child(11) { width: 4%; } /* RT */
             table.table th:nth-child(12), table.table td:nth-child(12) { width: 8%; } /* KETERANGAN */
-
-            /* Pemisah KK Tebal Hitam Saat Diprint */
-            .nkk-group-border td {
-                border-top: 2.5px solid #000 !important;
-            }
         }
     </style>
 </head>
@@ -572,8 +578,8 @@
 
                 const tr = document.createElement('tr');
 
-                // CEK PEMISAH NKK: Jika NKK berbeda dari baris sebelumnya, tambahkan kelas pembatas
-                if (lastNKK !== null && nkk !== lastNKK) {
+                // Deteksi Pemisah NKK
+                if (index > 0 && nkk !== lastNKK) {
                     tr.classList.add('nkk-group-border');
                 }
                 lastNKK = nkk;
