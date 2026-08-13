@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard & Filter Data Pemilih</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        @media print {
+            .no-print, #statsContainer, .filter-panel, #excelFile, button, label, .pagination-container {
+                display: none !important;
+            }
+            body { background-color: white !important; padding: 0 !important; margin: 0 !important; }
+            .max-w-7xl { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 8px !important; font-size: 9pt !important; color: #000 !important; }
+            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
+            span { background: none !important; color: #000 !important; padding: 0 !important; font-weight: normal !important; }
+        }
+        .print-header { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header Cetak -->
+        <div class="print-header">
+            <h2 style="font-size: 16pt; font-weight: bold; text-transform: uppercase; margin: 0;">DAFTAR PEMILIH SEMENTARA / HASIL FILTER</h2>
+            <p style="font-size: 10pt; margin: 5px 0 0 0;" id="printSubTitle">Dokumen Hasil Pencarian Data Pemilih</p>
+        </div>
+
+        <!-- Header Utama -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Dashboard & Filter Data Pemilih</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Tombol Cetak PDF -->
+                <button onclick="cetakSemuaData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center gap-2 cursor-pointer">
+                    🖨️ Cetak / Print PDF
+                </button>
+                <!-- Tombol Import Excel -->
+                <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition shadow-sm inline-block">
+                    📂 Import File Excel (.xlsx)
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" class="hidden">
+                </label>
+            </div>
+        </div>
+
+        <!-- Ringkasan Statistik -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4" id="statsContainer">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Total Data</span>
+                <p class="text-2xl font-bold text-slate-800 mt-1" id="statTotal">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Jumlah KK</span>
+                <p class="text-2xl font-bold text-teal-600 mt-1" id="statKK">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Jumlah NIK</span>
+                <p class="text-2xl font-bold text-indigo-600 mt-1" id="statNIK">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Laki-Laki (L)</span>
+                <p class="text-2xl font-bold text-blue-600 mt-1" id="statLaki">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Perempuan (P)</span>
+                <p class="text-2xl font-bold text-pink-600 mt-1" id="statPerempuan">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Sudah Kawin (S)</span>
+                <p class="text-2xl font-bold text-emerald-600 mt-1" id="statSudahKawin">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Belum Kawin (B)</span>
+                <p class="text-2xl font-bold text-amber-600 mt-1" id="statBelumKawin">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Pernah Kawin (P)</span>
+                <p class="text-2xl font-bold text-purple-600 mt-1" id="statPernahKawin">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm col-span-2 sm:col-span-1 lg:col-span-2">
+                <span class="text-xs text-slate-400 font-semibold uppercase">Jumlah TPS</span>
+                <p class="text-2xl font-bold text-emerald-600 mt-1" id="statTPS">0</p>
+            </div>
+        </div>
+
+        <!-- Panel Filter -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 filter-panel">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">🔍 Filter Data</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Cari (Nama/NIK/NKK/Alamat)</label>
+                    <input type="text" id="filterSearch" placeholder="Ketik kata kunci..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Jenis Kelamin</label>
+                    <select id="filterKelamin" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- Semua --</option>
+                        <option value="L">Laki-Laki (L)</option>
+                        <option value="P">Perempuan (P)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih RT</label>
+                    <select id="filterRT" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- Semua RT --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih TPS</label>
+                    <select id="filterTPS" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- Semua TPS --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Status Kawin</label>
+                    <select id="filterKawin" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- Semua Status --</option>
+                        <option value="S">Sudah Kawin (S)</option>
+                        <option value="B">Belum Kawin (B)</option>
+                        <option value="P">Pernah Kawin (P)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-slate-500">Baris per halaman:</label>
+                    <select id="pageSize" class="border border-slate-300 rounded px-2 py-1 text-xs">
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                    </select>
+                </div>
+                <button id="resetFilter" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition">
+                    Reset Filter
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead class="bg-slate-50 text-slate-600 uppercase text-xs border-b border-slate-200">
+                        <tr>
+                            <th class="p-3">No</th>
+                            <th class="p-3">NKK</th>
+                            <th class="p-3">NIK</th>
+                            <th class="p-3">Nama</th>
+                            <th class="p-3">Tempat / Tgl Lahir</th>
+                            <th class="p-3">Umur</th>
+                            <th class="p-3">JK</th>
+                            <th class="p-3">Sts</th>
+                            <th class="p-3">Alamat</th>
+                            <th class="p-3">RT</th>
+                            <th class="p-3">TPS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700">
+                        <tr>
+                            <td colspan="11" class="p-8 text-center text-slate-400">Silakan upload file Excel untuk melihat data.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kontrol Paginasi -->
+            <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 pagination-container bg-slate-50">
+                <span class="text-xs text-slate-500" id="pageInfo">Menampilkan 0 data</span>
+                <div class="flex gap-2">
+                    <button id="btnPrev" class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">Sebelumnya</button>
+                    <button id="btnNext" class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">Selanjutnya</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rawData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let rowsPerPage = 100;
+        let isPrintingAll = false;
+
+        // Tanggal Patokan Perhitungan Umur: 29 Oktober 2026
+        const TARGET_DATE = new Date(2026, 9, 29);
+
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, {type: 'array', cellDates: true});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                processExcelData(json);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function calculateAge(birthDateObj) {
+            if (!birthDateObj || isNaN(birthDateObj.getTime())) return '-';
+            
+            let age = TARGET_DATE.getFullYear() - birthDateObj.getFullYear();
+            const monthDiff = TARGET_DATE.getMonth() - birthDateObj.getMonth();
+            const dayDiff = TARGET_DATE.getDate() - birthDateObj.getDate();
+
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+            return age >= 0 ? age : 0;
+        }
+
+        function processExcelData(rows) {
+            rawData = [];
+            let headerIdx = rows.findIndex(r => r && (r.includes('NAMA') || r.includes('NIK')));
+            if (headerIdx === -1) headerIdx = 0;
+
+            for (let i = headerIdx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length === 0) continue;
+
+                const nama = row[3] ? String(row[3]).trim() : '';
+                const nik = row[2] ? String(row[2]).trim() : '';
+                if (!nama && !nik) continue;
+
+                let tglLahirStr = '';
+                let birthObj = null;
+
+                if (row[5] instanceof Date) {
+                    birthObj = row[5];
+                    tglLahirStr = birthObj.toISOString().split('T')[0];
+                } else if (row[5]) {
+                    tglLahirStr = String(row[5]).split('T')[0];
+                    birthObj = new Date(tglLahirStr);
+                }
+
+                const calculatedAge = calculateAge(birthObj);
+
+                rawData.push({
+                    no: row[0] || '',
+                    nkk: row[1] ? String(row[1]) : '',
+                    nik: row[2] ? String(row[2]) : '',
+                    nama: nama,
+                    tempatLahir: row[4] || '',
+                    tglLahir: tglLahirStr,
+                    umur: calculatedAge,
+                    statusKawin: row[7] ? String(row[7]).trim() : '',
+                    kelamin: row[8] ? String(row[8]).trim() : '',
+                    alamat: row[9] || '',
+                    rt: row[10] !== undefined ? String(row[10]).trim() : '',
+                    tps: row[11] !== undefined ? String(row[11]).trim() : ''
+                });
+            }
+
+            populateDropdowns();
+            applyFilters();
+        }
+
+        function populateDropdowns() {
+            // Dropdown TPS
+            const tpsSet = new Set(rawData.map(d => d.tps).filter(t => t !== ''));
+            const tpsSelect = document.getElementById('filterTPS');
+            tpsSelect.innerHTML = '<option value="">-- Semua TPS --</option>';
+            Array.from(tpsSet).sort((a,b) => a - b).forEach(tps => {
+                const opt = document.createElement('option');
+                opt.value = tps;
+                opt.textContent = `TPS ${tps}`;
+                tpsSelect.appendChild(opt);
+            });
+
+            // Dropdown RT
+            const rtSet = new Set(rawData.map(d => d.rt).filter(r => r !== ''));
+            const rtSelect = document.getElementById('filterRT');
+            rtSelect.innerHTML = '<option value="">-- Semua RT --</option>';
+            Array.from(rtSet).sort((a,b) => a - b).forEach(rt => {
+                const opt = document.createElement('option');
+                opt.value = rt;
+                opt.textContent = `RT ${rt}`;
+                rtSelect.appendChild(opt);
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+            const kelamin = document.getElementById('filterKelamin').value;
+            const rt = document.getElementById('filterRT').value;
+            const tps = document.getElementById('filterTPS').value;
+            const kawin = document.getElementById('filterKawin').value;
+
+            filteredData = rawData.filter(d => {
+                const matchSearch = !search || 
+                    d.nama.toLowerCase().includes(search) || 
+                    d.nik.includes(search) || 
+                    d.nkk.includes(search) ||
+                    d.alamat.toLowerCase().includes(search);
+                const matchKelamin = !kelamin || d.kelamin === kelamin;
+                const matchRT = !rt || String(d.rt) === String(rt);
+                const matchTPS = !tps || String(d.tps) === String(tps);
+                const matchKawin = !kawin || d.statusKawin === kawin;
+
+                return matchSearch && matchKelamin && matchRT && matchTPS && matchKawin;
+            });
+
+            currentPage = 1;
+            renderTable();
+            updateStats();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-slate-400">Tidak ada data yang cocok dengan filter.</td></tr>';
+                renderPagination(0);
+                return;
+            }
+
+            let displayData = filteredData;
+            
+            if (!isPrintingAll) {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                displayData = filteredData.slice(start, end);
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            displayData.forEach((d, idx) => {
+                const globalIndex = isPrintingAll ? idx + 1 : ((currentPage - 1) * rowsPerPage) + idx + 1;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-400 text-xs">${globalIndex}</td>
+                    <td class="p-3 font-mono text-xs">${d.nkk}</td>
+                    <td class="p-3 font-mono text-xs">${d.nik}</td>
+                    <td class="p-3 font-semibold text-slate-800">${d.nama}</td>
+                    <td class="p-3 text-xs">${d.tempatLahir} ${d.tglLahir ? ', ' + d.tglLahir : ''}</td>
+                    <td class="p-3 text-xs font-semibold text-slate-700">${d.umur} thn</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${d.kelamin === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${d.kelamin}</span></td>
+                    <td class="p-3 text-xs">${d.statusKawin}</td>
+                    <td class="p-3 text-xs">${d.alamat}</td>
+                    <td class="p-3 text-xs font-semibold">${d.rt}</td>
+                    <td class="p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-xs">TPS ${d.tps}</span></td>
+                `;
+                fragment.appendChild(tr);
+            });
+
+            tbody.appendChild(fragment);
+            renderPagination(filteredData.length);
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage + 1;
+            const end = Math.min(currentPage * rowsPerPage, totalItems);
+
+            document.getElementById('pageInfo').textContent = totalItems > 0 
+                ? `Menampilkan ${start} - ${end} dari ${totalItems} data`
+                : `Menampilkan 0 data`;
+
+            document.getElementById('btnPrev').disabled = currentPage === 1 || totalPages === 0;
+            document.getElementById('btnNext').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function cetakSemuaData() {
+            isPrintingAll = true;
+            renderTable();
+
+            setTimeout(() => {
+                window.print();
+                isPrintingAll = false;
+                renderTable();
+            }, 300);
+        }
+
+        document.getElementById('btnPrev').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        document.getElementById('pageSize').addEventListener('change', (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderTable();
+        });
+
+        function updateStats() {
+            // Total Data
+            document.getElementById('statTotal').textContent = filteredData.length.toLocaleString('id-ID');
+            
+            // Hitung Jumlah KK Unik
+            const uniqueKK = new Set(filteredData.map(d => d.nkk).filter(k => k !== ''));
+            document.getElementById('statKK').textContent = uniqueKK.size.toLocaleString('id-ID');
+
+            // Hitung Jumlah NIK Unik/Valid
+            const validNIK = filteredData.filter(d => d.nik !== '');
+            document.getElementById('statNIK').textContent = validNIK.length.toLocaleString('id-ID');
+
+            // Jenis Kelamin
+            document.getElementById('statLaki').textContent = filteredData.filter(d => d.kelamin === 'L').length.toLocaleString('id-ID');
+            document.getElementById('statPerempuan').textContent = filteredData.filter(d => d.kelamin === 'P').length.toLocaleString('id-ID');
+
+            // Status Perkawinan
+            document.getElementById('statSudahKawin').textContent = filteredData.filter(d => d.statusKawin === 'S').length.toLocaleString('id-ID');
+            document.getElementById('statBelumKawin').textContent = filteredData.filter(d => d.statusKawin === 'B').length.toLocaleString('id-ID');
+            document.getElementById('statPernahKawin').textContent = filteredData.filter(d => d.statusKawin === 'P').length.toLocaleString('id-ID');
+
+            // TPS
+            const uniqueTPS = new Set(filteredData.map(d => d.tps).filter(t => t !== ''));
+            document.getElementById('statTPS').textContent = uniqueTPS.size;
+
+            document.getElementById('printSubTitle').textContent = `Total Hasil Filter: ${filteredData.length} Orang`;
+        }
+
+        document.getElementById('filterSearch').addEventListener('input', applyFilters);
+        document.getElementById('filterKelamin').addEventListener('change', applyFilters);
+        document.getElementById('filterRT').addEventListener('change', applyFilters);
+        document.getElementById('filterTPS').addEventListener('change', applyFilters);
+        document.getElementById('filterKawin').addEventListener('change', applyFilters);
+
+        document.getElementById('resetFilter').addEventListener('click', () => {
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('filterKelamin').value = '';
+            document.getElementById('filterRT').value = '';
+            document.getElementById('filterTPS').value = '';
+            document.getElementById('filterKawin').value = '';
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
