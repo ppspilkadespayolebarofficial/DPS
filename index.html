@@ -11,132 +11,147 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
+    
+    .theme-indigo { --bg-main: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --border-color: #e2e8f0; --accent: #6366f1; }
+    .theme-dark { --bg-main: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --border-color: #334155; --accent: #38bdf8; }
+    .theme-emerald { --bg-main: #f0fdf4; --card-bg: #ffffff; --text-main: #064e3b; --border-color: #bbf7d0; --accent: #10b981; }
+    .theme-navy { --bg-main: #f0f9ff; --card-bg: #ffffff; --text-main: #0c4a6e; --border-color: #bae6fd; --accent: #0284c7; }
+
+    body { background-color: var(--bg-main); color: var(--text-main); }
+    .card-theme { background-color: var(--card-bg); border-color: var(--border-color); }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 p-4 md:p-8">
+<body class="theme-indigo min-h-screen p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Header -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Header + Theme Selector -->
+    <div class="card-theme p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900">Dashboard & Filter Data Pemilih</h1>
-        <p class="text-slate-500 text-sm mt-1">Daftar Pemilih Sementara (DPS)</p>
+        <h1 class="text-2xl font-extrabold tracking-tight">Dashboard & Filter Data Pemilih</h1>
+        <p class="text-sm opacity-70 mt-1">Daftar Pemilih Sementara (DPS)</p>
+      </div>
+
+      <!-- Pilihan Tema -->
+      <div class="flex items-center gap-2 card-theme p-2 rounded-xl border">
+        <i class="fa-solid fa-palette text-indigo-500 ml-2"></i>
+        <span class="text-xs font-semibold uppercase tracking-wider mr-1">Tema:</span>
+        <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-transparent text-xs font-bold focus:outline-none cursor-pointer pr-2">
+          <option value="theme-indigo" class="text-slate-800">✨ Modern Indigo</option>
+          <option value="theme-dark" class="text-slate-800">🌙 Dark Mode</option>
+          <option value="theme-emerald" class="text-slate-800">🍃 Emerald Green</option>
+          <option value="theme-navy" class="text-slate-800">🌊 Ocean Navy</option>
+        </select>
       </div>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="statsContainer">
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">TOTAL DATA</p>
-        <p class="text-2xl font-bold text-slate-800 mt-1" id="statTotal">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">TOTAL DATA</p>
+        <p class="text-2xl font-black mt-1 text-indigo-500" id="statTotal">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">JUMLAH KK</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-1" id="statKK">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">JUMLAH KK</p>
+        <p class="text-2xl font-black mt-1 text-emerald-500" id="statKK">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">JUMLAH NIK</p>
-        <p class="text-2xl font-bold text-indigo-600 mt-1" id="statNIK">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">JUMLAH NIK</p>
+        <p class="text-2xl font-black mt-1 text-sky-500" id="statNIK">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">LAKI-LAKI (L)</p>
-        <p class="text-2xl font-bold text-blue-600 mt-1" id="statLaki">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">LAKI-LAKI (L)</p>
+        <p class="text-2xl font-black mt-1 text-blue-500" id="statLaki">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">PEREMPUAN (P)</p>
-        <p class="text-2xl font-bold text-pink-600 mt-1" id="statPerempuan">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">PEREMPUAN (P)</p>
+        <p class="text-2xl font-black mt-1 text-pink-500" id="statPerempuan">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">SUDAH KAWIN (S)</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-1" id="statSudahKawin">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">SUDAH KAWIN (S)</p>
+        <p class="text-2xl font-black mt-1 text-teal-500" id="statSudahKawin">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">BELUM KAWIN (B)</p>
-        <p class="text-2xl font-bold text-amber-600 mt-1" id="statBelumKawin">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">BELUM KAWIN (B)</p>
+        <p class="text-2xl font-black mt-1 text-amber-500" id="statBelumKawin">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">PERNAH KAWIN (P)</p>
-        <p class="text-2xl font-bold text-purple-600 mt-1" id="statPernahKawin">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">PERNAH KAWIN (P)</p>
+        <p class="text-2xl font-black mt-1 text-purple-500" id="statPernahKawin">0</p>
       </div>
-      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm col-span-2 md:col-span-2">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">JUMLAH TPS</p>
-        <p class="text-2xl font-bold text-teal-600 mt-1" id="statTPS">0</p>
+      <div class="card-theme p-4 rounded-xl border shadow-sm col-span-2 md:col-span-2">
+        <p class="text-xs font-semibold opacity-60 uppercase tracking-wider">JUMLAH TPS</p>
+        <p class="text-2xl font-black mt-1 text-violet-500" id="statTPS">0</p>
       </div>
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-      <div class="flex items-center gap-2 text-slate-800 font-bold text-lg">
-        <i class="fa-solid fa-magnifying-glass text-indigo-600"></i>
-        <h2>Filter Data</h2>
+    <div class="card-theme p-6 rounded-2xl shadow-sm border space-y-4">
+      <div class="flex items-center gap-2 font-bold text-lg">
+        <i class="fa-solid fa-filter text-indigo-500"></i>
+        <h2>Filter Data Pemilih</h2>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        <!-- Pencarian Teks -->
-        <div class="md:col-span-1">
-          <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">CARI (NAMA/NIK/NKK/ALAMAT)</label>
-          <input type="text" id="searchInput" placeholder="Ketik kata kunci..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <!-- Filter Jenis Kelamin -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">JENIS KELAMIN</label>
-          <select id="filterJK" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">-- Semua --</option>
-            <option value="L">Laki-Laki (L)</option>
-            <option value="P">Perempuan (P)</option>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">CARI (NAMA/NIK/NKK/ALAMAT)</label>
+          <input type="text" id="searchInput" placeholder="Ketik kata kunci..." class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">JENIS KELAMIN</label>
+          <select id="filterJK" class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" class="text-slate-800">-- Semua --</option>
+            <option value="L" class="text-slate-800">Laki-Laki (L)</option>
+            <option value="P" class="text-slate-800">Perempuan (P)</option>
           </select>
         </div>
-        <!-- Filter RT -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">PILIH RT</label>
-          <select id="filterRT" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">-- Semua RT --</option>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">PILIH RT</label>
+          <select id="filterRT" class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" class="text-slate-800">-- Semua RT --</option>
           </select>
         </div>
-        <!-- Filter TPS -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">PILIH TPS</label>
-          <select id="filterTPS" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">-- Semua TPS --</option>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">PILIH TPS</label>
+          <select id="filterTPS" class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" class="text-slate-800">-- Semua TPS --</option>
           </select>
         </div>
-        <!-- Filter Status Kawin -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">STATUS KAWIN</label>
-          <select id="filterStatus" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">-- Semua Status --</option>
-            <option value="S">Sudah Kawin (S)</option>
-            <option value="B">Belum Kawin (B)</option>
-            <option value="P">Pernah Kawin (P)</option>
+          <label class="block text-xs font-semibold opacity-70 mb-1 uppercase">STATUS KAWIN</label>
+          <select id="filterStatus" class="w-full bg-transparent border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" class="text-slate-800">-- Semua Status --</option>
+            <option value="S" class="text-slate-800">Sudah Kawin (S)</option>
+            <option value="B" class="text-slate-800">Belum Kawin (B)</option>
+            <option value="P" class="text-slate-800">Pernah Kawin (P)</option>
           </select>
         </div>
       </div>
 
       <div class="flex justify-between items-center pt-2">
-        <div class="text-xs text-slate-500">
+        <div class="text-xs opacity-70">
           Baris per halaman: 
-          <select id="pageSize" class="bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs">
-            <option value="50">50</option>
-            <option value="100" selected>100</option>
-            <option value="200">200</option>
-            <option value="all">Semua</option>
+          <select id="pageSize" class="bg-transparent border rounded px-2 py-1 text-xs">
+            <option value="50" class="text-slate-800">50</option>
+            <option value="100" selected class="text-slate-800">100</option>
+            <option value="200" class="text-slate-800">200</option>
+            <option value="all" class="text-slate-800">Semua</option>
           </select>
         </div>
-        <button id="btnReset" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-1.5 rounded-lg text-sm font-medium transition">
+        <button id="btnReset" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition shadow-sm">
           Reset Filter
         </button>
       </div>
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+    <div class="card-theme rounded-2xl shadow-sm border overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs border-collapse">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+            <tr class="border-b font-bold uppercase tracking-wider opacity-80">
               <th class="p-3 text-center">NO</th>
               <th class="p-3">NKK</th>
               <th class="p-3">NIK</th>
@@ -150,16 +165,16 @@
               <th class="p-3 text-center">TPS</th>
             </tr>
           </thead>
-          <tbody id="dataTable" class="divide-y divide-slate-100 text-slate-700">
+          <tbody id="dataTable" class="divide-y divide-slate-500/10">
             <tr>
-              <td colspan="11" class="p-8 text-center text-slate-400">Memuat data otomatis...</td>
+              <td colspan="11" class="p-8 text-center opacity-60">Memuat data otomatis...</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Pagination Footer -->
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-slate-500">
+      <div class="p-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-xs opacity-70">
         <div id="pageInfo">Menampilkan 0 dari 0 data</div>
         <div class="flex gap-1" id="pagination"></div>
       </div>
@@ -172,8 +187,16 @@
     let filteredData = [];
     let currentPage = 1;
 
-    // Otomatis muat file data.xlsx saat halaman terbuka
+    function changeTheme(themeName) {
+      document.body.className = themeName + ' min-h-screen p-4 md:p-8';
+      localStorage.setItem('selectedTheme', themeName);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('selectedTheme') || 'theme-indigo';
+      document.getElementById('themeSelect').value = savedTheme;
+      changeTheme(savedTheme);
+
       fetch('data.xlsx')
         .then(res => {
           if(!res.ok) throw new Error('File data.xlsx tidak ditemukan');
@@ -195,6 +218,7 @@
         });
     });
 
+    // Pencari Nama Kolom Lebih Fleksibel
     function cleanKey(obj, targetKeys) {
       for (let k in obj) {
         let cleanK = k.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -205,12 +229,19 @@
       return '';
     }
 
-    // Fungsi pembantu untuk membersihkan format penulisan angka TPS/RT
-    function formatCleanValue(val) {
+    function cleanNumberOnly(val) {
       if (!val) return '';
-      let str = String(val).trim();
-      // Ambil karakter alfanumerik dasar & rapikan
-      str = str.replace(/^tps\s*/i, '').trim(); 
+      let str = String(val).replace(/[^0-9]/g, ''); 
+      return str ? parseInt(str, 10).toString() : String(val).trim();
+    }
+
+    // Pembersih Kode Status Kawin (Memastikan output S, B, atau P)
+    function normalizeStatus(val) {
+      if (!val) return '-';
+      let str = String(val).trim().toUpperCase();
+      if (str.includes('BELUM') || str === 'B' || str === '1') return 'B';
+      if (str.includes('SUDAH') || str.includes('KAWIN') || str === 'S' || str === '2' || str === 'K') return 'S';
+      if (str.includes('PERNAH') || str.includes('JANDA') || str.includes('DUDA') || str === 'P' || str === '3') return 'P';
       return str;
     }
 
@@ -223,7 +254,7 @@
         let tglLahir = cleanKey(item, ['tgllahir', 'tanggallahir', 'tgl']);
         let umur = cleanKey(item, ['umur', 'usia']);
         let jk = cleanKey(item, ['jk', 'jeniskelamin', 'kelamin']);
-        let sts = cleanKey(item, ['sts', 'status', 'statuskawin', 'kawin']);
+        let sts = cleanKey(item, ['sts', 'status', 'statuskawin', 'kawin', 'stskawin', 'statusperkawinan', 'st']);
         let alamat = cleanKey(item, ['alamat', 'jalan', 'dusun']);
         let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
         let tps = cleanKey(item, ['tps', 'notps']);
@@ -236,10 +267,10 @@
           tglLahir: tglLahir ? String(tglLahir).trim() : '',
           umur: umur ? String(umur).trim() : '',
           jk: jk ? String(jk).toUpperCase().trim() : '',
-          sts: sts ? String(sts).toUpperCase().trim() : '',
+          sts: normalizeStatus(sts),
           alamat: alamat ? String(alamat).trim() : '',
-          rt: formatCleanValue(rt),
-          tps: formatCleanValue(tps)
+          rt: cleanNumberOnly(rt),
+          tps: cleanNumberOnly(tps)
         };
       });
 
@@ -251,20 +282,14 @@
       const rtSelect = document.getElementById('filterRT');
       const tpsSelect = document.getElementById('filterTPS');
 
-      // Pengurutan angka secara alami (Natural Sorting: 1, 2, 3, ... 10, 11)
-      let rts = [...new Set(rawData.map(d => d.rt).filter(Boolean))].sort((a, b) => 
-        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-      );
-      
-      let tpss = [...new Set(rawData.map(d => d.tps).filter(Boolean))].sort((a, b) => 
-        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-      );
+      let rts = [...new Set(rawData.map(d => d.rt).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
+      let tpss = [...new Set(rawData.map(d => d.tps).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
 
-      rtSelect.innerHTML = '<option value="">-- Semua RT --</option>' + 
-        rts.map(r => `<option value="${r}">RT ${r}</option>`).join('');
+      rtSelect.innerHTML = '<option value="" class="text-slate-800">-- Semua RT --</option>' + 
+        rts.map(r => `<option value="${r}" class="text-slate-800">RT ${r}</option>`).join('');
 
-      tpsSelect.innerHTML = '<option value="">-- Semua TPS --</option>' + 
-        tpss.map(t => `<option value="${t}">${t.toLowerCase().startsWith('tps') ? t : 'TPS ' + t}</option>`).join('');
+      tpsSelect.innerHTML = '<option value="" class="text-slate-800">-- Semua TPS --</option>' + 
+        tpss.map(t => `<option value="${t}" class="text-slate-800">TPS ${t}</option>`).join('');
     }
 
     function updateStats() {
@@ -274,9 +299,11 @@
       let uniqueNIK = new Set(filteredData.map(d => d.nik).filter(Boolean)).size;
       let laki = filteredData.filter(d => d.jk.startsWith('L')).length;
       let perempuan = filteredData.filter(d => d.jk.startsWith('P')).length;
-      let sudah = filteredData.filter(d => d.sts.startsWith('S')).length;
-      let belum = filteredData.filter(d => d.sts.startsWith('B')).length;
-      let pernah = filteredData.filter(d => d.sts.startsWith('P')).length;
+      
+      let sudah = filteredData.filter(d => d.sts === 'S').length;
+      let belum = filteredData.filter(d => d.sts === 'B').length;
+      let pernah = filteredData.filter(d => d.sts === 'P').length;
+      
       let uniqueTPS = new Set(filteredData.map(d => d.tps).filter(Boolean)).size;
 
       document.getElementById('statKK').innerText = uniqueKK.toLocaleString('id-ID');
@@ -306,7 +333,7 @@
         let matchJK = !jk || item.jk.startsWith(jk);
         let matchRT = !rt || item.rt === rt;
         let matchTPS = !tps || item.tps === tps;
-        let matchStatus = !status || item.sts.startsWith(status);
+        let matchStatus = !status || item.sts === status;
 
         return matchSearch && matchJK && matchRT && matchTPS && matchStatus;
       });
@@ -322,7 +349,7 @@
       let pageSize = pageSizeVal === 'all' ? filteredData.length : parseInt(pageSizeVal);
       
       if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-slate-400">Data tidak ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center opacity-60">Data tidak ditemukan.</td></tr>`;
         document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
         document.getElementById('pagination').innerHTML = '';
         return;
@@ -338,34 +365,37 @@
       tbody.innerHTML = pageData.map((d, index) => {
         let ttl = d.tempatLahir && d.tglLahir ? `${d.tempatLahir}, ${d.tglLahir}` : (d.tempatLahir || d.tglLahir || '-');
         return `
-          <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-            <td class="p-3 text-center font-medium text-slate-400">${start + index + 1}</td>
-            <td class="p-3 font-mono text-slate-600">${d.nkk || '-'}</td>
-            <td class="p-3 font-mono text-slate-800 font-semibold">${d.nik || '-'}</td>
-            <td class="p-3 font-bold text-slate-900">${d.nama || '-'}</td>
-            <td class="p-3 text-slate-600">${ttl}</td>
+          <tr class="hover:bg-indigo-500/10 transition border-b border-slate-500/10">
+            <td class="p-3 text-center font-medium opacity-50">${start + index + 1}</td>
+            <td class="p-3 font-mono opacity-80">${d.nkk || '-'}</td>
+            <td class="p-3 font-mono font-bold">${d.nik || '-'}</td>
+            <td class="p-3 font-extrabold">${d.nama || '-'}</td>
+            <td class="p-3 opacity-80">${ttl}</td>
             <td class="p-3 text-center font-medium">${d.umur || '-'}</td>
             <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.jk.startsWith('L') ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.jk.startsWith('L') ? 'bg-blue-500/20 text-blue-500' : 'bg-pink-500/20 text-pink-500'}">
                 ${d.jk || '-'}
               </span>
             </td>
-            <td class="p-3 text-center font-medium">${d.sts || '-'}</td>
-            <td class="p-3 text-slate-600">${d.alamat || '-'}</td>
-            <td class="p-3 text-center font-semibold text-slate-700">${d.rt || '-'}</td>
-            <td class="p-3 text-center font-bold text-indigo-600">${d.tps || '-'}</td>
+            <td class="p-3 text-center font-bold text-indigo-500">${d.sts || '-'}</td>
+            <td class="p-3 opacity-80">${d.alamat || '-'}</td>
+            <td class="p-3 text-center font-semibold">${d.rt || '-'}</td>
+            <td class="p-3 text-center">
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-400 font-bold text-xs">
+                TPS ${d.tps || '-'}
+              </span>
+            </td>
           </tr>
         `;
       }).join('');
 
       document.getElementById('pageInfo').innerText = `Menampilkan ${start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} data`;
 
-      // Render Pagination Buttons
       let navHtml = '';
       if (totalPages > 1) {
-        navHtml += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1 rounded bg-slate-200 hover:bg-slate-300 disabled:opacity-40">Prev</button>`;
-        navHtml += `<span class="px-3 py-1 font-semibold text-slate-700">${currentPage} / ${totalPages}</span>`;
-        navHtml += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1 rounded bg-slate-200 hover:bg-slate-300 disabled:opacity-40">Next</button>`;
+        navHtml += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1 rounded border opacity-80 hover:opacity-100 disabled:opacity-30">Prev</button>`;
+        navHtml += `<span class="px-3 py-1 font-semibold">${currentPage} / ${totalPages}</span>`;
+        navHtml += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1 rounded border opacity-80 hover:opacity-100 disabled:opacity-30">Next</button>`;
       }
       document.getElementById('pagination').innerHTML = navHtml;
     }
@@ -375,7 +405,6 @@
       renderTable();
     }
 
-    // Event Listeners
     document.getElementById('searchInput').addEventListener('input', applyFilter);
     document.getElementById('filterJK').addEventListener('change', applyFilter);
     document.getElementById('filterRT').addEventListener('change', applyFilter);
