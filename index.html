@@ -386,7 +386,10 @@
         let rawUmur = cleanKey(item, ['umur', 'usia', 'thn', 'umurthn']);
         let jk = cleanKey(item, ['jk', 'jeniskelamin', 'kelamin']);
         let sts = cleanKey(item, ['sts', 'status', 'statuskawin', 'kawin', 'stskawin', 'statusperkawinan', 'st']);
-        let alamat = cleanKey(item, ['alamat', 'jalan', 'dusun']);
+        
+        // Pencarian variasi header kolom alamat
+        let alamat = cleanKey(item, ['alamat', 'jalan', 'jln', 'dusun', 'desa', 'kelurahan', 'alamatlengkap', 'lokasi', 'domisili']);
+        
         let rt = cleanKey(item, ['rt', 'rwrt', 'rtrw']);
         let tps = cleanKey(item, ['tps', 'notps']);
 
