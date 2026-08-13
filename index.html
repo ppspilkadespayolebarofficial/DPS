@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (xlsx) Library untuk Membaca Excel -->
+    <!-- SheetJS (xlsx) Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Chart.js untuk Grafik -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,7 +18,7 @@
         body {
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 13px;
+            font-size: 12px;
         }
         .card {
             border: none;
@@ -30,10 +30,10 @@
             background: #ffffff;
             border-top: 4px solid #4f46e5;
         }
-        .badge-jk-l { background-color: #3b82f6; color: white; }
-        .badge-jk-p { background-color: #ec4899; color: white; }
-        .badge-tps { background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
-        .badge-sts { background-color: #f3f4f6; color: #374151; }
+        .badge-jk-l { background-color: #3b82f6; color: white; padding: 3px 7px; border-radius: 4px; font-weight: 600; }
+        .badge-jk-p { background-color: #ec4899; color: white; padding: 3px 7px; border-radius: 4px; font-weight: 600; }
+        .badge-tps { background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 3px 7px; border-radius: 4px; font-weight: 600; }
+        .badge-sts { background-color: #f3f4f6; color: #374151; padding: 3px 7px; border-radius: 4px; font-weight: 600; }
         .table-responsive {
             background: white;
             border-radius: 10px;
@@ -54,7 +54,7 @@
         }
         .chart-container {
             position: relative;
-            height: 200px;
+            height: 180px;
         }
     </style>
 </head>
@@ -66,7 +66,7 @@
     <div class="row mb-3">
         <div class="col-md-3">
             <div class="card p-3 text-center">
-                <h6>Jenis Kelamin</h6>
+                <h6 class="fw-bold text-secondary">Jenis Kelamin</h6>
                 <div class="chart-container">
                     <canvas id="chartJK"></canvas>
                 </div>
@@ -74,7 +74,7 @@
         </div>
         <div class="col-md-3">
             <div class="card p-3 text-center">
-                <h6>Status Perkawinan</h6>
+                <h6 class="fw-bold text-secondary">Status Perkawinan</h6>
                 <div class="chart-container">
                     <canvas id="chartStatus"></canvas>
                 </div>
@@ -82,7 +82,7 @@
         </div>
         <div class="col-md-3">
             <div class="card p-3 text-center">
-                <h6>Kelompok Umur</h6>
+                <h6 class="fw-bold text-secondary">Kelompok Umur</h6>
                 <div class="chart-container">
                     <canvas id="chartUmur"></canvas>
                 </div>
@@ -90,7 +90,7 @@
         </div>
         <div class="col-md-3">
             <div class="card p-3 text-center">
-                <h6>Pemilih per TPS</h6>
+                <h6 class="fw-bold text-secondary">Pemilih per TPS</h6>
                 <div class="chart-container">
                     <canvas id="chartTPS"></canvas>
                 </div>
@@ -201,41 +201,45 @@
     let filteredData = [];
     let currentPage = 1;
     let pageSize = 100;
+    let chartJKObj = null, chartStatusObj = null, chartUmurObj = null, chartTPSObj = null;
 
-    // FUNGSI KHUSUS MENGUBAH ANGKA SERIAL EXCEL MENJADI TANGGAL DD/MM/YYYY
-    function convertSerialToDate(serial) {
-        let num = Number(serial);
-        if (isNaN(num) || num < 1000) return serial;
-        
-        // Formula konversi Serial Number Excel ke Tanggal JS
-        let date = new Date((num - (25567 + 2)) * 86400 * 1000);
-        let day = String(date.getDate()).padStart(2, '0');
-        let month = String(date.getMonth() + 1).padStart(2, '0');
-        let year = date.getFullYear();
-        return `${day}/${month}/${year}`;
+    // PENCARI NILAI SANGAT FLEKSIBEL (Cari berdasarkan beberapa kata kunci header)
+    function getValue(row, ...possibleKeys) {
+        if (!row) return '';
+        const keys = Object.keys(row);
+        for (let targetKey of possibleKeys) {
+            const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+            for (let k of keys) {
+                const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (cleanK === cleanTarget) {
+                    let val = row[k];
+                    return (val !== undefined && val !== null) ? String(val).trim() : '';
+                }
+            }
+        }
+        return '';
     }
 
-    // FUNGSI MEMPROSES TEKS "TEMPAT, 24305" BEBAS SERIAL NUMBER
-    function parseTempatTglLahir(val) {
-        if (!val) return '-';
+    // KONVERSI ANGKA SERIAL EXCEL (misal 24305 / 31742) MENJADI DD/MM/YYYY
+    function convertExcelDate(val) {
+        if (!val) return '';
         let str = String(val).trim();
-
-        // 1. Jika ada koma, misal "JAWA TIMUR, 24305"
+        
+        // Kasus: "SINGKUT, 31742" atau "SINGKUT, 29/01/1987"
         if (str.includes(',')) {
             let parts = str.split(',');
             let tempat = parts[0].trim();
             let tglPart = parts[1].trim();
-
-            // Jika bagian setelah koma adalah angka 5 digit (serial Excel)
-            if (/^\d{4,5}$/.test(tglPart)) {
-                return `${tempat}, ${convertSerialToDate(tglPart)}`;
-            }
-            return `${tempat}, ${tglPart.replace(/-/g, '/')}`;
+            return `${tempat}, ${convertExcelDate(tglPart)}`;
         }
 
-        // 2. Jika seluruh isi cell hanya angka serial Excel
-        if (/^\d{4,5}$/.test(str)) {
-            return convertSerialToDate(str);
+        let num = Number(str);
+        if (!isNaN(num) && num > 1000 && num < 60000) {
+            let date = new Date((num - (25567 + 2)) * 86400 * 1000);
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
         }
 
         return str.replace(/-/g, '/');
@@ -260,7 +264,7 @@
                 document.getElementById('tableBody').innerHTML = `
                     <tr>
                         <td colspan="12" class="text-center text-danger py-4">
-                            <strong>Gagal memuat data.xlsx.</strong> Pastikan file data.xlsx telah diunggah ke repository GitHub.
+                            <strong>Gagal memuat file data.xlsx.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code> di root repository.
                         </td>
                     </tr>`;
             });
@@ -271,8 +275,10 @@
         const tpsSet = new Set();
 
         rawData.forEach(row => {
-            if (row.RT) rtSet.add(row.RT);
-            if (row.TPS) tpsSet.add(row.TPS);
+            let rt = getValue(row, 'RT');
+            let tps = getValue(row, 'TPS');
+            if (rt) rtSet.add(rt);
+            if (tps) tpsSet.add(tps);
         });
 
         const filterRT = document.getElementById('filterRT');
@@ -288,29 +294,41 @@
 
     function applyFilter() {
         const cari = document.getElementById('filterCari').value.toLowerCase();
-        const jk = document.getElementById('filterJK').value;
+        const jk = document.getElementById('filterJK').value.toUpperCase();
         const rt = document.getElementById('filterRT').value;
         const tps = document.getElementById('filterTPS').value;
-        const status = document.getElementById('filterStatus').value;
+        const status = document.getElementById('filterStatus').value.toUpperCase();
 
-        filteredData = rawData.filter(item => {
+        filteredData = rawData.filter(row => {
+            const rowNama = getValue(row, 'NAMA').toLowerCase();
+            const rowNik = getValue(row, 'NIK').toLowerCase();
+            const rowNkk = getValue(row, 'NKK').toLowerCase();
+            const rowAlamat = getValue(row, 'ALAMAT').toLowerCase();
+            const rowDpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID', 'NO DP').toLowerCase();
+
             const matchesCari = !cari || 
-                String(item.NAMA || '').toLowerCase().includes(cari) ||
-                String(item.NIK || '').toLowerCase().includes(cari) ||
-                String(item.NKK || '').toLowerCase().includes(cari) ||
-                String(item.ALAMAT || '').toLowerCase().includes(cari) ||
-                String(item['DP-ID'] || item.DP_ID || '').toLowerCase().includes(cari);
+                rowNama.includes(cari) ||
+                rowNik.includes(cari) ||
+                rowNkk.includes(cari) ||
+                rowAlamat.includes(cari) ||
+                rowDpId.includes(cari);
 
-            const matchesJK = !jk || String(item.JK || item.JENIS_KELAMIN || '').toUpperCase() === jk;
-            const matchesRT = !rt || String(item.RT) === String(rt);
-            const matchesTPS = !tps || String(item.TPS) === String(tps);
-            const matchesStatus = !status || String(item.STS || item.STATUS || '').toUpperCase() === status;
+            const rowJK = getValue(row, 'JK', 'JENIS KELAMIN', 'SEX').toUpperCase();
+            const rowRT = getValue(row, 'RT');
+            const rowTPS = getValue(row, 'TPS');
+            const rowStatus = getValue(row, 'STS', 'STATUS', 'STATUS KAWIN').toUpperCase();
+
+            const matchesJK = !jk || rowJK === jk;
+            const matchesRT = !rt || rowRT === rt;
+            const matchesTPS = !tps || rowTPS === tps;
+            const matchesStatus = !status || rowStatus === status;
 
             return matchesCari && matchesJK && matchesRT && matchesTPS && matchesStatus;
         });
 
         currentPage = 1;
         renderTable();
+        updateCharts();
     }
 
     function renderTable() {
@@ -329,24 +347,36 @@
         const pageData = filteredData.slice(startIdx, endIdx);
 
         pageData.forEach((row, index) => {
-            // Mengambil data dari berbagai kemungkinan nama kolom di Excel
-            const rawTempatTgl = row['TEMPAT / TGL LAHIR'] || row['TEMPAT/TGL LAHIR'] || row['TEMPAT_TGL_LAHIR'] || row['TEMPAT LAHIR'] || '';
-            const tempatTglFormatted = parseTempatTglLahir(rawTempatTgl);
+            const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
+            const nkk = getValue(row, 'NKK') || '-';
+            const nik = getValue(row, 'NIK') || '-';
+            const nama = getValue(row, 'NAMA') || '-';
+            
+            // Tempat & Tanggal Lahir
+            const rawTTL = getValue(row, 'TEMPAT/TGL LAHIR', 'TEMPAT / TGL LAHIR', 'TEMPAT_TGL_LAHIR', 'TTL', 'TEMPAT LAHIR');
+            const ttl = convertExcelDate(rawTTL) || '-';
+
+            const umur = getValue(row, 'UMUR', 'USIA') || '-';
+            const jk = getValue(row, 'JK', 'JENIS KELAMIN') || '-';
+            const sts = getValue(row, 'STS', 'STATUS') || '-';
+            const alamat = getValue(row, 'ALAMAT') || '-';
+            const rt = getValue(row, 'RT') || '-';
+            const tps = getValue(row, 'TPS') || '-';
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="text-center text-muted">${startIdx + index + 1}</td>
-                <td class="text-dp-id">${row['DP-ID'] || row.DP_ID || '-'}</td>
-                <td>${row.NKK || '-'}</td>
-                <td>${row.NIK || '-'}</td>
-                <td class="fw-bold">${row.NAMA || '-'}</td>
-                <td>${tempatTglFormatted}</td>
-                <td class="text-center">${row.UMUR || '-'}</td>
-                <td class="text-center"><span class="badge ${row.JK === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${row.JK || '-'}</span></td>
-                <td class="text-center"><span class="badge badge-sts">${row.STS || '-'}</span></td>
-                <td>${row.ALAMAT || '-'}</td>
-                <td class="text-center">${row.RT || '-'}</td>
-                <td class="text-center"><span class="badge badge-tps">${row.TPS || '-'}</span></td>
+                <td class="text-dp-id">${dpId}</td>
+                <td>${nkk}</td>
+                <td>${nik}</td>
+                <td class="fw-bold">${nama}</td>
+                <td>${ttl}</td>
+                <td class="text-center">${umur}</td>
+                <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
+                <td class="text-center"><span class="badge badge-sts">${sts}</span></td>
+                <td>${alamat}</td>
+                <td class="text-center">${rt}</td>
+                <td class="text-center"><span class="badge badge-tps">${tps}</span></td>
             `;
             tbody.appendChild(tr);
         });
@@ -417,36 +447,76 @@
     }
 
     function initCharts() {
-        new Chart(document.getElementById('chartJK'), {
+        // Chart JK
+        chartJKObj = new Chart(document.getElementById('chartJK'), {
             type: 'doughnut',
-            data: {
-                labels: ['Laki-Laki', 'Perempuan'],
-                datasets: [{
-                    data: [
-                        rawData.filter(d => d.JK === 'L').length,
-                        rawData.filter(d => d.JK === 'P').length
-                    ],
-                    backgroundColor: ['#3b82f6', '#ec4899']
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [0, 0], backgroundColor: ['#3b82f6', '#ec4899'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
-        new Chart(document.getElementById('chartStatus'), {
+        // Chart Status
+        chartStatusObj = new Chart(document.getElementById('chartStatus'), {
             type: 'doughnut',
-            data: {
-                labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'],
-                datasets: [{
-                    data: [
-                        rawData.filter(d => d.STS === 'S').length,
-                        rawData.filter(d => d.STS === 'B').length,
-                        rawData.filter(d => d.STS === 'P').length
-                    ],
-                    backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6']
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
+
+        // Chart Umur
+        chartUmurObj = new Chart(document.getElementById('chartUmur'), {
+            type: 'bar',
+            data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Jumlah', data: [0,0,0,0], backgroundColor: '#10b981' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // Chart TPS
+        chartTPSObj = new Chart(document.getElementById('chartTPS'), {
+            type: 'bar',
+            data: { labels: [], datasets: [{ label: 'Pemilih', data: [], backgroundColor: '#6366f1' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        updateCharts();
+    }
+
+    function updateCharts() {
+        if (!chartJKObj) return;
+
+        // 1. Jenis Kelamin
+        let l = filteredData.filter(d => getValue(d, 'JK', 'JENIS KELAMIN').toUpperCase() === 'L').length;
+        let p = filteredData.filter(d => getValue(d, 'JK', 'JENIS KELAMIN').toUpperCase() === 'P').length;
+        chartJKObj.data.datasets[0].data = [l, p];
+        chartJKObj.update();
+
+        // 2. Status Perkawinan
+        let s = filteredData.filter(d => getValue(d, 'STS', 'STATUS').toUpperCase() === 'S').length;
+        let b = filteredData.filter(d => getValue(d, 'STS', 'STATUS').toUpperCase() === 'B').length;
+        let pr = filteredData.filter(d => getValue(d, 'STS', 'STATUS').toUpperCase() === 'P').length;
+        chartStatusObj.data.datasets[0].data = [s, b, pr];
+        chartStatusObj.update();
+
+        // 3. Kelompok Umur
+        let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
+        filteredData.forEach(d => {
+            let u = parseInt(getValue(d, 'UMUR', 'USIA'));
+            if (!isNaN(u)) {
+                if (u < 20) u20++;
+                else if (u < 40) u40++;
+                else if (u < 60) u60++;
+                else uOld++;
+            }
+        });
+        chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
+        chartUmurObj.update();
+
+        // 4. TPS
+        let tpsCounts = {};
+        filteredData.forEach(d => {
+            let tps = getValue(d, 'TPS');
+            if (tps) tpsCounts[tps] = (tpsCounts[tps] || 0) + 1;
+        });
+        chartTPSObj.data.labels = Object.keys(tpsCounts);
+        chartTPSObj.data.datasets[0].data = Object.values(tpsCounts);
+        chartTPSObj.update();
     }
 </script>
 
