@@ -1,395 +1,729 @@
-<script>
-    let rawData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    let pageSize = 100;
-    let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
-
-    const isMasked = true;
-
-    function maskIdentity(str) {
-        if (!str) return '-';
-        let cleanStr = String(str).replace(/\D/g, '').trim(); 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pemilih Sementara - Pilkades Payo Lebar 2026</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            background: #ffffff;
+            margin-bottom: 20px;
+        }
+        .header-title {
+            font-weight: 800;
+            color: #0f172a;
+        }
         
-        if (!isMasked || cleanStr.length < 10) {
-            return str || '-';
+        /* STAT CARDS */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border: 1px solid #f1f5f9;
+            height: 100%;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .val-total { color: #4f46e5; }
+        .val-kk { color: #059669; }
+        .val-l { color: #2563eb; }
+        .val-p { color: #db2777; }
+        .val-sudah { color: #16a34a; }
+        .val-belum { color: #d97706; }
+        .val-pernah { color: #9333ea; }
+
+        /* CHART BOX */
+        .chart-box {
+            position: relative;
+            height: 200px;
         }
 
-        let prefix = cleanStr.substring(0, 6);
-        let suffix = cleanStr.substring(cleanStr.length - 4);
-        return `${prefix}xxxxxx${suffix}`;
-    }
+        /* TABLE STYLES */
+        .table-container {
+            overflow-x: auto;
+        }
+        .table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            padding: 12px 10px;
+        }
+        .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+            white-space: nowrap;
+            border-top: 1px solid #f1f5f9;
+            padding: 10px;
+        }
+        
+        /* PEMISAH NKK / KK DI MONITOR */
+        tr.nkk-group-border td {
+            border-top: 3px solid #0f172a !important;
+        }
 
-    function getValue(row, ...possibleKeys) {
-        if (!row) return '';
-        const keys = Object.keys(row);
-        for (let targetKey of possibleKeys) {
-            const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
-            for (let k of keys) {
-                const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-                if (cleanK === cleanTarget) {
-                    let val = row[k];
-                    return (val !== undefined && val !== null) ? val : '';
-                }
+        .badge-jk-l { background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 4px 8px; }
+        .badge-jk-p { background-color: #fce7f3; color: #9d174d; font-weight: 600; padding: 4px 8px; }
+        .text-dp-id { color: #ef4444; font-weight: 700; }
+
+        .print-only-header {
+            display: none;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            .no-print, .pagination, #pageSize, .d-flex.justify-content-between {
+                display: none !important;
+            }
+            .print-only-header {
+                display: block !important;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #000000;
+                padding-bottom: 8px;
+            }
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .card-custom {
+                box-shadow: none !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            .table-container {
+                overflow: visible !important;
+            }
+            table.table {
+                width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+            }
+            table.table th, table.table td {
+                padding: 4px 3px !important;
+                font-size: 7pt !important;
+                word-wrap: break-word !important;
+                white-space: normal !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            table.table tr.nkk-group-border td {
+                border-top: 3px solid #000000 !important;
             }
         }
-        return '';
-    }
+    </style>
+</head>
+<body class="py-4">
 
-    // FUNGSI TANGGAL YANG DIPERBAIKI SECARA PRESISI
-    function formatTanggal(val) {
-        if (!val) return '';
+    <div class="container-fluid px-4">
         
-        // Jika sudah objek Date
-        if (val instanceof Date) {
-            let d = String(val.getDate()).padStart(2, '0');
-            let m = String(val.getMonth() + 1).padStart(2, '0');
-            let y = val.getFullYear();
-            return `${d}/${m}/${y}`;
-        }
-        
-        let str = String(val).trim();
-        if (!str) return '';
+        <!-- HEADER UTAMA -->
+        <div class="card card-custom p-4 no-print">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="header-title m-0">Dashboard & Filter Data Pemilih</h3>
+                    <div class="text-secondary fw-semibold mt-1" style="font-size: 0.95rem;">
+                        Daftar Pemilih Sementara (DPS)
+                    </div>
+                    <div class="text-muted mt-1" style="font-size: 0.85rem;">
+                        Pemilihan Kepala Desa Payo Lebar, Kecamatan Singkut, Kabupaten Sarolangun Tahun 2026
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        // Tangani format teks hasil bawaan SheetJS (misal: "7/17/66", "11/26/1986", "2026-08-14")
-        if (str.includes('/') || str.includes('-')) {
-            if (str.includes('T')) str = str.split('T')[0];
-            let parts = str.split(/[\/-]/);
+        <!-- STAT CARDS -->
+        <div class="row g-2 mb-3 no-print">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL DATA</div>
+                    <div class="stat-value val-total" id="stTotal">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">JUMLAH KK</div>
+                    <div class="stat-value val-kk" id="stKK">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">LAKI-LAKI (L)</div>
+                    <div class="stat-value val-l" id="stL">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-label">PEREMPUAN (P)</div>
+                    <div class="stat-value val-p" id="stP">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">SUDAH KAWIN (S)</div>
+                    <div class="stat-value val-sudah" id="stSudah">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">BELUM KAWIN (B)</div>
+                    <div class="stat-value val-belum" id="stBelum">0</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-12 mt-2">
+                <div class="stat-card">
+                    <div class="stat-label">PERNAH KAWIN (P)</div>
+                    <div class="stat-value val-pernah" id="stPernah">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFIK VISUAL -->
+        <div class="row g-3 mb-4 no-print">
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-venus-mars me-1"></i> GENDER PEMILIH</h6>
+                    <div class="chart-box">
+                        <canvas id="chartJK"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-ring me-1"></i> STATUS KAWIN</h6>
+                    <div class="chart-box">
+                        <canvas id="chartStatus"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-custom p-3 text-center">
+                    <h6 class="text-muted fw-bold small mb-2"><i class="fa-solid fa-chart-column me-1"></i> KELOMPOK UMUR</h6>
+                    <div class="chart-box">
+                        <canvas id="chartUmur"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL FILTER -->
+        <div class="card card-custom p-4 no-print">
+            <h6 class="fw-bold mb-3 text-slate-700"><i class="fa-solid fa-filter me-2 text-primary"></i>Filter Data Pemilih</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-bold">CARI (NAMA/NIK/NKK/ALAMAT/DP-ID)</label>
+                    <input type="text" id="filterCari" class="form-control form-control-sm" placeholder="Ketik kata kunci..." oninput="applyFilter()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">JENIS KELAMIN</label>
+                    <select id="filterJK" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua --</option>
+                        <option value="L">Laki-Laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">PILIH RT KTP</label>
+                    <select id="filterRT" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua RT --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">STATUS KAWIN</label>
+                    <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilter()">
+                        <option value="">-- Semua Status --</option>
+                        <option value="S">Sudah (S)</option>
+                        <option value="B">Belum (B)</option>
+                        <option value="P">Pernah (P)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABEL DATA -->
+        <div class="card card-custom p-4">
             
-            if (parts.length === 3) {
-                let p1 = parseInt(parts[0], 10);
-                let p2 = parseInt(parts[1], 10);
-                let p3 = parseInt(parts[2], 10);
+            <div class="print-only-header text-center">
+                <h4 class="fw-bold m-0 text-uppercase" style="letter-spacing: 1px;">DAFTAR PEMILIH SEMENTARA (DPS)</h4>
+                <div class="fw-semibold mt-1" style="font-size: 9.5pt;">
+                    Pemilihan Kepala Desa Payo Lebar, Kecamatan Singkut, Kabupaten Sarolangun Tahun 2026
+                </div>
+            </div>
 
-                let day, month, year;
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <div class="d-flex align-items-center">
+                    <span class="me-2 text-muted small fw-bold">Baris per halaman:</span>
+                    <select id="pageSize" class="form-select form-select-sm" style="width: 80px;" onchange="changePageSize()">
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="500">500</option>
+                        <option value="10000">Semua Data</option>
+                    </select>
+                </div>
+                <div id="paginationInfo" class="text-muted small">Memuat data...</div>
+            </div>
 
-                // Format YYYY-MM-DD
-                if (parts[0].length === 4) {
-                    year = p1;
-                    month = p2;
-                    day = p3;
-                } else {
-                    // Format M/D/YY atau M/D/YYYY dari Excel (US style)
-                    // Jika angka kedua > 12, pasti itu adalah HARI (p2 = day, p1 = month)
-                    if (p2 > 12) {
-                        month = p1;
-                        day = p2;
-                    } else if (p1 > 12) {
-                        day = p1;
+            <div class="table-container">
+                <table class="table align-middle" id="dpsTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">NO</th>
+                            <th>DP-ID</th>
+                            <th>NKK</th>
+                            <th>NIK</th>
+                            <th>NAMA</th>
+                            <th>TEMPAT / TGL LAHIR</th>
+                            <th class="text-center">UMUR</th>
+                            <th class="text-center">JK</th>
+                            <th class="text-center">STS</th>
+                            <th>ALAMAT</th>
+                            <th class="text-center">RT KTP</th>
+                            <th class="text-center">RT DOMISILI</th>
+                            <th class="text-center">KETERANGAN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="13" class="text-center py-4 text-muted">
+                                <i class="fa-solid fa-spinner fa-spin me-2"></i> Sedang mengambil data Excel...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3 no-print">
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT JAVASCRIPT LENGKAP -->
+    <script>
+        let rawData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let pageSize = 100;
+        let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
+
+        const isMasked = true;
+
+        function maskIdentity(str) {
+            if (!str) return '-';
+            let cleanStr = String(str).replace(/\D/g, '').trim(); 
+            
+            if (!isMasked || cleanStr.length < 10) {
+                return str || '-';
+            }
+
+            let prefix = cleanStr.substring(0, 6);
+            let suffix = cleanStr.substring(cleanStr.length - 4);
+            return prefix + "xxxxxx" + suffix;
+        }
+
+        function getValue(row, ...possibleKeys) {
+            if (!row) return '';
+            const keys = Object.keys(row);
+            for (let targetKey of possibleKeys) {
+                const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+                for (let k of keys) {
+                    const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (cleanK === cleanTarget) {
+                        let val = row[k];
+                        return (val !== undefined && val !== null) ? val : '';
+                    }
+                }
+            }
+            return '';
+        }
+
+        function formatTanggal(val) {
+            if (!val) return '';
+            
+            if (val instanceof Date) {
+                let d = String(val.getDate()).padStart(2, '0');
+                let m = String(val.getMonth() + 1).padStart(2, '0');
+                let y = val.getFullYear();
+                return d + '/' + m + '/' + y;
+            }
+            
+            let str = String(val).trim();
+            if (!str) return '';
+
+            if (str.includes('/') || str.includes('-')) {
+                if (str.includes('T')) str = str.split('T')[0];
+                let parts = str.split(/[\/-]/);
+                
+                if (parts.length === 3) {
+                    let p1 = parseInt(parts[0], 10);
+                    let p2 = parseInt(parts[1], 10);
+                    let p3 = parseInt(parts[2], 10);
+
+                    let day, month, year;
+
+                    if (parts[0].length === 4) {
+                        year = p1;
                         month = p2;
+                        day = p3;
                     } else {
-                        // Default fallback untuk M/D/YY bawaan Excel US
-                        month = p1;
-                        day = p2;
+                        if (p2 > 12) {
+                            month = p1;
+                            day = p2;
+                        } else if (p1 > 12) {
+                            day = p1;
+                            month = p2;
+                        } else {
+                            month = p1;
+                            day = p2;
+                        }
+
+                        year = p3;
+                        if (year < 100) {
+                            year = (year > 30) ? 1900 + year : 2000 + year;
+                        }
                     }
 
-                    year = p3;
-                    // Konversi tahun 2 digit (misal: '66' -> 1966, '06' -> 2006)
-                    if (year < 100) {
-                        year = (year > 30) ? 1900 + year : 2000 + year;
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                        let dStr = String(day).padStart(2, '0');
+                        let mStr = String(month).padStart(2, '0');
+                        return dStr + '/' + mStr + '/' + year;
                     }
                 }
+            }
 
-                if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                    let dStr = String(day).padStart(2, '0');
-                    let mStr = String(month).padStart(2, '0');
-                    return `${dStr}/${mStr}/${year}`;
+            let num = Number(str);
+            if (!isNaN(num) && num > 1000 && num < 60000) {
+                if (window.XLSX && XLSX.SSF) {
+                    return XLSX.SSF.format("dd/mm/yyyy", num);
                 }
             }
+
+            return str;
         }
 
-        // Tangani angka Serial Number Excel jika berupa angka murni
-        let num = Number(str);
-        if (!isNaN(num) && num > 1000 && num < 60000) {
-            if (window.XLSX && XLSX.SSF) {
-                return XLSX.SSF.format("dd/mm/yyyy", num);
+        function formatTTL(tempat, tgl) {
+            let tglFormatted = formatTanggal(tgl);
+            let tempatStr = String(tempat || '').trim();
+            if (tempatStr && tglFormatted) {
+                return tempatStr + ', ' + tglFormatted;
             }
+            return tempatStr || tglFormatted || '-';
         }
 
-        return str;
-    }
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('data.xlsx')
+                .then(res => {
+                    if (!res.ok) throw new Error('File not found');
+                    return res.arrayBuffer();
+                })
+                .then(buffer => {
+                    const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false });
+                    
+                    rawData = loadedData.sort((a, b) => {
+                        let rtA = parseInt(getValue(a, 'RT KTP', 'RT_KTP', 'RT')) || 999;
+                        let rtB = parseInt(getValue(b, 'RT KTP', 'RT_KTP', 'RT')) || 999;
+                        if (rtA !== rtB) return rtA - rtB;
 
-    function formatTTL(tempat, tgl) {
-        let tglFormatted = formatTanggal(tgl);
-        let tempatStr = String(tempat || '').trim();
-        if (tempatStr && tglFormatted) {
-            return `${tempatStr}, ${tglFormatted}`;
-        }
-        return tempatStr || tglFormatted || '-';
-    }
+                        let nkkA = String(getValue(a, 'NKK')).trim();
+                        let nkkB = String(getValue(b, 'NKK')).trim();
+                        return nkkA.localeCompare(nkkB);
+                    });
 
-    window.addEventListener('DOMContentLoaded', () => {
-        fetch('data.xlsx')
-            .then(res => {
-                if (!res.ok) throw new Error('File not found');
-                return res.arrayBuffer();
-            })
-            .then(buffer => {
-                const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false });
-                
-                rawData = loadedData.sort((a, b) => {
-                    let rtA = parseInt(getValue(a, 'RT KTP', 'RT_KTP', 'RT')) || 999;
-                    let rtB = parseInt(getValue(b, 'RT KTP', 'RT_KTP', 'RT')) || 999;
-                    if (rtA !== rtB) return rtA - rtB;
-
-                    let nkkA = String(getValue(a, 'NKK')).trim();
-                    let nkkB = String(getValue(b, 'NKK')).trim();
-                    return nkkA.localeCompare(nkkB);
+                    initDropdowns();
+                    applyFilter();
+                    initCharts();
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('tableBody').innerHTML = `
+                        <tr>
+                            <td colspan="13" class="text-center text-danger py-4">
+                                <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
+                            </td>
+                        </tr>`;
                 });
+        });
 
-                initDropdowns();
-                applyFilter();
-                initCharts();
-            })
-            .catch(err => {
-                document.getElementById('tableBody').innerHTML = `
-                    <tr>
-                        <td colspan="13" class="text-center text-danger py-4">
-                            <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
-                        </td>
-                    </tr>`;
+        function initDropdowns() {
+            const rtSet = new Set();
+            rawData.forEach(row => {
+                let rt = getValue(row, 'RT KTP', 'RT_KTP', 'RT');
+                if (rt) rtSet.add(parseInt(rt) || String(rt).trim());
             });
-    });
 
-    function initDropdowns() {
-        const rtSet = new Set();
-        rawData.forEach(row => {
-            let rt = getValue(row, 'RT KTP', 'RT_KTP', 'RT');
-            if (rt) rtSet.add(parseInt(rt) || String(rt).trim());
-        });
-
-        const filterRT = document.getElementById('filterRT');
-        filterRT.innerHTML = '<option value="">-- Semua RT --</option>';
-        Array.from(rtSet).sort((a,b)=>a-b).forEach(rt => {
-            filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
-        });
-    }
-
-    function applyFilter() {
-        const cari = document.getElementById('filterCari').value.toLowerCase();
-        const jk = document.getElementById('filterJK').value.toUpperCase();
-        const rt = document.getElementById('filterRT').value;
-        const status = document.getElementById('filterStatus').value.toUpperCase();
-
-        filteredData = rawData.filter(row => {
-            const rowNama = String(getValue(row, 'NAMA')).toLowerCase();
-            const rowNik = String(getValue(row, 'NIK')).toLowerCase();
-            const rowNkk = String(getValue(row, 'NKK')).toLowerCase();
-            const rowAlamat = String(getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT')).toLowerCase();
-            const rowDpId = String(getValue(row, 'DP-ID', 'DP_ID', 'DPID', 'NO DP')).toLowerCase();
-
-            const matchesCari = !cari || 
-                rowNama.includes(cari) ||
-                rowNik.includes(cari) ||
-                rowNkk.includes(cari) ||
-                rowAlamat.includes(cari) ||
-                rowDpId.includes(cari);
-
-            const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
-            const rowRT = String(getValue(row, 'RT KTP', 'RT_KTP', 'RT')).trim();
-            const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
-
-            const matchesJK = !jk || rowJK === jk;
-            const matchesRT = !rt || rowRT === rt;
-            const matchesStatus = !status || rowStatus === status;
-
-            return matchesCari && matchesJK && matchesRT && matchesStatus;
-        });
-
-        currentPage = 1;
-        renderTable();
-        updateStats();
-        updateCharts();
-    }
-
-    function updateStats() {
-        const total = filteredData.length;
-        const kkSet = new Set();
-        let l = 0, p = 0, s = 0, b = 0, pr = 0;
-
-        filteredData.forEach(row => {
-            const nkk = getValue(row, 'NKK');
-            if (nkk) kkSet.add(String(nkk).trim());
-
-            const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
-            if (jk === 'L') l++;
-            else if (jk === 'P') p++;
-
-            const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
-            if (sts === 'S') s++;
-            else if (sts === 'B') b++;
-            else if (sts === 'P') pr++;
-        });
-
-        document.getElementById('stTotal').innerText = total.toLocaleString('id-ID');
-        document.getElementById('stKK').innerText = kkSet.size.toLocaleString('id-ID');
-        document.getElementById('stL').innerText = l.toLocaleString('id-ID');
-        document.getElementById('stP').innerText = p.toLocaleString('id-ID');
-        document.getElementById('stSudah').innerText = s.toLocaleString('id-ID');
-        document.getElementById('stBelum').innerText = b.toLocaleString('id-ID');
-        document.getElementById('stPernah').innerText = pr.toLocaleString('id-ID');
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        if (filteredData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="13" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
-            document.getElementById('paginationInfo').innerText = 'Menampilkan 0 data';
-            document.getElementById('pagination').innerHTML = '';
-            return;
+            const filterRT = document.getElementById('filterRT');
+            filterRT.innerHTML = '<option value="">-- Semua RT --</option>';
+            Array.from(rtSet).sort((a,b)=>a-b).forEach(rt => {
+                filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
+            });
         }
 
-        const startIdx = (currentPage - 1) * pageSize;
-        const endIdx = Math.min(startIdx + pageSize, filteredData.length);
-        const pageData = filteredData.slice(startIdx, endIdx);
+        function applyFilter() {
+            const cari = document.getElementById('filterCari').value.toLowerCase();
+            const jk = document.getElementById('filterJK').value.toUpperCase();
+            const rt = document.getElementById('filterRT').value;
+            const status = document.getElementById('filterStatus').value.toUpperCase();
 
-        let lastNKK = null;
+            filteredData = rawData.filter(row => {
+                const rowNama = String(getValue(row, 'NAMA')).toLowerCase();
+                const rowNik = String(getValue(row, 'NIK')).toLowerCase();
+                const rowNkk = String(getValue(row, 'NKK')).toLowerCase();
+                const rowAlamat = String(getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT')).toLowerCase();
+                const rowDpId = String(getValue(row, 'DP-ID', 'DP_ID', 'DPID', 'NO DP')).toLowerCase();
 
-        pageData.forEach((row, index) => {
-            const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
-            const rawNkk = String(getValue(row, 'NKK') || '').trim();
-            const rawNik = String(getValue(row, 'NIK') || '').trim();
-            
-            const maskedNkk = maskIdentity(rawNkk);
-            const maskedNik = maskIdentity(rawNik);
+                const matchesCari = !cari || 
+                    rowNama.includes(cari) ||
+                    rowNik.includes(cari) ||
+                    rowNkk.includes(cari) ||
+                    rowAlamat.includes(cari) ||
+                    rowDpId.includes(cari);
 
-            const nama = getValue(row, 'NAMA') || '-';
-            
-            const tempatLahir = getValue(row, 'TEMPAT LAHIR', 'TEMPAT_LAHIR');
-            const tglLahir = getValue(row, 'TANGGAL LAHIR', 'TANGGAL_LAHIR', 'TGL LAHIR');
-            const ttl = formatTTL(tempatLahir, tglLahir);
+                const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
+                const rowRT = String(getValue(row, 'RT KTP', 'RT_KTP', 'RT')).trim();
+                const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
 
-            const umur = getValue(row, 'USIA', 'UMUR') || '-';
-            const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase() || '-';
-            const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() || '-';
-            const alamat = getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT') || '-';
-            const rtKtp = getValue(row, 'RT KTP', 'RT_KTP', 'RT') || '-';
-            const rtDomisili = getValue(row, 'RT DOMISILI', 'RT_DOMISILI') || '-';
-            const keterangan = getValue(row, 'KETERANGAN') || '';
+                const matchesJK = !jk || rowJK === jk;
+                const matchesRT = !rt || rowRT === rt;
+                const matchesStatus = !status || rowStatus === status;
 
-            const tr = document.createElement('tr');
+                return matchesCari && matchesJK && matchesRT && matchesStatus;
+            });
 
-            if (index > 0 && rawNkk !== lastNKK) {
-                tr.classList.add('nkk-group-border');
+            currentPage = 1;
+            renderTable();
+            updateStats();
+            updateCharts();
+        }
+
+        function updateStats() {
+            const total = filteredData.length;
+            const kkSet = new Set();
+            let l = 0, p = 0, s = 0, b = 0, pr = 0;
+
+            filteredData.forEach(row => {
+                const nkk = getValue(row, 'NKK');
+                if (nkk) kkSet.add(String(nkk).trim());
+
+                const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
+                if (jk === 'L') l++;
+                else if (jk === 'P') p++;
+
+                const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
+                if (sts === 'S') s++;
+                else if (sts === 'B') b++;
+                else if (sts === 'P') pr++;
+            });
+
+            document.getElementById('stTotal').innerText = total.toLocaleString('id-ID');
+            document.getElementById('stKK').innerText = kkSet.size.toLocaleString('id-ID');
+            document.getElementById('stL').innerText = l.toLocaleString('id-ID');
+            document.getElementById('stP').innerText = p.toLocaleString('id-ID');
+            document.getElementById('stSudah').innerText = s.toLocaleString('id-ID');
+            document.getElementById('stBelum').innerText = b.toLocaleString('id-ID');
+            document.getElementById('stPernah').innerText = pr.toLocaleString('id-ID');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
+                document.getElementById('paginationInfo').innerText = 'Menampilkan 0 data';
+                document.getElementById('pagination').innerHTML = '';
+                return;
             }
-            lastNKK = rawNkk;
 
-            tr.innerHTML = `
-                <td class="text-center text-muted">${startIdx + index + 1}</td>
-                <td class="text-dp-id">${dpId}</td>
-                <td class="fw-bold text-dark">${maskedNkk}</td>
-                <td>${maskedNik}</td>
-                <td class="fw-bold">${nama}</td>
-                <td>${ttl}</td>
-                <td class="text-center">${umur} thn</td>
-                <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
-                <td class="text-center">${sts}</td>
-                <td>${alamat}</td>
-                <td class="text-center fw-bold">${rtKtp}</td>
-                <td class="text-center fw-bold text-primary">${rtDomisili}</td>
-                <td>${keterangan}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIdx, endIdx);
 
-        document.getElementById('paginationInfo').innerText = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${filteredData.length} data`;
-        renderPagination();
-    }
+            let lastNKK = null;
 
-    function renderPagination() {
-        const totalPages = Math.ceil(filteredData.length / pageSize);
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = '';
+            pageData.forEach((row, index) => {
+                const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
+                const rawNkk = String(getValue(row, 'NKK') || '').trim();
+                const rawNik = String(getValue(row, 'NIK') || '').trim();
+                
+                const maskedNkk = maskIdentity(rawNkk);
+                const maskedNik = maskIdentity(rawNik);
 
-        if (totalPages <= 1) return;
+                const nama = getValue(row, 'NAMA') || '-';
+                
+                const tempatLahir = getValue(row, 'TEMPAT LAHIR', 'TEMPAT_LAHIR');
+                const tglLahir = getValue(row, 'TANGGAL LAHIR', 'TANGGAL_LAHIR', 'TGL LAHIR');
+                const ttl = formatTTL(tempatLahir, tglLahir);
 
-        let prevClass = currentPage === 1 ? 'disabled' : '';
-        pagination.innerHTML += `<li class="page-item ${prevClass}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Prev</a></li>`;
+                const umur = getValue(row, 'USIA', 'UMUR') || '-';
+                const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase() || '-';
+                const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() || '-';
+                const alamat = getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT') || '-';
+                const rtKtp = getValue(row, 'RT KTP', 'RT_KTP', 'RT') || '-';
+                const rtDomisili = getValue(row, 'RT DOMISILI', 'RT_DOMISILI') || '-';
+                const keterangan = getValue(row, 'KETERANGAN') || '';
 
-        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-            let activeClass = currentPage === i ? 'active' : '';
-            pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+                const tr = document.createElement('tr');
+
+                if (index > 0 && rawNkk !== lastNKK) {
+                    tr.classList.add('nkk-group-border');
+                }
+                lastNKK = rawNkk;
+
+                tr.innerHTML = `
+                    <td class="text-center text-muted">${startIdx + index + 1}</td>
+                    <td class="text-dp-id">${dpId}</td>
+                    <td class="fw-bold text-dark">${maskedNkk}</td>
+                    <td>${maskedNik}</td>
+                    <td class="fw-bold">${nama}</td>
+                    <td>${ttl}</td>
+                    <td class="text-center">${umur} thn</td>
+                    <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
+                    <td class="text-center">${sts}</td>
+                    <td>${alamat}</td>
+                    <td class="text-center fw-bold">${rtKtp}</td>
+                    <td class="text-center fw-bold text-primary">${rtDomisili}</td>
+                    <td>${keterangan}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('paginationInfo').innerText = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${filteredData.length} data`;
+            renderPagination();
         }
 
-        let nextClass = currentPage === totalPages ? 'disabled' : '';
-        pagination.innerHTML += `<li class="page-item ${nextClass}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a></li>`;
-    }
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
 
-    function changePage(page) {
-        const totalPages = Math.ceil(filteredData.length / pageSize);
-        if (page >= 1 && page <= totalPages) {
-            currentPage = page;
+            if (totalPages <= 1) return;
+
+            let prevClass = currentPage === 1 ? 'disabled' : '';
+            pagination.innerHTML += `<li class="page-item ${prevClass}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Prev</a></li>`;
+
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                let activeClass = currentPage === i ? 'active' : '';
+                pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+            }
+
+            let nextClass = currentPage === totalPages ? 'disabled' : '';
+            pagination.innerHTML += `<li class="page-item ${nextClass}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a></li>`;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+            }
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
             renderTable();
         }
-    }
 
-    function changePageSize() {
-        pageSize = parseInt(document.getElementById('pageSize').value);
-        currentPage = 1;
-        renderTable();
-    }
+        function resetFilter() {
+            document.getElementById('filterCari').value = '';
+            document.getElementById('filterJK').value = '';
+            document.getElementById('filterRT').value = '';
+            document.getElementById('filterStatus').value = '';
+            applyFilter();
+        }
 
-    function resetFilter() {
-        document.getElementById('filterCari').value = '';
-        document.getElementById('filterJK').value = '';
-        document.getElementById('filterRT').value = '';
-        document.getElementById('filterStatus').value = '';
-        applyFilter();
-    }
+        function initCharts() {
+            chartJKObj = new Chart(document.getElementById('chartJK'), {
+                type: 'doughnut',
+                data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [0, 0], backgroundColor: ['#3b82f6', '#ec4899'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
 
-    function initCharts() {
-        chartJKObj = new Chart(document.getElementById('chartJK'), {
-            type: 'doughnut',
-            data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [0, 0], backgroundColor: ['#3b82f6', '#ec4899'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-        });
+            chartStatusObj = new Chart(document.getElementById('chartStatus'), {
+                type: 'doughnut',
+                data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
 
-        chartStatusObj = new Chart(document.getElementById('chartStatus'), {
-            type: 'doughnut',
-            data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-        });
+            chartUmurObj = new Chart(document.getElementById('chartUmur'), {
+                type: 'bar',
+                data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Pemilih', data: [0,0,0,0], backgroundColor: '#10b981' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
 
-        chartUmurObj = new Chart(document.getElementById('chartUmur'), {
-            type: 'bar',
-            data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ label: 'Pemilih', data: [0,0,0,0], backgroundColor: '#10b981' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
+            updateCharts();
+        }
 
-        updateCharts();
-    }
+        function updateCharts() {
+            if (!chartJKObj) return;
 
-    function updateCharts() {
-        if (!chartJKObj) return;
+            let l = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'L').length;
+            let p = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'P').length;
+            chartJKObj.data.datasets[0].data = [l, p];
+            chartJKObj.update();
 
-        let l = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'L').length;
-        let p = filteredData.filter(d => String(getValue(d, 'JENIS KELAMIN', 'JK')).toUpperCase() === 'P').length;
-        chartJKObj.data.datasets[0].data = [l, p];
-        chartJKObj.update();
+            let s = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'S').length;
+            let b = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'B').length;
+            let pr = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'P').length;
+            chartStatusObj.data.datasets[0].data = [s, b, pr];
+            chartStatusObj.update();
 
-        let s = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'S').length;
-        let b = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'B').length;
-        let pr = filteredData.filter(d => String(getValue(d, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() === 'P').length;
-        chartStatusObj.data.datasets[0].data = [s, b, pr];
-        chartStatusObj.update();
-
-        let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
-        filteredData.forEach(d => {
-            let u = parseInt(getValue(d, 'USIA', 'UMUR'));
-            if (!isNaN(u)) {
-                if (u < 20) u20++;
-                else if (u < 40) u40++;
-                else if (u < 60) u60++;
-                else uOld++;
-            }
-        });
-        chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
-        chartUmurObj.update();
-    }
-</script>
+            let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
+            filteredData.forEach(d => {
+                let u = parseInt(getValue(d, 'USIA', 'UMUR'));
+                if (!isNaN(u)) {
+                    if (u < 20) u20++;
+                    else if (u < 40) u40++;
+                    else if (u < 60) u60++;
+                    else uOld++;
+                }
+            });
+            chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
+            chartUmurObj.update();
+        }
+    </script>
+</body>
+</html>
