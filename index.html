@@ -287,7 +287,6 @@
                 </div>
             </div>
 
-            <!-- ACTION BAR / DOWNLOAD & PRINT MENU -->
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                 <div class="d-flex align-items-center">
                     <span class="me-2 text-muted small fw-bold">Baris per halaman:</span>
@@ -299,15 +298,7 @@
                         <option value="10000">Semua Data</option>
                     </select>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span id="paginationInfo" class="text-muted small me-2">Memuat data...</span>
-                    <button class="btn btn-sm btn-outline-danger" onclick="window.print()">
-                        <i class="fa-solid fa-print me-1"></i> Cetak / PDF
-                    </button>
-                    <button class="btn btn-sm btn-success" onclick="exportToExcel()">
-                        <i class="fa-solid fa-file-excel me-1"></i> Export Excel
-                    </button>
-                </div>
+                <div id="paginationInfo" class="text-muted small">Memuat data...</div>
             </div>
 
             <div class="table-container">
@@ -354,8 +345,7 @@
         let pageSize = 100;
         let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
 
-        // DIUBAH MENJADI FALSE AGAR NIK DAN NKK MUNCUL PENUH
-        const isMasked = false;
+        const isMasked = true;
 
         function maskIdentity(str) {
             if (!str) return '-';
@@ -683,38 +673,6 @@
             document.getElementById('filterRT').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
-        }
-
-        // FUNGSI EKSPOR EXCEL
-        function exportToExcel() {
-            if (filteredData.length === 0) {
-                alert("Tidak ada data untuk di-export!");
-                return;
-            }
-
-            const exportData = filteredData.map((row, index) => {
-                return {
-                    "NO": index + 1,
-                    "DP-ID": getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-',
-                    "NKK": String(getValue(row, 'NKK') || ''),
-                    "NIK": String(getValue(row, 'NIK') || ''),
-                    "NAMA": getValue(row, 'NAMA') || '-',
-                    "TEMPAT LAHIR": getValue(row, 'TEMPAT LAHIR', 'TEMPAT_LAHIR') || '-',
-                    "TANGGAL LAHIR": formatTanggal(getValue(row, 'TANGGAL LAHIR', 'TANGGAL_LAHIR', 'TGL LAHIR')),
-                    "UMUR": getValue(row, 'USIA', 'UMUR') || '-',
-                    "JK": getValue(row, 'JENIS KELAMIN', 'JK') || '-',
-                    "STATUS": getValue(row, 'STS KAWIN', 'STS', 'STATUS') || '-',
-                    "ALAMAT": getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT') || '-',
-                    "RT KTP": getValue(row, 'RT KTP', 'RT_KTP', 'RT') || '-',
-                    "RT DOMISILI": getValue(row, 'RT DOMISILI', 'RT_DOMISILI') || '-',
-                    "KETERANGAN": getValue(row, 'KETERANGAN') || ''
-                };
-            });
-
-            const worksheet = XLSX.utils.json_to_sheet(exportData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "DPS Terfilter");
-            XLSX.writeFile(workbook, "DPS_Payo_Lebar_Terfilter.xlsx");
         }
 
         function initCharts() {
