@@ -186,10 +186,7 @@
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-dark btn-sm me-1" onclick="cetakLaporan()">
-                        <i class="fa-solid fa-print me-1"></i> Cetak / Print PDF
-                    </button>
-                    <button class="btn btn-success btn-sm me-1" onclick="exportExcel()">
+                    <button class="btn btn-success btn-sm" onclick="exportExcel()">
                         <i class="fa-solid fa-file-excel me-1"></i> Export Excel
                     </button>
                 </div>
@@ -330,7 +327,7 @@
                         <option value="50">50</option>
                         <option value="100" selected>100</option>
                         <option value="500">500</option>
-                        <option value="10000">Semua Data (Cetak)</option>
+                        <option value="10000">Semua Data</option>
                     </select>
                 </div>
                 <div id="paginationInfo" class="text-muted small">Memuat data...</div>
@@ -654,25 +651,6 @@
             document.getElementById('filterRT').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
-        }
-
-        function cetakLaporan() {
-            const rtVal = document.getElementById('filterRT').value;
-            const printRtInfo = document.getElementById('printRtInfo');
-            const printTimeInfo = document.getElementById('printTimeInfo');
-
-            if (rtVal) {
-                printRtInfo.innerText = "RT " + rtVal;
-            } else {
-                printRtInfo.innerText = "Semua RT";
-            }
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            printTimeInfo.innerText = `${dateStr}, ${timeStr} WIB`;
-
-            window.print();
         }
 
         function exportExcel() {
