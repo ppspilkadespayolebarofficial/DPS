@@ -141,7 +141,7 @@
             /* Garis Standar Tabel saat Print */
             table.table th, table.table td {
                 padding: 4px 3px !important;
-                font-size: 7.5pt !important;
+                font-size: 7pt !important;
                 word-wrap: break-word !important;
                 white-space: normal !important;
                 border: 1px solid #cbd5e1 !important;
@@ -152,19 +152,20 @@
                 border-top: 3px solid #000000 !important;
             }
 
-            /* Pembagian Lebar Kolom saat Print */
-            table.table th:nth-child(1), table.table td:nth-child(1) { width: 4%; }  /* NO */
-            table.table th:nth-child(2), table.table td:nth-child(2) { width: 7%; }  /* DP-ID */
-            table.table th:nth-child(3), table.table td:nth-child(3) { width: 12%; } /* NKK */
-            table.table th:nth-child(4), table.table td:nth-child(4) { width: 12%; } /* NIK */
-            table.table th:nth-child(5), table.table td:nth-child(5) { width: 14%; } /* NAMA */
-            table.table th:nth-child(6), table.table td:nth-child(6) { width: 14%; } /* TTL */
+            /* Pembagian Lebar Kolom saat Print disesuaikan dengan penambahan RT DOMISILI */
+            table.table th:nth-child(1), table.table td:nth-child(1) { width: 3%; }  /* NO */
+            table.table th:nth-child(2), table.table td:nth-child(2) { width: 6%; }  /* DP-ID */
+            table.table th:nth-child(3), table.table td:nth-child(3) { width: 11%; } /* NKK */
+            table.table th:nth-child(4), table.table td:nth-child(4) { width: 11%; } /* NIK */
+            table.table th:nth-child(5), table.table td:nth-child(5) { width: 13%; } /* NAMA */
+            table.table th:nth-child(6), table.table td:nth-child(6) { width: 13%; } /* TTL */
             table.table th:nth-child(7), table.table td:nth-child(7) { width: 5%; }  /* UMUR */
             table.table th:nth-child(8), table.table td:nth-child(8) { width: 3%; }  /* JK */
-            table.table th:nth-child(9), table.table td:nth-child(9) { width: 4%; }  /* STS */
-            table.table th:nth-child(10), table.table td:nth-child(10) { width: 13%; } /* ALAMAT */
-            table.table th:nth-child(11), table.table td:nth-child(11) { width: 4%; } /* RT */
-            table.table th:nth-child(12), table.table td:nth-child(12) { width: 8%; } /* KETERANGAN */
+            table.table th:nth-child(9), table.table td:nth-child(9) { width: 3%; }  /* STS */
+            table.table th:nth-child(10), table.table td:nth-child(10) { width: 12%; } /* ALAMAT */
+            table.table th:nth-child(11), table.table td:nth-child(11) { width: 5%; } /* RT KTP */
+            table.table th:nth-child(12), table.table td:nth-child(12) { width: 6%; } /* RT DOMISILI */
+            table.table th:nth-child(13), table.table td:nth-child(13) { width: 9%; } /* KETERANGAN */
         }
     </style>
 </head>
@@ -286,7 +287,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label text-muted small fw-bold">PILIH RT</label>
+                    <label class="form-label text-muted small fw-bold">PILIH RT KTP</label>
                     <select id="filterRT" class="form-select form-select-sm" onchange="applyFilter()">
                         <option value="">-- Semua RT --</option>
                     </select>
@@ -349,13 +350,14 @@
                             <th class="text-center">JK</th>
                             <th class="text-center">STS</th>
                             <th>ALAMAT</th>
-                            <th class="text-center">RT</th>
+                            <th class="text-center">RT KTP</th>
+                            <th class="text-center">RT DOMISILI</th>
                             <th class="text-center">KETERANGAN</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="12" class="text-center py-4 text-muted">
+                            <td colspan="13" class="text-center py-4 text-muted">
                                 <i class="fa-solid fa-spinner fa-spin me-2"></i> Sedang mengambil data Excel...
                             </td>
                         </tr>
@@ -444,10 +446,10 @@
                     
                     let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
                     
-                    // URUTKAN BERDASARKAN RT LALU NKK
+                    // URUTKAN BERDASARKAN RT KTP LALU NKK
                     rawData = loadedData.sort((a, b) => {
-                        let rtA = parseInt(getValue(a, 'RT', 'RT KTP')) || 999;
-                        let rtB = parseInt(getValue(b, 'RT', 'RT KTP')) || 999;
+                        let rtA = parseInt(getValue(a, 'RT KTP', 'RT_KTP', 'RT')) || 999;
+                        let rtB = parseInt(getValue(b, 'RT KTP', 'RT_KTP', 'RT')) || 999;
                         if (rtA !== rtB) return rtA - rtB;
 
                         let nkkA = String(getValue(a, 'NKK')).trim();
@@ -462,7 +464,7 @@
                 .catch(err => {
                     document.getElementById('tableBody').innerHTML = `
                         <tr>
-                            <td colspan="12" class="text-center text-danger py-4">
+                            <td colspan="13" class="text-center text-danger py-4">
                                 <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
                             </td>
                         </tr>`;
@@ -472,7 +474,7 @@
         function initDropdowns() {
             const rtSet = new Set();
             rawData.forEach(row => {
-                let rt = getValue(row, 'RT', 'RT KTP');
+                let rt = getValue(row, 'RT KTP', 'RT_KTP', 'RT');
                 if (rt) rtSet.add(parseInt(rt) || String(rt).trim());
             });
 
@@ -493,7 +495,7 @@
                 const rowNama = String(getValue(row, 'NAMA')).toLowerCase();
                 const rowNik = String(getValue(row, 'NIK')).toLowerCase();
                 const rowNkk = String(getValue(row, 'NKK')).toLowerCase();
-                const rowAlamat = String(getValue(row, 'DUSUN/ALAMAT', 'ALAMAT')).toLowerCase();
+                const rowAlamat = String(getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT')).toLowerCase();
                 const rowDpId = String(getValue(row, 'DP-ID', 'DP_ID', 'DPID', 'NO DP')).toLowerCase();
 
                 const matchesCari = !cari || 
@@ -504,7 +506,7 @@
                     rowDpId.includes(cari);
 
                 const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
-                const rowRT = String(getValue(row, 'RT', 'RT KTP')).trim();
+                const rowRT = String(getValue(row, 'RT KTP', 'RT_KTP', 'RT')).trim();
                 const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
 
                 const matchesJK = !jk || rowJK === jk;
@@ -553,7 +555,7 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
                 document.getElementById('paginationInfo').innerText = 'Menampilkan 0 data';
                 document.getElementById('pagination').innerHTML = '';
                 return;
@@ -578,8 +580,10 @@
                 const umur = getValue(row, 'USIA', 'UMUR') || '-';
                 const jk = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase() || '-';
                 const sts = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase() || '-';
-                const alamat = getValue(row, 'DUSUN/ALAMAT', 'ALAMAT') || '-';
-                const rt = getValue(row, 'RT', 'RT KTP') || '-';
+                const alamat = getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT') || '-';
+                const rtKtp = getValue(row, 'RT KTP', 'RT_KTP', 'RT') || '-';
+                const rtDomisili = getValue(row, 'RT DOMISILI', 'RT_DOMISILI') || '-';
+                const keterangan = getValue(row, 'KETERANGAN') || '';
 
                 const tr = document.createElement('tr');
 
@@ -600,8 +604,9 @@
                     <td class="text-center"><span class="badge ${jk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${jk}</span></td>
                     <td class="text-center">${sts}</td>
                     <td>${alamat}</td>
-                    <td class="text-center fw-bold">${rt}</td>
-                    <td></td>
+                    <td class="text-center fw-bold">${rtKtp}</td>
+                    <td class="text-center fw-bold text-primary">${rtDomisili}</td>
+                    <td>${keterangan}</td>
                 `;
                 tbody.appendChild(tr);
             });
