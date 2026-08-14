@@ -152,7 +152,7 @@
                 border-top: 3px solid #000000 !important;
             }
 
-            /* Pembagian Lebar Kolom saat Print disesuaikan dengan penambahan RT DOMISILI */
+            /* Pembagian Lebar Kolom saat Print */
             table.table th:nth-child(1), table.table td:nth-child(1) { width: 3%; }  /* NO */
             table.table th:nth-child(2), table.table td:nth-child(2) { width: 6%; }  /* DP-ID */
             table.table th:nth-child(3), table.table td:nth-child(3) { width: 11%; } /* NKK */
@@ -173,7 +173,7 @@
 
     <div class="container-fluid px-4">
         
-        <!-- HEADER UTAMA WEB -->
+        <!-- HEADER UTAMA WEB (TOMBOL EXPORT DIBUANG) -->
         <div class="card card-custom p-4 no-print">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -184,11 +184,6 @@
                     <div class="text-muted mt-1" style="font-size: 0.85rem;">
                         Pemilihan Kepala Desa Payo Lebar, Kecamatan Singkut, Kabupaten Sarolangun Tahun 2026
                     </div>
-                </div>
-                <div>
-                    <button class="btn btn-success btn-sm" onclick="exportExcel()">
-                        <i class="fa-solid fa-file-excel me-1"></i> Export Excel
-                    </button>
                 </div>
             </div>
         </div>
@@ -377,6 +372,24 @@
         let pageSize = 100;
         let chartJKObj = null, chartStatusObj = null, chartUmurObj = null;
 
+        // VARIABLE KONTROL SENSOR NIK / NKK
+        // Ubah ke 'false' jika nanti ingin membuka sensornya kembali
+        const isMasked = true;
+
+        function maskIdentity(str) {
+            if (!str) return '-';
+            let cleanStr = String(str).replace(/\D/g, '').trim(); // Hanya ambil digit angka
+            
+            if (!isMasked || cleanStr.length < 10) {
+                return str || '-';
+            }
+
+            // Sensor 6 digit tengah: 6 digit awal + xxxxxx + 4 digit akhir (misal: 150309xxxxxx0004)
+            let prefix = cleanStr.substring(0, 6);
+            let suffix = cleanStr.substring(cleanStr.length - 4);
+            return `${prefix}xxxxxx${suffix}`;
+        }
+
         function getValue(row, ...possibleKeys) {
             if (!row) return '';
             const keys = Object.keys(row);
@@ -441,7 +454,7 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: true });
+                    let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false }); // Gunakan string terformat
                     
                     // URUTKAN BERDASARKAN RT KTP LALU NKK
                     rawData = loadedData.sort((a, b) => {
@@ -566,8 +579,13 @@
 
             pageData.forEach((row, index) => {
                 const dpId = getValue(row, 'DP-ID', 'DP_ID', 'DPID') || '-';
-                const nkk = String(getValue(row, 'NKK') || '-').trim();
-                const nik = getValue(row, 'NIK') || '-';
+                const rawNkk = String(getValue(row, 'NKK') || '').trim();
+                const rawNik = String(getValue(row, 'NIK') || '').trim();
+                
+                // Sensor NKK dan NIK secara otomatis
+                const maskedNkk = maskIdentity(rawNkk);
+                const maskedNik = maskIdentity(rawNik);
+
                 const nama = getValue(row, 'NAMA') || '-';
                 
                 const tempatLahir = getValue(row, 'TEMPAT LAHIR', 'TEMPAT_LAHIR');
@@ -584,17 +602,17 @@
 
                 const tr = document.createElement('tr');
 
-                // Deteksi Pemisah NKK
-                if (index > 0 && nkk !== lastNKK) {
+                // Pemisah baris antar NKK
+                if (index > 0 && rawNkk !== lastNKK) {
                     tr.classList.add('nkk-group-border');
                 }
-                lastNKK = nkk;
+                lastNKK = rawNkk;
 
                 tr.innerHTML = `
                     <td class="text-center text-muted">${startIdx + index + 1}</td>
                     <td class="text-dp-id">${dpId}</td>
-                    <td class="fw-bold text-dark">${nkk}</td>
-                    <td>${nik}</td>
+                    <td class="fw-bold text-dark">${maskedNkk}</td>
+                    <td>${maskedNik}</td>
                     <td class="fw-bold">${nama}</td>
                     <td>${ttl}</td>
                     <td class="text-center">${umur} thn</td>
@@ -651,13 +669,6 @@
             document.getElementById('filterRT').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
-        }
-
-        function exportExcel() {
-            const ws = XLSX.utils.json_to_sheet(filteredData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data_Pemilih");
-            XLSX.writeFile(wb, "Data_Pemilih_Sorted_RT.xlsx");
         }
 
         function initCharts() {
