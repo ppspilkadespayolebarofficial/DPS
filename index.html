@@ -22,7 +22,7 @@
             --accent-blue: #2563eb;
         }
 
-        /* LATAR BELAKANG LEBIH HIDUP DAN MODERN */
+        /* LATAR BELAKANG */
         body {
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
             background-attachment: fixed;
@@ -52,8 +52,14 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        .navbar-brand:hover .brand-logo {
+            transform: rotate(10deg) scale(1.08);
+        }
+
+        /* TOMBOL MENU NAVIGASI (DENGAN EFEK) */
         .nav-btn-custom {
             border: none;
             background: transparent;
@@ -62,35 +68,47 @@
             font-weight: 600;
             color: #475569;
             border-radius: 8px;
-            transition: all 0.25s ease;
+            /* Transisi Halus */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
         }
 
+        /* Efek Hover Tombol */
         .nav-btn-custom:hover {
             background: #f1f5f9;
             color: var(--primary-red);
+            transform: translateY(-2px);
         }
 
+        /* Efek Tombol Saat Diklik (Active Press) */
+        .nav-btn-custom:active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        /* Status Tombol Aktif */
         .nav-btn-custom.active {
             background: var(--primary-red);
             color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+            box-shadow: 0 4px 14px rgba(185, 28, 28, 0.4);
+            transform: translateY(-1px);
         }
 
-        /* TAB KONTEN SYSTEM */
+        /* TAB KONTEN SYSTEM (DENGAN ANIMASI TRANSISI SMTH) */
         .tab-pane-custom {
             display: none;
+            opacity: 0;
+            transform: translateY(15px) scale(0.99);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .tab-pane-custom.active {
             display: block;
-            animation: fadeIn 0.3s ease-in-out;
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* CARD STYLES - EFEK HIDUP */
+        /* CARD STYLES */
         .card-custom {
             border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 16px;
@@ -113,10 +131,11 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             border: 1px solid #e2e8f0;
             height: 100%;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .stat-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
         }
         .stat-label {
             font-size: 0.7rem;
@@ -657,14 +676,42 @@
 
     </div>
 
-    <!-- SCRIPT JAVASCRIPT & LOGIKA DPS EXCEL -->
+    <!-- SCRIPT JAVASCRIPT LOGIKA TAB & ANIMASI -->
     <script>
         function switchTab(tabId, btnEl) {
-            document.querySelectorAll('.tab-pane-custom').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn-custom').forEach(btn => btn.classList.remove('active'));
+            const currentTab = document.querySelector('.tab-pane-custom.active');
+            const targetTab = document.getElementById(tabId);
 
-            document.getElementById(tabId).classList.add('active');
+            // Jika mengklik tab yang sama, jangan lakukan animasi ulang
+            if (currentTab === targetTab) return;
+
+            // Transisi keluar tab aktif saat ini
+            if (currentTab) {
+                currentTab.style.opacity = '0';
+                currentTab.style.transform = 'translateY(-10px) scale(0.99)';
+                
+                setTimeout(() => {
+                    currentTab.classList.remove('active');
+                    
+                    // Aktifkan tab baru
+                    showTargetTab(targetTab);
+                }, 200); // Waktu jeda transisi keluar
+            } else {
+                showTargetTab(targetTab);
+            }
+
+            // Update style tombol menu
+            document.querySelectorAll('.nav-btn-custom').forEach(btn => btn.classList.remove('active'));
             btnEl.classList.add('active');
+        }
+
+        function showTargetTab(targetTab) {
+            targetTab.classList.add('active');
+            // Timeout sedikit untuk memicu animasi CSS trasition fade-in
+            setTimeout(() => {
+                targetTab.style.opacity = '1';
+                targetTab.style.transform = 'translateY(0) scale(1)';
+            }, 50);
         }
 
         let rawData = [];
@@ -778,6 +825,13 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Inisialisasi visual status tab pertama saat load
+            const initialTab = document.getElementById('tab-dps');
+            if (initialTab) {
+                initialTab.style.opacity = '1';
+                initialTab.style.transform = 'translateY(0) scale(1)';
+            }
+
             fetch('data.xlsx')
                 .then(res => {
                     if (!res.ok) throw new Error('File not found');
