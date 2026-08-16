@@ -19,19 +19,24 @@
         :root {
             --primary-red: #b91c1c;
             --primary-dark: #7f1d1d;
+            --accent-blue: #2563eb;
         }
 
+        /* LATAR BELAKANG LEBIH HIDUP DAN MODERN */
         body {
-            background-color: #f8fafc;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+            background-attachment: fixed;
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #334155;
+            color: #1e293b;
+            min-height: 100vh;
         }
 
         /* NAVBAR HEADER ATAS */
         .navbar-main {
-            background: #ffffff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border-bottom: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -40,23 +45,24 @@
         .brand-logo {
             background: linear-gradient(135deg, var(--primary-red), var(--primary-dark));
             color: white;
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3);
         }
 
         .nav-btn-custom {
             border: none;
             background: transparent;
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 8px 14px;
+            font-size: 0.88rem;
             font-weight: 600;
-            color: #64748b;
+            color: #475569;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .nav-btn-custom:hover {
@@ -67,7 +73,7 @@
         .nav-btn-custom.active {
             background: var(--primary-red);
             color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.25);
+            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
         }
 
         /* TAB KONTEN SYSTEM */
@@ -80,18 +86,20 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* CARD STYLES */
+        /* CARD STYLES - EFEK HIDUP */
         .card-custom {
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            background: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
             margin-bottom: 20px;
         }
+        
         .header-title {
             font-weight: 800;
             color: #0f172a;
@@ -102,9 +110,13 @@
             background: #ffffff;
             border-radius: 12px;
             padding: 14px 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
             height: 100%;
+            transition: transform 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
         }
         .stat-label {
             font-size: 0.7rem;
@@ -137,12 +149,12 @@
             overflow-x: auto;
         }
         .table th {
-            background-color: #f8fafc;
-            color: #475569;
+            background-color: #f1f5f9;
+            color: #334155;
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid #cbd5e1;
             white-space: nowrap;
             padding: 12px 10px;
         }
@@ -150,7 +162,7 @@
             font-size: 0.85rem;
             vertical-align: middle;
             white-space: nowrap;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid #e2e8f0;
             padding: 10px;
         }
         
@@ -164,14 +176,6 @@
 
         .print-only-header { display: none; }
 
-        /* TIMELINE STYLES */
-        .timeline { position: relative; padding-left: 25px; border-left: 2px solid #e2e8f0; }
-        .timeline-item { position: relative; margin-bottom: 25px; }
-        .timeline-item::before {
-            content: ''; position: absolute; left: -31px; top: 4px; width: 14px; height: 14px;
-            border-radius: 50%; background: var(--primary-red); border: 2px solid #fff;
-        }
-
         /* PRINT STYLES */
         @media print {
             .no-print, .pagination, #pageSize, .navbar-main { display: none !important; }
@@ -183,7 +187,7 @@
             }
             @page { size: A4 landscape; margin: 8mm; }
             body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
-            .card-custom { box-shadow: none !important; padding: 0 !important; border: none !important; }
+            .card-custom { box-shadow: none !important; padding: 0 !important; border: none !important; background: transparent !important; }
             .table-container { overflow: visible !important; }
             table.table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
             table.table th, table.table td {
@@ -196,7 +200,7 @@
 </head>
 <body>
 
-    <!-- NAVBAR HEADER ATAS (NAVIGASI PILKADES) -->
+    <!-- NAVBAR HEADER ATAS -->
     <nav class="navbar navbar-expand-lg navbar-main px-4 py-2 no-print">
         <div class="container-fluid p-0">
             <a class="navbar-brand d-flex align-items-center gap-2 text-dark fw-bold" href="#">
@@ -206,9 +210,12 @@
                 <span style="font-size: 1.05rem; letter-spacing: -0.3px;">PILKADES PAYO LEBAR 2026</span>
             </a>
             
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-1 flex-wrap">
                 <button class="nav-btn-custom active" onclick="switchTab('tab-dps', this)">
                     <i class="fa-solid fa-chart-pie me-1"></i> Data Pemilih (DPS)
+                </button>
+                <button class="nav-btn-custom" onclick="switchTab('tab-info-tps', this)">
+                    <i class="fa-solid fa-map-location-dot me-1"></i> Info TPS
                 </button>
                 <button class="nav-btn-custom" onclick="switchTab('tab-tahapan', this)">
                     <i class="fa-solid fa-calendar-check me-1"></i> Tahapan
@@ -219,20 +226,23 @@
                 <button class="nav-btn-custom" onclick="switchTab('tab-panitia', this)">
                     <i class="fa-solid fa-user-shield me-1"></i> Panitia (PPS)
                 </button>
+                <button class="nav-btn-custom" onclick="switchTab('tab-pengaduan', this)">
+                    <i class="fa-solid fa-envelope-open-text me-1"></i> Layanan & Pengaduan
+                </button>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid px-4 pt-4">
 
-        <!-- ==================== TAB 1: DATA PEMILIH (DPS - KODE ASLI KAMU) ==================== -->
+        <!-- ==================== TAB 1: DATA PEMILIH (DPS) ==================== -->
         <div id="tab-dps" class="tab-pane-custom active">
             
             <!-- HEADER UTAMA -->
             <div class="card card-custom p-4 no-print">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3 class="header-title m-0">Dashboard & Filter Data Pemilih</h3>
+                        <h3 class="header-title m-0">Dashboard & Data Pemilih</h3>
                         <div class="text-secondary fw-semibold mt-1" style="font-size: 0.95rem;">
                             Daftar Pemilih Sementara (DPS)
                         </div>
@@ -317,13 +327,13 @@
                 </div>
             </div>
 
-            <!-- PANEL FILTER -->
+            <!-- PANEL FILTER DATA PEMILIH -->
             <div class="card card-custom p-4 no-print">
-                <h6 class="fw-bold mb-3 text-slate-700"><i class="fa-solid fa-filter me-2 text-primary"></i>Filter Data Pemilih</h6>
+                <h6 class="fw-bold mb-3 text-slate-700"><i class="fa-solid fa-filter me-2 text-primary"></i>Pencarian & Filter Data Pemilih</h6>
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label text-muted small fw-bold">CARI (NAMA/NIK/NKK/ALAMAT/DP-ID)</label>
-                        <input type="text" id="filterCari" class="form-control form-control-sm" placeholder="Ketik kata kunci..." oninput="applyFilter()">
+                        <input type="text" id="filterCari" class="form-control form-control-sm" placeholder="Ketik nama atau NIK..." oninput="applyFilter()">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label text-muted small fw-bold">JENIS KELAMIN</label>
@@ -340,6 +350,12 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <label class="form-label text-muted small fw-bold">PILIH TPS</label>
+                        <select id="filterTPS" class="form-select form-select-sm" onchange="applyFilter()">
+                            <option value="">-- Semua TPS --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
                         <label class="form-label text-muted small fw-bold">STATUS KAWIN</label>
                         <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilter()">
                             <option value="">-- Semua Status --</option>
@@ -348,8 +364,8 @@
                             <option value="P">Pernah (P)</option>
                         </select>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()">Reset Filter</button>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button class="btn btn-primary btn-sm w-100" style="background-color: #6366f1; border:none;" onclick="resetFilter()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
                     </div>
                 </div>
             </div>
@@ -394,12 +410,13 @@
                                 <th>ALAMAT</th>
                                 <th class="text-center">RT KTP</th>
                                 <th class="text-center">RT DOMISILI</th>
+                                <th class="text-center">TPS</th>
                                 <th class="text-center">KETERANGAN</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             <tr>
-                                <td colspan="13" class="text-center py-4 text-muted">
+                                <td colspan="14" class="text-center py-4 text-muted">
                                     <i class="fa-solid fa-spinner fa-spin me-2"></i> Sedang mengambil data Excel...
                                 </td>
                             </tr>
@@ -414,122 +431,119 @@
 
         </div>
 
-        <!-- ==================== TAB 2: TAHAPAN ==================== -->
-        <!-- ==================== TAB 2: TAHAPAN ==================== -->
-<div id="tab-tahapan" class="tab-pane-custom">
-    <div class="card card-custom p-5 text-center">
-        <div class="mb-3">
-            <i class="fa-solid fa-clock-rotate-left text-danger" style="font-size: 3.5rem;"></i>
+        <!-- ==================== TAB 2: INFO TPS ==================== -->
+        <div id="tab-info-tps" class="tab-pane-custom">
+            <div class="card card-custom p-5 text-center">
+                <div class="mb-3">
+                    <i class="fa-solid fa-map-location-dot text-danger" style="font-size: 3.5rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Informasi Lokasi TPS Sedang Disiapkan</h4>
+                <p class="text-muted mx-auto" style="max-width: 500px;">
+                    Penetapan titik lokasi Tempat Pemungutan Suara (TPS) Desa Payo Lebar sedang dipetakan oleh Panitia PPS.
+                </p>
+                <div>
+                    <span class="badge bg-warning text-dark px-3 py-2 fw-semibold">
+                        <i class="fa-solid fa-hourglass-half me-1"></i> Keterangan TPS Mengikuti Status Tahapan
+                    </span>
+                </div>
+            </div>
         </div>
-        <h4 class="fw-bold text-dark">Tahapan & Jadwal Sedang Disiapkan</h4>
-        <p class="text-muted mx-auto" style="max-width: 500px;">
-            Jadwal resmi Pemilihan Kepala Desa Payo Lebar Tahun 2026 sedang dalam tahap finalisasi oleh Panitia Pemilihan (PPS). Informasi akan diperbarui segera.
-        </p>
-        <div>
-            <span class="badge bg-warning text-dark px-3 py-2 fw-semibold">
-                <i class="fa-solid fa-hourglass-half me-1"></i> Update Segera
-            </span>
+
+        <!-- ==================== TAB 3: TAHAPAN ==================== -->
+        <div id="tab-tahapan" class="tab-pane-custom">
+            <div class="card card-custom p-5 text-center">
+                <div class="mb-3">
+                    <i class="fa-solid fa-clock-rotate-left text-danger" style="font-size: 3.5rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Tahapan & Jadwal Sedang Disiapkan</h4>
+                <p class="text-muted mx-auto" style="max-width: 500px;">
+                    Jadwal resmi Pemilihan Kepala Desa Payo Lebar Tahun 2026 sedang dalam tahap finalisasi oleh Panitia Pemilihan (PPS). Informasi akan diperbarui segera.
+                </p>
+                <div>
+                    <span class="badge bg-warning text-dark px-3 py-2 fw-semibold">
+                        <i class="fa-solid fa-hourglass-half me-1"></i> Update Segera
+                    </span>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-        <!-- ==================== TAB 3: CALON KADES ==================== -->
-        <!-- ==================== TAB 3: CALON KADES ==================== -->
+
+        <!-- ==================== TAB 4: CALON KADES ==================== -->
         <div id="tab-calon" class="tab-pane-custom">
             <div class="card card-custom p-4">
                 <h4 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users me-2 text-danger"></i>Calon Kepala Desa Payo Lebar</h4>
                 <div class="row g-3">
-                    
-                    <!-- CALON 01 -->
                     <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-4 p-4 text-center bg-light h-100">
+                        <div class="border rounded-4 p-4 text-center bg-white h-100 shadow-sm">
                             <span class="badge bg-danger mb-2">Nomor Urut 01</span>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
                                 <i class="fa-solid fa-user fs-1 text-secondary"></i>
                             </div>
                             <h5 class="fw-bold">Nama Calon Kades 1</h5>
                             <p class="text-muted small fst-italic">"Visi & Misi Calon Nomor Urut 01"</p>
                         </div>
                     </div>
-
-                    <!-- CALON 02 -->
                     <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-4 p-4 text-center bg-light h-100">
+                        <div class="border rounded-4 p-4 text-center bg-white h-100 shadow-sm">
                             <span class="badge bg-danger mb-2">Nomor Urut 02</span>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
                                 <i class="fa-solid fa-user fs-1 text-secondary"></i>
                             </div>
                             <h5 class="fw-bold">Nama Calon Kades 2</h5>
                             <p class="text-muted small fst-italic">"Visi & Misi Calon Nomor Urut 02"</p>
                         </div>
                     </div>
-
-                    <!-- CALON 03 -->
                     <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-4 p-4 text-center bg-light h-100">
+                        <div class="border rounded-4 p-4 text-center bg-white h-100 shadow-sm">
                             <span class="badge bg-danger mb-2">Nomor Urut 03</span>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
                                 <i class="fa-solid fa-user fs-1 text-secondary"></i>
                             </div>
                             <h5 class="fw-bold">Nama Calon Kades 3</h5>
                             <p class="text-muted small fst-italic">"Visi & Misi Calon Nomor Urut 03"</p>
                         </div>
                     </div>
-
-                    <!-- CALON 04 -->
                     <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-4 p-4 text-center bg-light h-100">
+                        <div class="border rounded-4 p-4 text-center bg-white h-100 shadow-sm">
                             <span class="badge bg-danger mb-2">Nomor Urut 04</span>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
                                 <i class="fa-solid fa-user fs-1 text-secondary"></i>
                             </div>
                             <h5 class="fw-bold">Nama Calon Kades 4</h5>
                             <p class="text-muted small fst-italic">"Visi & Misi Calon Nomor Urut 04"</p>
                         </div>
                     </div>
-
-                    <!-- CALON 05 -->
                     <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-4 p-4 text-center bg-light h-100">
+                        <div class="border rounded-4 p-4 text-center bg-white h-100 shadow-sm">
                             <span class="badge bg-danger mb-2">Nomor Urut 05</span>
-                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 90px; height: 90px;">
                                 <i class="fa-solid fa-user fs-1 text-secondary"></i>
                             </div>
                             <h5 class="fw-bold">Nama Calon Kades 5</h5>
                             <p class="text-muted small fst-italic">"Visi & Misi Calon Nomor Urut 05"</p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- ==================== TAB 4: PANITIA ==================== -->
-        <!-- ==================== TAB 4: PANITIA ==================== -->
+        <!-- ==================== TAB 5: PANITIA ==================== -->
         <div id="tab-panitia" class="tab-pane-custom">
             <div class="card card-custom p-4">
-                
-                <!-- BAGIAN 1: PANITIA PEMILIHAN DESA (4 ORANG) -->
                 <div class="mb-4 text-center text-md-start">
                     <h4 class="fw-bold text-dark m-0"><i class="fa-solid fa-user-shield me-2 text-danger"></i>Panitia Pemilihan Desa (PPS)</h4>
                     <p class="text-muted small mt-1">Susunan Panitia PPS Pilkades Payo Lebar 2026</p>
                 </div>
 
                 <div class="row g-3 mb-5">
-                    
-                    <!-- 1. KETUA PPS -->
                     <div class="col-md-3 col-sm-6">
                         <div class="border rounded-4 p-3 text-center bg-white shadow-sm h-100">
                             <div class="mb-3">
-                                <!-- Ganti ketua.jpg dengan nama file foto kamu -->
                                 <img src="ketua.jpg" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Ketua+PPS&background=b91c1c&color=fff';" class="rounded-circle img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
                             </div>
                             <span class="badge bg-danger mb-1">KETUA</span>
                             <h6 class="fw-bold mb-0 text-dark">BADRUN, S.E., M.Pd</h6>
-                            <small class="text-muted"></small>
                         </div>
                     </div>
-
-                    <!-- 2. WAKIL -->
                     <div class="col-md-3 col-sm-6">
                         <div class="border rounded-4 p-3 text-center bg-white shadow-sm h-100">
                             <div class="mb-3">
@@ -537,11 +551,8 @@
                             </div>
                             <span class="badge bg-primary mb-1">WAKIL</span>
                             <h6 class="fw-bold mb-0 text-dark">Ir. SAIKUN SUGONDO</h6>
-                            <small class="text-muted"></small>
                         </div>
                     </div>
-
-                    <!-- 3. SEKRETARIS -->
                     <div class="col-md-3 col-sm-6">
                         <div class="border rounded-4 p-3 text-center bg-white shadow-sm h-100">
                             <div class="mb-3">
@@ -549,11 +560,8 @@
                             </div>
                             <span class="badge bg-success mb-1">SEKRETARIS</span>
                             <h6 class="fw-bold mb-0 text-dark">ADI SETIAWAN, S.Pd</h6>
-                            <small class="text-muted"></small>
                         </div>
                     </div>
-
-                    <!-- 4. ANGGOTA -->
                     <div class="col-md-3 col-sm-6">
                         <div class="border rounded-4 p-3 text-center bg-white shadow-sm h-100">
                             <div class="mb-3">
@@ -561,21 +569,18 @@
                             </div>
                             <span class="badge bg-secondary mb-1">ANGGOTA</span>
                             <h6 class="fw-bold mb-0 text-dark">KRIS SUDARTO</h6>
-                            <small class="text-muted"></small>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- BAGIAN 2: SEKRETARIAT PPS (1 ORANG) -->
                 <div class="mb-3 text-center text-md-start border-top pt-4">
                     <h5 class="fw-bold text-dark m-0"><i class="fa-solid fa-building-user me-2 text-warning"></i>Sekretariat PPS</h5>
-                    <p class="text-muted small mt-1">Pendukung Adminisitrasi & Operasional</p>
+                    <p class="text-muted small mt-1">Pendukung Administrasi & Operasional</p>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-4 col-sm-6">
-                        <div class="border rounded-4 p-3 text-center bg-light shadow-sm">
+                        <div class="border rounded-4 p-3 text-center bg-white shadow-sm">
                             <div class="mb-3">
                                 <img src="sekretariat.jpg" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Sekretariat&background=d97706&color=fff';" class="rounded-circle img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
                             </div>
@@ -585,13 +590,75 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-    <!-- SCRIPT JAVASCRIPT ASLI & NAVIGASI -->
+        <!-- ==================== TAB 6: LAYANAN & PENGADUAN ==================== -->
+        <div id="tab-pengaduan" class="tab-pane-custom">
+            <div class="card card-custom p-4">
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-headset me-2 text-danger"></i>Layanan Pengaduan</h4>
+                        <p class="text-muted small">Apabila terdapat perbedaan data, belum terdaftar dalam DPS, atau keluhan terkait pelaksanaan Pilkades Payo Lebar 2026, silakan kirim masukan/tanggapan Anda.</p>
+                        
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 border mb-3">
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-envelope fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small font-weight-bold">EMAIL RESMI PPS</div>
+                                <a href="mailto:ppspilkadespayolebarofficial@gmail.com" class="fw-bold text-danger text-decoration-none">ppspilkadespayolebarofficial@gmail.com</a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 border">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-location-dot fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small font-weight-bold">ALAMAT SEKRETARIAT</div>
+                                <span class="fw-bold text-dark small">Kantor Desa Payo Lebar, Kec. Singkut, Kab. Sarolangun</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7 border-start-md">
+                        <h5 class="fw-bold text-dark mb-3">Kirim Masukan / Pengaduan</h5>
+                        <form onsubmit="kirimPengaduan(event)">
+                            <div class="row g-2">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
+                                    <input type="text" class="form-control" required placeholder="Nama Anda">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small fw-bold text-muted">Nomor WhatsApp / HP</label>
+                                    <input type="tel" class="form-control" required placeholder="08xxxxxxxxxx">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold text-muted">Subjek / Topik Pengaduan</label>
+                                <select class="form-select">
+                                    <option>Perbaikan Data Pemilih</option>
+                                    <option>Pemilih Belum Terdaftar</option>
+                                    <option>Informasi TPS / Tempat Memilih</option>
+                                    <option>Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Detail Pesan / Pengaduan</label>
+                                <textarea class="form-control" rows="4" required placeholder="Tuliskan keterangan rinci pengaduan Anda..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-paper-plane me-1"></i> Kirim Pesan via Email</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT JAVASCRIPT & LOGIKA DPS EXCEL -->
     <script>
-        // FUNCTION NAVIGASI TAB MENU
         function switchTab(tabId, btnEl) {
             document.querySelectorAll('.tab-pane-custom').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-btn-custom').forEach(btn => btn.classList.remove('active'));
@@ -600,7 +667,6 @@
             btnEl.classList.add('active');
         }
 
-        // ================= KODE ASLI LOGIKA DPS EXCEL =================
         let rawData = [];
         let filteredData = [];
         let currentPage = 1;
@@ -742,7 +808,7 @@
                     console.error(err);
                     document.getElementById('tableBody').innerHTML = `
                         <tr>
-                            <td colspan="13" class="text-center text-danger py-4">
+                            <td colspan="14" class="text-center text-danger py-4">
                                 <strong>Gagal memuat file Excel.</strong> Pastikan file tersimpan dengan nama <code>data.xlsx</code>.
                             </td>
                         </tr>`;
@@ -751,9 +817,13 @@
 
         function initDropdowns() {
             const rtSet = new Set();
+            const tpsSet = new Set();
             rawData.forEach(row => {
                 let rt = getValue(row, 'RT KTP', 'RT_KTP', 'RT');
                 if (rt) rtSet.add(parseInt(rt) || String(rt).trim());
+
+                let tps = getValue(row, 'TPS', 'NO TPS', 'NO_TPS');
+                if (tps) tpsSet.add(String(tps).trim());
             });
 
             const filterRT = document.getElementById('filterRT');
@@ -761,12 +831,19 @@
             Array.from(rtSet).sort((a,b)=>a-b).forEach(rt => {
                 filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
             });
+
+            const filterTPS = document.getElementById('filterTPS');
+            filterTPS.innerHTML = '<option value="">-- Semua TPS --</option>';
+            Array.from(tpsSet).sort().forEach(tps => {
+                filterTPS.innerHTML += `<option value="${tps}">TPS ${tps}</option>`;
+            });
         }
 
         function applyFilter() {
             const cari = document.getElementById('filterCari').value.toLowerCase();
             const jk = document.getElementById('filterJK').value.toUpperCase();
             const rt = document.getElementById('filterRT').value;
+            const tps = document.getElementById('filterTPS').value;
             const status = document.getElementById('filterStatus').value.toUpperCase();
 
             filteredData = rawData.filter(row => {
@@ -785,13 +862,15 @@
 
                 const rowJK = String(getValue(row, 'JENIS KELAMIN', 'JK')).toUpperCase();
                 const rowRT = String(getValue(row, 'RT KTP', 'RT_KTP', 'RT')).trim();
+                const rowTPS = String(getValue(row, 'TPS', 'NO TPS', 'NO_TPS')).trim();
                 const rowStatus = String(getValue(row, 'STS KAWIN', 'STS', 'STATUS')).toUpperCase();
 
                 const matchesJK = !jk || rowJK === jk;
                 const matchesRT = !rt || rowRT === rt;
+                const matchesTPS = !tps || rowTPS === tps;
                 const matchesStatus = !status || rowStatus === status;
 
-                return matchesCari && matchesJK && matchesRT && matchesStatus;
+                return matchesCari && matchesJK && matchesRT && matchesTPS && matchesStatus;
             });
 
             currentPage = 1;
@@ -833,7 +912,7 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
                 document.getElementById('paginationInfo').innerText = 'Menampilkan 0 data';
                 document.getElementById('pagination').innerHTML = '';
                 return;
@@ -865,6 +944,7 @@
                 const alamat = getValue(row, 'DUSUN/ALAMAT', 'DUSUN ALAMAT', 'ALAMAT') || '-';
                 const rtKtp = getValue(row, 'RT KTP', 'RT_KTP', 'RT') || '-';
                 const rtDomisili = getValue(row, 'RT DOMISILI', 'RT_DOMISILI') || '-';
+                const tpsVal = getValue(row, 'TPS', 'NO TPS', 'NO_TPS') || '-';
                 const keterangan = getValue(row, 'KETERANGAN') || '';
 
                 const tr = document.createElement('tr');
@@ -887,6 +967,7 @@
                     <td>${alamat}</td>
                     <td class="text-center fw-bold">${rtKtp}</td>
                     <td class="text-center fw-bold text-primary">${rtDomisili}</td>
+                    <td class="text-center fw-bold text-danger">${tpsVal}</td>
                     <td>${keterangan}</td>
                 `;
                 tbody.appendChild(tr);
@@ -933,6 +1014,7 @@
             document.getElementById('filterCari').value = '';
             document.getElementById('filterJK').value = '';
             document.getElementById('filterRT').value = '';
+            document.getElementById('filterTPS').value = '';
             document.getElementById('filterStatus').value = '';
             applyFilter();
         }
@@ -985,6 +1067,13 @@
             });
             chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
             chartUmurObj.update();
+        }
+
+        /* FORM PENGADUAN VIA EMAIL */
+        function kirimPengaduan(e) {
+            e.preventDefault();
+            alert('Terima kasih! Formulir pengaduan akan dialihkan ke Email Resmi PPS Payo Lebar.');
+            window.location.href = `mailto:ppspilkadespayolebarofficial@gmail.com?subject=Pengaduan Pilkades Payo Lebar`;
         }
     </script>
 </body>
