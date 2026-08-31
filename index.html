@@ -3,1026 +3,717 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Resmi Pilkades Payo Lebar 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Sistem Informasi & Real-Count Pilkades Payo Lebar 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root {
-            --primary-red: #b91c1c;
-            --primary-dark: #7f1d1d;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        body {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
-            background-attachment: fixed;
-            font-family: 'Inter', sans-serif;
-            color: #1e293b;
-            min-height: 100vh;
+        .animate-fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(220, 38, 38, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(220, 38, 38, 0.6); }
 
-        .navbar-main {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .bg-pattern-dots {
+            background-image: radial-gradient(rgba(220, 38, 38, 0.08) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
         }
-
-        .brand-logo {
-            background: linear-gradient(135deg, var(--primary-red), var(--primary-dark));
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3);
-        }
-
-        .nav-btn-custom {
-            border: none;
-            background: transparent;
-            padding: 8px 14px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: #475569;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn-custom:hover {
-            background: #f1f5f9;
-            color: var(--primary-red);
-        }
-
-        .nav-btn-custom.active {
-            background: var(--primary-red);
-            color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(185, 28, 28, 0.4);
-        }
-
-        .tab-pane-custom {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab-pane-custom.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .card-custom {
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            margin-bottom: 20px;
-        }
-        
-        .header-title { font-weight: 800; color: #0f172a; }
-        
-        .stat-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 14px 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid #e2e8f0;
-            height: 100%;
-        }
-        .stat-label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-        .stat-value { font-size: 1.6rem; font-weight: 800; line-height: 1; }
-        .val-total { color: #4f46e5; }
-        .val-kk { color: #059669; }
-        .val-l { color: #2563eb; }
-        .val-p { color: #db2777; }
-        .val-sudah { color: #16a34a; }
-        .val-belum { color: #d97706; }
-        .val-pernah { color: #9333ea; }
-        .val-bcu { color: #dc2626; }
-
-        .chart-box { position: relative; height: 200px; }
-
-        .table-container { overflow-x: auto; max-height: 550px; }
-        .table th {
-            background-color: #f1f5f9; color: #334155; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; border-bottom: 2px solid #cbd5e1; white-space: nowrap; padding: 12px 10px;
-            position: sticky; top: 0; z-index: 10;
-        }
-        .table td { font-size: 0.85rem; vertical-align: middle; white-space: nowrap; border-top: 1px solid #e2e8f0; padding: 10px; }
-        
-        tr.nkk-group-border td { border-top: 3px solid #0f172a !important; }
-
-        .badge-jk-l { background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 4px 8px; }
-        .badge-jk-p { background-color: #fce7f3; color: #9d174d; font-weight: 600; padding: 4px 8px; }
-        .text-dp-id { color: #ef4444; font-weight: 700; }
-        .text-tms { color: #dc2626; font-weight: 700; background-color: #fee2e2; padding: 3px 8px; border-radius: 6px; }
-        .text-ms { color: #059669; font-weight: 700; background-color: #d1fae5; padding: 3px 8px; border-radius: 6px; }
-
-        @media print {
-            body { background: white !important; }
-            .navbar-main, .card-custom:not(#printableArea), .modal, button, .row.g-3.mb-4, .row.g-2.mb-3 { display: none !important; }
-            .table-container { overflow: visible !important; max-height: none !important; }
+        .bg-map-indonesia {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a7/BlankMap-Indonesia.svg');
+            background-repeat: no-repeat;
+            background-position: center right;
+            background-size: contain;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased bg-pattern-dots" onload="mulaiJamRealtime()">
 
-    <nav class="navbar navbar-expand-lg navbar-main px-4 py-2">
-        <div class="container-fluid p-0">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-dark fw-bold" href="#">
-                <div class="brand-logo"><i class="fa-solid fa-check-to-slot"></i></div>
-                <span style="font-size: 1.05rem;">PILKADES PAYO LEBAR 2026</span>
-            </a>
-            <div class="d-flex gap-1 flex-wrap align-items-center">
-                <button class="nav-btn-custom active" onclick="switchTab('tab-dps', this)"><i class="fa-solid fa-chart-pie me-1"></i> Data Pemilih (DPS)</button>
-                <button class="nav-btn-custom" onclick="switchTab('tab-upload', this)"><i class="fa-solid fa-file-excel me-1 text-success"></i> Upload Excel</button>
-                
-                <!-- MENU EKSPOR & PRINT -->
-                <div class="dropdown ms-2">
-                    <button class="btn btn-outline-dark btn-sm dropdown-toggle fw-bold px-3 py-2 rounded-8" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.88rem;">
-                        <i class="fa-solid fa-print me-1 text-danger"></i> Ekspor / Cetak
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-gradient-to-b from-red-950 via-red-900 to-slate-950 text-white flex flex-col justify-between overflow-y-auto shadow-2xl z-20">
+            <div>
+                <div class="p-5 border-b border-red-800/50 bg-red-950/40 backdrop-blur-sm flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-red-950 flex items-center justify-center font-black shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-check-to-slot text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-black text-base tracking-wide leading-tight bg-gradient-to-r from-white via-red-100 to-amber-200 bg-clip-text text-transparent">Pilkades Digital</h1>
+                        <p class="text-[11px] font-medium text-amber-300/80">Desa Payo Lebar 2026</p>
+                    </div>
+                </div>
+
+                <nav class="p-3.5 space-y-1.5 text-sm font-medium">
+                    <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/70">Menu Utama</p>
+                    
+                    <button id="nav-realcount" onclick="switchTab('realcount')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-semibold shadow-lg shadow-red-950/50 border border-red-400/30 transition-all duration-200">
+                        <i class="fa-solid fa-chart-line w-5 text-red-200"></i> Live Real-Count
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 py-2">
-                        <li><a class="dropdown-item py-2 fw-semibold" href="#" onclick="exportToExcel()"><i class="fa-solid fa-file-excel text-success me-2"></i> Download Excel (.xlsx)</a></li>
-                        <li><a class="dropdown-item py-2 fw-semibold" href="#" onclick="cetakDataFiltered()"><i class="fa-solid fa-print text-primary me-2"></i> Cetak / Print Data (Sesuai Filter)</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+                    
+                    <button id="nav-calon" onclick="switchTab('calon')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <i class="fa-solid fa-users w-5 text-red-300/80"></i> Profil Calon Kades
+                    </button>
 
-    <div class="container-fluid px-4 pt-4">
-        <div id="tab-dps" class="tab-pane-custom active">
+                    <div>
+                        <button onclick="toggleSubmenu('sub-pemilih', 'arrow-pemilih')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 transition-all duration-200 border border-transparent">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-id-card w-5 text-red-300/80"></i> Data Pemilih
+                            </span>
+                            <i id="arrow-pemilih" class="fa-solid fa-chevron-down text-xs text-amber-400 transition-transform duration-300"></i>
+                        </button>
+                        <div id="sub-pemilih" class="hidden pl-4 pr-1 py-1.5 space-y-1 mt-1 bg-red-950/70 rounded-xl border border-red-800/40 backdrop-blur-md">
+                            <button onclick="pilihTahapan('DPT Awal KPU', 'Selesai')" class="w-full text-left py-2 px-3 text-xs text-red-200/80 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
+                                <span>1. DPT Awal KPU</span>
+                                <span class="text-[9px] bg-red-900/80 text-red-200 px-1.5 py-0.5 rounded">Selesai</span>
+                            </button>
+                            <button onclick="pilihTahapan('DPS (Sementara)', 'Berjalan')" class="w-full text-left py-2 px-3 text-xs text-amber-300 hover:text-white hover:bg-red-800/50 rounded-lg flex items-center justify-between font-semibold">
+                                <span>2. DPS (Sementara)</span>
+                                <span class="text-[9px] bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 px-2 py-0.5 rounded-full font-bold">Aktif</span>
+                            </button>
+                            <button onclick="pilihTahapan('DPTam (Tambahan)', 'Mendatang')" class="w-full text-left py-2 px-3 text-xs text-red-300/50 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
+                                <span>3. DPTam (Tambahan)</span>
+                                <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Pending</span>
+                            </button>
+                            <button onclick="pilihTahapan('DPT (Tetap)', 'Penetapan Akhir')" class="w-full text-left py-2 px-3 text-xs text-red-300/50 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
+                                <span>4. DPT (Tetap)</span>
+                                <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Final</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button onclick="toggleSubmenu('sub-panitia', 'arrow-panitia')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 transition-all duration-200 border border-transparent">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-sitemap w-5 text-red-300/80"></i> Panitia & Pengawas
+                            </span>
+                            <i id="arrow-panitia" class="fa-solid fa-chevron-down text-xs text-amber-400 transition-transform duration-300"></i>
+                        </button>
+                        <div id="sub-panitia" class="hidden pl-4 pr-1 py-1.5 space-y-1 mt-1 bg-red-950/70 rounded-xl border border-red-800/40 backdrop-blur-md">
+                            <button id="nav-pps" onclick="switchTab('pps')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
+                                <i class="fa-solid fa-user-group text-amber-400 text-[10px]"></i> PPS (Panitia Pemungutan)
+                            </button>
+                            <button id="nav-bpd" onclick="switchTab('bpd')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-amber-400 text-[10px]"></i> Pengawas BPD
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="nav-dasarhukum" onclick="switchTab('dasarhukum')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <i class="fa-solid fa-scale-balanced w-5 text-red-300/80"></i> Dasar Hukum
+                    </button>
+
+                    <button id="nav-layanan" onclick="switchTab('layanan')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <i class="fa-solid fa-headset w-5 text-red-300/80"></i> Layanan Public
+                    </button>
+
+                    <div class="pt-2">
+                        <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/70">Panitia P2KD</p>
+                    </div>
+
+                    <button id="nav-input" onclick="aksesAksiPanitia('input')" class="menu-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-file-invoice w-5 text-red-300/80"></i> Input Suara TPS</span>
+                        <i id="lock-input" class="fa-solid fa-lock text-xs text-amber-400 bg-amber-400/10 p-1.5 rounded-lg border border-amber-400/20"></i>
+                    </button>
+                    <button id="nav-upload" onclick="aksesAksiPanitia('upload')" class="menu-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-camera w-5 text-red-300/80"></i> Upload Form C1</span>
+                        <i id="lock-upload" class="fa-solid fa-lock text-xs text-amber-400 bg-amber-400/10 p-1.5 rounded-lg border border-amber-400/20"></i>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-red-800/40 bg-red-950/60 backdrop-blur-sm space-y-3 text-center">
+                <button onclick="bukaModalLogin()" id="btn-auth" class="w-full py-2.5 px-4 bg-gradient-to-r from-red-700 to-rose-700 hover:from-red-600 hover:to-rose-600 text-white rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-red-950/60 border border-red-400/30">
+                    <i class="fa-solid fa-user-shield text-amber-300"></i> Login Panitia (P2KD)
+                </button>
+                <p class="text-[10px] text-red-200/60 font-medium">Panitia Pemilihan Desa (P2KD)<br>&copy; 2026 Payo Lebar</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-y-auto">
             
-            <div class="card card-custom p-4">
-                <h3 class="header-title m-0">DASBOR DAFTAR PEMILIH SEMENTARA (DPS)</h3>
-                <div class="text-secondary fw-semibold mt-1">Pemilihan Kepala Desa Payo Lebar 2026</div>
-            </div>
+            <header class="relative bg-gradient-to-r from-slate-900 via-red-950 to-slate-900 text-white px-8 py-6 border-b border-red-900/40 overflow-hidden shadow-md">
+                <div class="absolute inset-0 bg-map-indonesia opacity-10 pointer-events-none mix-blend-overlay"></div>
+                <div class="absolute inset-0 bg-pattern-dots opacity-20 pointer-events-none"></div>
 
-            <!-- KARTU STATISTIK GLOBAL -->
-            <div class="row g-2 mb-3">
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">TOTAL GLOBAL</div><div class="stat-value val-total" id="stTotal">0</div></div></div>
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">JUMLAH KK</div><div class="stat-value val-kk" id="stKK">0</div></div></div>
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">LAKI-LAKI (L)</div><div class="stat-value val-l" id="stL">0</div></div></div>
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">PEREMPUAN (P)</div><div class="stat-value val-p" id="stP">0</div></div></div>
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">MEMENUHI SYARAT (MS)</div><div class="stat-value val-sudah" id="stMS">0</div></div></div>
-                <div class="col-md-2 col-4"><div class="stat-card"><div class="stat-label">TIDAK MEMENUHI (TMS)</div><div class="stat-value val-bcu" id="stTMS">0</div></div></div>
-            </div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="relative flex h-2.5 w-2.5">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                            </span>
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 bg-red-950/80 border border-amber-400/30 px-3 py-0.5 rounded-full shadow-inner">
+                                Portal Publikasi Resmi KPU Desa
+                            </span>
+                        </div>
+                        <h1 class="text-xl md:text-2xl font-black tracking-wide text-white drop-shadow-md">
+                            PEMILIHAN KEPALA DESA PAYO LEBAR
+                        </h1>
+                        <p class="text-xs font-medium text-red-200/90 flex items-center gap-2">
+                            <i class="fa-solid fa-location-dot text-amber-400"></i> Kecamatan Singkut, Kabupaten Sarolangun — Tahun 2026
+                        </p>
+                    </div>
 
-            <!-- GRAFIK -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3"><div class="card card-custom p-3 text-center"><h6 class="text-muted fw-bold small mb-2">GENDER PEMILIH (GLOBAL)</h6><div class="chart-box"><canvas id="chartJK"></canvas></div></div></div>
-                <div class="col-md-3"><div class="card card-custom p-3 text-center"><h6 class="text-muted fw-bold small mb-2">STATUS KAWIN (GLOBAL)</h6><div class="chart-box"><canvas id="chartStatus"></canvas></div></div></div>
-                <div class="col-md-3"><div class="card card-custom p-3 text-center"><h6 class="text-muted fw-bold small mb-2">KELOMPOK UMUR (GLOBAL)</h6><div class="chart-box"><canvas id="chartUmur"></canvas></div></div></div>
-                <div class="col-md-3"><div class="card card-custom p-3 text-center"><h6 class="text-muted fw-bold small mb-2">STATUS COKLIT / SYARAT</h6><div class="chart-box"><canvas id="chartCoklit"></canvas></div></div></div>
-            </div>
-
-            <div class="card card-custom p-4">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label text-muted small fw-bold">CARI</label>
-                        <input type="text" id="filterCari" class="form-control form-control-sm" placeholder="Nama / NIK / NKK..." oninput="debounceFilter()">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold">JENIS KELAMIN</label>
-                        <select id="filterJK" class="form-select form-select-sm" onchange="applyFilter()">
-                            <option value="">-- Semua --</option><option value="L">Laki-Laki</option><option value="P">Perempuan</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold">RT KTP</label>
-                        <select id="filterRT" class="form-select form-select-sm" onchange="applyFilter()"><option value="">-- Semua RT --</option></select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold">STATUS KAWIN</label>
-                        <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilter()">
-                            <option value="">-- Semua Status --</option><option value="S">Sudah (S)</option><option value="B">Belum (B)</option><option value="P">Pernah (P)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label text-muted small fw-bold">KODE COKLIT</label>
-                        <select id="filterCoklit" class="form-select form-select-sm" onchange="applyFilter()">
-                            <option value="">-- Semua --</option><option value="0">0 - Aktif</option><option value="1">1 - Meninggal</option><option value="2">2 - Ganda</option><option value="3">3 - TNI</option><option value="4">4 - Polisi</option><option value="5">5 - Pindah Luar</option><option value="6">6 - Pindah Dalam</option><option value="7">7 - Pisah KK</option><option value="BCU">BCU - Belum Cukup Umur</option><option value="U">U - Ubah</option><option value="B">B - Baru</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button class="btn btn-secondary btn-sm w-100" onclick="resetFilter()"><i class="fa-solid fa-rotate-right"></i></button>
+                    <!-- Widget Hari, Tanggal, dan Waktu Realtime menggantikan Logo -->
+                    <div class="flex items-center gap-3 bg-red-950/70 border border-red-700/50 backdrop-blur-md px-4 py-2.5 rounded-2xl self-start md:self-auto shadow-lg">
+                        <div class="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-300 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-clock text-base"></i>
+                        </div>
+                        <div class="text-left text-xs">
+                            <p id="realtime-tanggal" class="font-bold text-white tracking-wide">Memuat Tanggal...</p>
+                            <p id="realtime-jam" class="text-[11px] text-amber-300 font-mono font-bold">00:00:00 WIB</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div class="card card-custom p-4" id="printableArea">
-                <div class="table-container">
-                    <table class="table align-middle" id="dpsTable">
-                        <thead>
-                            <tr>
-                                <th class="text-center">NO</th><th>DP-ID</th><th>NO. KK</th><th>NIK</th><th>NAMA LENGKAP</th>
-                                <th>TEMPAT LAHIR</th><th>TANGGAL LAHIR</th><th class="text-center">UMUR (29 Okt 2026)</th><th class="text-center">JK</th>
-                                <th class="text-center">STS</th><th>HUBUNGAN</th><th>AGAMA</th><th>ALAMAT</th>
-                                <th class="text-center">RT KTP</th><th class="text-center">RT DOM</th><th class="text-center">COKLIT</th>
-                                <th>KETERANGAN</th><th class="text-center">AKSI</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <tr><td colspan="18" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Silakan upload file Excel melalui tab <strong>Upload Excel</strong>.</td></tr>
-                        </tbody>
-                    </table>
+            <div class="p-6 space-y-6">
+
+                <div id="view-realcount" class="animate-fade-in space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <p class="text-xs text-slate-400 font-medium">Total DPT Desa</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-0.5">1,450</h3>
+                            <p class="text-[11px] text-slate-400 mt-1">Hak Pilih Terdaftar</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <p class="text-xs text-slate-400 font-medium">Suara Masuk (Sah & Tidak)</p>
+                            <h3 class="text-2xl font-black text-red-600 mt-0.5">1,120</h3>
+                            <p class="text-[11px] text-red-600 font-semibold mt-1">77.2% Partisipasi Pemilih</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <p class="text-xs text-slate-400 font-medium">Suara Tidak Sah</p>
+                            <h3 class="text-2xl font-black text-rose-500 mt-0.5">24</h3>
+                            <p class="text-[11px] text-slate-400 mt-1">Kerusakan / Salah Coblos</p>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <p class="text-xs text-slate-400 font-medium">Progress Masuk TPS</p>
+                            <h3 class="text-2xl font-black text-amber-600 mt-0.5">3 / 3 TPS</h3>
+                            <p class="text-[11px] text-amber-600 font-semibold mt-1">100% data terverifikasi</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-red-600"></i> Hasil Perhitungan Suara Sementara (Real-Count)
+                        </h2>
+                        <div id="realcount-bars-container" class="space-y-5"></div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div id="tab-upload" class="tab-pane-custom">
-            <div class="card card-custom p-5 text-center">
-                <h4 class="fw-bold">Upload File Excel (DESA FIX.xlsx)</h4>
-                <p class="text-muted small">Pilih file Excel data penduduk untuk mulai memuat dashboard.</p>
-                <div class="mx-auto mt-3" style="max-width: 400px;">
-                    <input type="file" id="excelFileDrop" class="form-control" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)">
+                <div id="view-calon" class="hidden animate-fade-in space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-users text-red-600"></i> Daftar Pasangan Calon Kades
+                            </h2>
+                            <p class="text-xs text-slate-500">Profil resmi Calon Kepala Desa Payo Lebar Tahun 2026</p>
+                        </div>
+                        <button id="btn-tambah-calon" onclick="bukaModalEditCalon()" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-plus"></i> Tambah / Edit Calon
+                        </button>
+                    </div>
+
+                    <div id="grid-calon-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- MODAL EDIT & COKLIT -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header bg-dark text-white rounded-top-4">
-                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Edit Data Pemilih & Coklit</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div id="view-pemilih" class="hidden animate-fade-in space-y-6">
+                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h2 class="text-lg font-black text-slate-800" id="judul-tahapan-dpt">Daftar Pemilih Sementara (DPS)</h2>
+                        <div class="flex gap-3">
+                            <input type="text" placeholder="Cari NIK / Nama Pemilih..." class="flex-1 border border-slate-200 p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
+                            <button class="bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm">Cari</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body p-4">
-                    <form id="editForm" onsubmit="saveEditedData(event)">
-                        <input type="hidden" id="editRowIndex">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
-                            <input type="text" id="editNama" class="form-control" required>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">NIK</label>
-                                <input type="text" id="editNik" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">NO. KK</label>
-                                <input type="text" id="editNkk" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">Tempat Lahir</label>
-                                <input type="text" id="editTempatLahir" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">Tanggal Lahir</label>
-                                <input type="date" id="editTanggalLahir" class="form-control" onchange="recalcModalAge()">
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold text-muted">Jenis Kelamin</label>
-                                <select id="editJk" class="form-select">
-                                    <option value="L">L</option><option value="P">P</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold text-muted">Umur (Otomatis)</label>
-                                <input type="number" id="editUmur" class="form-control bg-light" readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold text-muted">Status Kawin</label>
-                                <select id="editSts" class="form-select">
-                                    <option value="S">S</option><option value="B">B</option><option value="P">P</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold text-muted">Hubungan Keluarga</label>
-                                <select id="editHubungan" class="form-select">
-                                    <option value="KEPALA KELUARGA">KEPALA KELUARGA</option>
-                                    <option value="SUAMI">SUAMI</option>
-                                    <option value="ISTRI">ISTRI</option>
-                                    <option value="ANAK">ANAK</option>
-                                    <option value="MENANTU">MENANTU</option>
-                                    <option value="CUCU">CUCU</option>
-                                    <option value="ORANG TUA">ORANG TUA</option>
-                                    <option value="MERTUA">MERTUA</option>
-                                    <option value="FAMILI LAIN">FAMILI LAIN</option>
-                                    <option value="LAINNYA">LAINNYA</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-danger">Kode Coklit</label>
-                                <select id="editCoklit" class="form-select border-danger" onchange="toggleCoklitPanels()">
-                                    <option value="0">0 - Aktif (MS)</option>
-                                    <option value="1">1 - Meninggal (TMS)</option>
-                                    <option value="2">2 - Ganda (TMS)</option>
-                                    <option value="3">3 - TNI (TMS)</option>
-                                    <option value="4">4 - Polisi (TMS)</option>
-                                    <option value="5">5 - Pindah Luar (TMS)</option>
-                                    <option value="6">6 - Pindah Dalam (MS)</option>
-                                    <option value="7">7 - Pisah KK (MS)</option>
-                                    <option value="BCU">BCU - Belum Cukup Umur (Otomatis TMS)</option>
-                                    <option value="U">U - Ubah (MS)</option>
-                                    <option value="B">B - Baru (MS)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">RT KTP</label>
-                                <input type="text" id="editRt" class="form-control">
-                            </div>
-                        </div>
 
-                        <!-- PANEL KHUSUS KODE 6 (PINDAH DALAM) -->
-                        <div id="panelPindahDalam" class="card p-3 mb-3 bg-light border-success" style="display: none;">
-                            <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-house-chimney-user me-1"></i> Form Pindah Dalam Desa</h6>
-                            <div class="row g-2">
-                                <div class="col-md-12">
-                                    <label class="form-label small fw-bold">Tujuan RT Domisili (RT Baru dalam Desa)</label>
-                                    <input type="text" id="inputRtTujuanPindah" class="form-control form-control-sm" placeholder="Contoh: 03 atau RT 03">
-                                </div>
-                            </div>
+                <div id="view-pps" class="hidden animate-fade-in space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-user-group text-red-600"></i> Panitia Pemungutan Suara (PPS)
+                            </h2>
+                            <p class="text-xs text-slate-500">Struktur Penyelenggara Pemilihan Desa Payo Lebar</p>
                         </div>
+                        <button id="btn-tambah-pps" onclick="bukaModalAnggota('pps')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Panitia PPS
+                        </button>
+                    </div>
+                    <div id="grid-pps-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
 
-                        <!-- PANEL KHUSUS KODE 7 -->
-                        <div id="panelPisahKK" class="card p-3 mb-3 bg-light border-primary" style="display: none;">
-                            <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-users-rectangle me-1"></i> Form Khusus Pisah KK & Anggota Baru</h6>
-                            <div class="row g-2 mb-2">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Nomor KK Baru</label>
-                                    <input type="text" id="inputNkkBaru" class="form-control form-control-sm" placeholder="Masukkan No KK Baru...">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Alamat / RT Tujuan</label>
-                                    <input type="text" id="inputAlamatTujuan" class="form-control form-control-sm" placeholder="Contoh: RT 02 / Dusun I">
-                                </div>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="checkTambahAnggota" onchange="toggleAnggotaBaruForm()">
-                                <label class="form-check-label small fw-bold text-dark" for="checkTambahAnggota">
-                                    Tambah Biodata Anggota Keluarga Baru di KK Ini?
-                                </label>
-                            </div>
-                            <div id="formAnggotaBaru" class="border-top pt-2 mt-2" style="display: none;">
-                                <div class="row g-2">
-                                    <div class="col-md-3">
-                                        <input type="text" id="anNama" class="form-control form-control-sm" placeholder="Nama Anggota">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="text" id="anNik" class="form-control form-control-sm" placeholder="NIK Anggota">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select id="anHub" class="form-select form-select-sm">
-                                            <option value="SUAMI">SUAMI</option><option value="ISTRI">ISTRI</option><option value="ANAK">ANAK</option><option value="FAMILI LAIN">FAMILI LAIN</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select id="anJk" class="form-select form-select-sm">
-                                            <option value="L">L</option><option value="P">P</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input type="date" id="anTglLahir" class="form-control form-control-sm" placeholder="Tgl Lahir">
-                                    </div>
-                                </div>
-                            </div>
+                <div id="view-bpd" class="hidden animate-fade-in space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-red-600"></i> Pengawas BPD (Badan Permusyawaratan Desa)
+                            </h2>
+                            <p class="text-xs text-slate-500">Tim Pengawas Independen Pilkades Payo Lebar</p>
                         </div>
+                        <button id="btn-tambah-bpd" onclick="bukaModalAnggota('bpd')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Pengawas BPD
+                        </button>
+                    </div>
+                    <div id="grid-bpd-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
 
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="hapusPemilihDariModal()"><i class="fa-solid fa-trash-can me-1"></i> Hapus</button>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan</button>
-                            </div>
+                <div id="view-dasarhukum" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-scale-balanced text-red-600"></i> Landasan Hukum Pilkades</h2>
+                    <p class="text-xs text-slate-500">UU No. 6/2014 & Permendagri No. 112/2014</p>
+                </div>
+
+                <div id="view-layanan" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-headset text-red-600"></i> Pusat Layanan Public</h2>
+                    <p class="text-xs text-slate-500">Kantor Desa Payo Lebar, Kec. Singkut</p>
+                </div>
+
+                <div id="view-input" class="hidden animate-fade-in max-w-2xl mx-auto bg-white/95 backdrop-blur-xs rounded-2xl shadow-lg border border-slate-200/80 overflow-hidden">
+                    <div class="bg-gradient-to-r from-red-950 to-red-900 text-white p-5 flex items-center justify-between">
+                        <div>
+                            <h2 class="font-black text-lg">Input Hasil Suara TPS (Form C1)</h2>
+                            <p class="text-xs text-red-200">Akses Terotorisasi Panitia P2KD</p>
                         </div>
+                        <i class="fa-solid fa-file-signature text-2xl text-amber-400"></i>
+                    </div>
+                    <form onsubmit="simpanData(event)" class="p-6 space-y-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-2">Pilih TPS</label>
+                            <select required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none">
+                                <option value="">-- Pilih TPS --</option>
+                                <option value="TPS 01">TPS 01 - Dusun I</option>
+                                <option value="TPS 02">TPS 02 - Dusun II</option>
+                                <option value="TPS 03">TPS 03 - Dusun III</option>
+                            </select>
+                        </div>
+                        <div id="form-input-calon-container" class="space-y-3 pt-2 border-t border-slate-100"></div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-red-700 to-rose-700 text-white rounded-xl font-bold">
+                            Simpan Hasil Perhitungan
+                        </button>
                     </form>
                 </div>
+
             </div>
+        </main>
+    </div>
+
+    <div id="modalLogin" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-shield text-red-700"></i> Otorisasi Akses Panitia</h3>
+                <button onclick="tutupModalLogin()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="prosesLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username Panitia</label>
+                    <input type="text" id="username" required placeholder="Masukkan username" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm">
+                    Masuk Mode Admin
+                </button>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div id="modalEditCalon" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg space-y-4 border border-slate-100 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-pen text-red-700"></i> Form Update Data Calon Kades</h3>
+                <button onclick="tutupModalEditCalon()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="simpanProfilCalon(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nomor Urut</label>
+                    <input type="number" id="input-no-urut" min="1" max="99" required placeholder="Contoh: 01" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
+                    <input type="text" id="input-nama-calon" required placeholder="Contoh: H. Ahmad Dahlan, S.Pd." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Visi Utama</label>
+                    <textarea id="input-visi-calon" rows="3" required placeholder="Tuliskan visi singkat calon..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md">
+                    Simpan & Perbarui Data
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalAnggota" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 id="modal-anggota-title" class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-gear text-red-700"></i> Form Data Anggota</h3>
+                <button onclick="tutupModalAnggota()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="simpanAnggota(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="input-anggota-index">
+                <input type="hidden" id="input-anggota-tipe">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama-anggota" required placeholder="Masukkan nama lengkap" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Jabatan / Peran</label>
+                    <input type="text" id="input-jabatan-anggota" required placeholder="Contoh: Ketua / Anggota Divisi Logistik" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nomor Kontak / WA</label>
+                    <input type="text" id="input-kontak-anggota" placeholder="Contoh: 081234567890" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md">
+                    Simpan Data Anggota
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script>
-        const TARGET_DATE = new Date(2026, 9, 29); // 29 Oktober 2026
-
-        function switchTab(tabId, btnEl) {
-            document.querySelectorAll('.tab-pane-custom').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            if (btnEl) {
-                document.querySelectorAll('.nav-btn-custom').forEach(b => b.classList.remove('active'));
-                btnEl.classList.add('active');
-            }
+        // Fungsi Realtime Jam & Tanggal
+        function mulaiJamRealtime() {
+            updateWaktu();
+            setInterval(updateWaktu, 1000);
         }
 
-        let rawData = [];
-        let filteredData = [];
-        let chartJKObj = null, chartStatusObj = null, chartUmurObj = null, chartCoklitObj = null;
-        let searchTimeout = null;
-
-        function getValue(row, ...keys) {
-            for (let k of keys) {
-                for (let rk in row) {
-                    if (rk.trim().toLowerCase() === k.toLowerCase()) {
-                        return row[rk] !== undefined && row[rk] !== null ? row[rk] : '';
-                    }
-                }
-            }
-            return '';
-        }
-
-        function calculateAgeToDate(tglStr, targetDate) {
-            if (!tglStr) return 0;
-            try {
-                let d = new Date(tglStr);
-                if (isNaN(d.getTime())) {
-                    let parts = String(tglStr).split(/[\/\-]/);
-                    if (parts.length === 3) {
-                        if (parts[0].length === 4) {
-                            d = new Date(parts[0], parts[1] - 1, parts[2]);
-                        } else {
-                            d = new Date(parts[2], parts[1] - 1, parts[0]);
-                        }
-                    }
-                }
-                if (!isNaN(d.getTime())) {
-                    let age = targetDate.getFullYear() - d.getFullYear();
-                    let m = targetDate.getMonth() - d.getMonth();
-                    if (m < 0 || (m === 0 && targetDate.getDate() < d.getDate())) {
-                        age--;
-                    }
-                    return age >= 0 ? age : 0;
-                }
-            } catch(e) {}
-            return 0;
-        }
-
-        function parseToStandardDateInput(tglStr) {
-            if (!tglStr) return '';
-            try {
-                let d = new Date(tglStr);
-                if (!isNaN(d.getTime())) {
-                    return d.toISOString().split('T')[0];
-                }
-                let parts = String(tglStr).split(/[\/\-]/);
-                if (parts.length === 3) {
-                    if (parts[0].length === 4) {
-                        return `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
-                    } else {
-                        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                    }
-                }
-            } catch(e) {}
-            return '';
-        }
-
-        function guessJK(nik, rawJk) {
-            if (rawJk) {
-                let j = String(rawJk).trim().toUpperCase();
-                if (j.startsWith('L') || j === 'LAKI-LAKI') return 'L';
-                if (j.startsWith('P') || j === 'PEREMPUAN') return 'P';
-            }
-            let n = String(nik).trim();
-            if (n.length >= 8) {
-                try {
-                    let dayCode = parseInt(n.substring(6, 8));
-                    if (dayCode > 40) return 'P';
-                } catch(e) {}
-            }
-            return 'L';
-        }
-
-        function guessStatus(rawSts, usia) {
-            if (rawSts) {
-                let s = String(rawSts).trim().toUpperCase();
-                if (s.startsWith('S') || s.includes('KAWIN')) return 'S';
-                if (s.startsWith('B')) return 'B';
-                if (s.startsWith('P')) return 'P';
-            }
-            return (usia && parseInt(usia) >= 18) ? 'S' : 'B';
-        }
-
-        function guessHubungan(rawHub) {
-            if (rawHub) {
-                let h = String(rawHub).trim().toUpperCase();
-                if (h.includes('KEPALA')) return 'KEPALA KELUARGA';
-                if (h.includes('SUAMI')) return 'SUAMI';
-                if (h.includes('ISTRI')) return 'ISTRI';
-                if (h.includes('ANAK')) return 'ANAK';
-                if (h.includes('MENANTU')) return 'MENANTU';
-                if (h.includes('CUCU')) return 'CUCU';
-                if (h.includes('ORANG TUA') || h.includes('BAPAK') || h.includes('IBU')) return 'ORANG TUA';
-                if (h.includes('MERTUA')) return 'MERTUA';
-                if (h.includes('FAMILI')) return 'FAMILI LAIN';
-                return h;
-            }
-            return 'ANAK';
-        }
-
-        function getCoklitDetails(row) {
-            let usia = parseInt(row._parsedUsia || 0);
-            if (usia < 17) {
-                return { code: 'BCU', label: 'Belum Cukup Umur (TMS)', isMS: false };
-            }
-            let c = String(row._parsedCoklit).trim();
-            if (c === '0') return { code: '0', label: 'Aktif / Memenuhi Syarat (MS)', isMS: true };
-            if (c === '6') {
-                let rtTujuan = row._parsedRtTujuan ? ` (Tujuan RT: ${row._parsedRtTujuan})` : '';
-                return { code: '6', label: `Pindah Dalam Desa (MS)${rtTujuan}`, isMS: true };
-            }
-            if (c === '7') return { code: '7', label: 'Pisah KK (MS)', isMS: true };
-            if (c === 'U') return { code: 'U', label: 'Data Diubah (MS)', isMS: true };
-            if (c === 'B') return { code: 'B', label: 'Pemilih Baru (MS)', isMS: true };
-
-            const map = {
-                '1': 'Meninggal Dunia (TMS)',
-                '2': 'Pemilih Ganda (TMS)',
-                '3': 'Anggota TNI (TMS)',
-                '4': 'Anggota POLRI (TMS)',
-                '5': 'Pindah Domisili (Luar Desa) (TMS)'
-            };
-            return { code: c, label: map[c] || 'Tidak Memenuhi Syarat (TMS)', isMS: false };
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initCharts();
-        });
-
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    processWorkbookBuffer(evt.target.result);
-                    switchTab('tab-dps', document.querySelector('.nav-btn-custom'));
-                } catch(err) {
-                    alert("Gagal membaca file Excel. Pastikan format file benar.");
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function processWorkbookBuffer(buffer) {
-            const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            let loadedData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false });
+        function updateWaktu() {
+            const now = new Date();
             
-            rawData = loadedData.map(row => {
-                let nik = getValue(row, 'NIK');
-                let tglLahir = getValue(row, 'TANGGAL LAHIR');
-                let tempatLahir = getValue(row, 'TEMPAT LAHIR', 'TEMPAT / TGL LAHIR');
-                if (!tglLahir && tempatLahir.includes(',')) {
-                    let parts = tempatLahir.split(',');
-                    tempatLahir = parts[0].trim();
-                    tglLahir = parts[1].trim();
-                }
-                
-                let usia = calculateAgeToDate(tglLahir, TARGET_DATE);
-                let jk = guessJK(nik, getValue(row, 'JK', 'JENIS KELAMIN'));
-                let sts = guessStatus(getValue(row, 'STS KAWIN', 'STS'), usia);
-                let hub = guessHubungan(getValue(row, 'STATUS HUBUNGAN', 'HUBUNGAN'));
-
-                return {
-                    ...row,
-                    _parsedNama: getValue(row, 'NAMA LENGAKAP', 'NAMA LENGKAP', 'NAMA'),
-                    _parsedNik: nik,
-                    _parsedNkk: getValue(row, 'NO. KK', 'NKK'),
-                    _parsedTempatLahir: tempatLahir,
-                    _parsedTglLahir: tglLahir,
-                    _parsedUsia: usia,
-                    _parsedJk: jk,
-                    _parsedSts: sts,
-                    _parsedHub: hub,
-                    _parsedRt: getValue(row, 'RT KTP', 'RT'),
-                    _parsedRtTujuan: getValue(row, 'RT DOMISILI', 'RT TUJUAN'),
-                    _parsedCoklit: getValue(row, 'KODE COKLIT', 'COKLIT') || '0'
-                };
-            });
-
-            initDropdowns();
-            applyFilter();
-            updateCharts();
-        }
-
-        function initDropdowns() {
-            const rtSet = new Set();
-            rawData.forEach(row => { if (row._parsedRt) rtSet.add(row._parsedRt); });
-            const filterRT = document.getElementById('filterRT');
-            filterRT.innerHTML = '<option value="">-- Semua RT --</option>';
-            Array.from(rtSet).sort().forEach(rt => {
-                filterRT.innerHTML += `<option value="${rt}">RT ${rt}</option>`;
-            });
-        }
-
-        function debounceFilter() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                applyFilter();
-            }, 250);
-        }
-
-        function applyFilter() {
-            const cari = document.getElementById('filterCari').value.toLowerCase();
-            const jk = document.getElementById('filterJK').value.toUpperCase();
-            const rt = document.getElementById('filterRT').value;
-            const status = document.getElementById('filterStatus').value.toUpperCase();
-            const coklit = document.getElementById('filterCoklit').value;
-
-            filteredData = rawData.filter(row => {
-                const details = getCoklitDetails(row);
-                const matchesCari = !cari || row._parsedNama.toLowerCase().includes(cari) || row._parsedNik.toLowerCase().includes(cari) || row._parsedNkk.toLowerCase().includes(cari);
-                const matchesCoklit = !coklit || details.code === coklit;
-                return matchesCari && matchesCoklit && (!jk || row._parsedJk === jk) && (!rt || String(row._parsedRt) === rt) && (!status || row._parsedSts === status);
-            });
-
-            renderTable();
-            updateStats();
-            updateCharts();
-        }
-
-        function updateStats() {
-            document.getElementById('stTotal').innerText = filteredData.length.toLocaleString();
-            const kkSet = new Set(filteredData.map(d => d._parsedNkk));
-            document.getElementById('stKK').innerText = kkSet.size.toLocaleString();
-            document.getElementById('stL').innerText = filteredData.filter(d => d._parsedJk === 'L').length.toLocaleString();
-            document.getElementById('stP').innerText = filteredData.filter(d => d._parsedJk === 'P').length.toLocaleString();
+            // Format Hari, Tanggal, Bulan, Tahun
+            const opsiTanggal = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formatTanggal = now.toLocaleDateString('id-ID', opsiTanggal);
             
-            const msCount = filteredData.filter(d => getCoklitDetails(d).isMS).length;
-            const tmsCount = filteredData.length - msCount;
-            document.getElementById('stMS').innerText = msCount.toLocaleString();
-            document.getElementById('stTMS').innerText = tmsCount.toLocaleString();
+            // Format Jam, Menit, Detik
+            const jam = String(now.getHours()).padStart(2, '0');
+            const menit = String(now.getMinutes()).padStart(2, '0');
+            const detik = String(now.getSeconds()).padStart(2, '0');
+            const formatJam = `${jam}:${menit}:${detik} WIB`;
+
+            const elTgl = document.getElementById('realtime-tanggal');
+            const elJam = document.getElementById('realtime-jam');
+
+            if (elTgl) elTgl.innerText = formatTanggal;
+            if (elJam) elJam.innerText = formatJam;
         }
 
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="18" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>`;
-                return;
-            }
+        let isPanitiaLoggedIn = false;
 
-            let lastNkk = null;
-            let renderLimit = filteredData.slice(0, 150);
-            
-            let htmlFragment = '';
-            renderLimit.forEach((row, i) => {
-                const originalIndex = rawData.indexOf(row);
-                let isNewGroup = false;
-                if (i > 0 && row._parsedNkk !== lastNkk) {
-                    isNewGroup = true;
-                }
-                lastNkk = row._parsedNkk;
-                
-                const details = getCoklitDetails(row);
-                let displayCode = details.code === 'BCU' ? '<span class="text-danger fw-bold">BCU</span>' : row._parsedCoklit;
-                let displayRtDom = row._parsedCoklit === '6' && row._parsedRtTujuan ? row._parsedRtTujuan : getValue(row, 'RT DOMISILI');
-                let badgeClass = details.isMS ? 'text-ms' : 'text-tms';
+        let daftarCalon = [
+            { no: "01", nama: "H. Ahmad Dahlan, S.Pd.", visi: "Mewujudkan Desa Payo Lebar yang Sejahtera, Transparan, dan Berbasis Teknologi Informasi.", suara: 420, persen: "37.5%" },
+            { no: "02", nama: "Bambang Subianto", visi: "Pemerataan Pembangunan Infrastruktur dan Pemberdayaan Ekonomi Pertanian Desa.", suara: 310, persen: "27.6%" },
+            { no: "03", nama: "H. Suryadi, S.E.", visi: "Penguatan Badan Usaha Milik Desa (BUMDes) dan Kemandirian Ekonomi Pemuda.", suara: 200, persen: "17.8%" },
+            { no: "04", nama: "Dra. Hj. Nurjanah", visi: "Peningkatan Pelayanan Kesehatan, Pendidikan Anak, dan Kesejahteraan Perempuan.", suara: 110, persen: "9.8%" },
+            { no: "05", nama: "M. Ridwan Al-Faruq", visi: "Tata Kelola Pemerintahan Desa yang Bersih, Religius, dan Bebas Pungutan Liar.", suara: 80, persen: "7.1%" }
+        ];
 
-                htmlFragment += `
-                    <tr class="${isNewGroup ? 'nkk-group-border' : ''}">
-                        <td class="text-center text-muted">${i + 1}</td>
-                        <td class="text-dp-id">${getValue(row, 'DP-ID')}</td>
-                        <td class="fw-bold">${row._parsedNkk}</td>
-                        <td>${row._parsedNik}</td>
-                        <td class="fw-bold">${row._parsedNama}</td>
-                        <td>${row._parsedTempatLahir}</td>
-                        <td>${row._parsedTglLahir}</td>
-                        <td class="text-center fw-bold text-primary">${row._parsedUsia}</td>
-                        <td class="text-center"><span class="badge ${row._parsedJk === 'P' ? 'badge-jk-p' : 'badge-jk-l'}">${row._parsedJk}</span></td>
-                        <td class="text-center">${row._parsedSts}</td>
-                        <td><span class="badge bg-secondary">${row._parsedHub}</span></td>
-                        <td>${getValue(row, 'AGAMA')}</td>
-                        <td>${getValue(row, 'DUSUN/ALAMAT')}</td>
-                        <td class="text-center fw-bold">${row._parsedRt}</td>
-                        <td class="text-center fw-bold text-primary">${displayRtDom}</td>
-                        <td class="text-center fw-bold">${displayCode}</td>
-                        <td><span class="${badgeClass}">${details.label}</span></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary py-0 px-2 me-1" onclick="openEditModal(${originalIndex})" title="Edit & Coklit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="hapusPemilih(${originalIndex})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
+        let daftarPPS = [
+            { nama: "Heryanto, S.ST", jabatan: "Ketua PPS", kontak: "0821-7788-9900" },
+            { nama: "Siti Rahmawati", jabatan: "Divisi Teknis & Penyelenggaraan", kontak: "0852-1122-3344" },
+            { nama: "Andi Saputra", jabatan: "Divisi Data & Pemutakhiran", kontak: "0813-4455-6677" },
+            { nama: "Nur Hidayah, A.Md", jabatan: "Divisi Keuangan & Logistik", kontak: "0812-9900-1122" },
+            { nama: "Budi Santoso", jabatan: "Anggota Divisi Hubmas", kontak: "0853-3344-5566" }
+        ];
+
+        let daftarBPD = [
+            { nama: "Drs. M. Ali Akbar", jabatan: "Ketua Pengawas BPD", kontak: "0811-1234-5678" },
+            { nama: "H. Ahmad Fauzi", jabatan: "Wakil Ketua BPD", kontak: "0812-2345-6789" },
+            { nama: "Mustofa, S.P.", jabatan: "Sekretaris Pengawas", kontak: "0813-3456-7890" },
+            { nama: "Zulkifli Mansur", jabatan: "Pengawas Wilayah Dusun I", kontak: "0814-4567-8901" },
+            { nama: "Rahmat Hidayat", jabatan: "Pengawas Wilayah Dusun II", kontak: "0815-5678-9012" },
+            { nama: "Suryani, S.Pd", jabatan: "Pengawas Wilayah Dusun III", kontak: "0816-6789-0123" }
+        ];
+
+        function renderCalon() {
+            const gridContainer = document.getElementById('grid-calon-container');
+            const realcountContainer = document.getElementById('realcount-bars-container');
+            const inputContainer = document.getElementById('form-input-calon-container');
+
+            gridContainer.innerHTML = '';
+            realcountContainer.innerHTML = '';
+            inputContainer.innerHTML = '';
+
+            daftarCalon.forEach((calon, idx) => {
+                gridContainer.innerHTML += `
+                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl ${idx === 0 ? 'bg-red-100 text-red-800 border-red-200' : 'bg-slate-100 text-slate-800 border-slate-200'} flex items-center justify-center font-black text-2xl border flex-shrink-0">
+                                ${calon.no}
+                            </div>
+                            <div class="overflow-hidden">
+                                <h3 class="text-base font-black text-slate-800 truncate">${calon.nama}</h3>
+                                <p class="text-xs text-slate-400">Calon Kepala Desa Nomor Urut ${calon.no}</p>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50/80 rounded-xl border border-slate-100 text-xs space-y-1.5">
+                            <p class="font-bold text-slate-700">Visi Utama:</p>
+                            <p class="text-slate-600 italic">"${calon.visi}"</p>
+                        </div>
+                        ${isPanitiaLoggedIn ? `<button onclick="editCalonSpesifik(${idx})" class="w-full py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 rounded-lg text-xs font-bold border border-slate-200 transition">Edit Data Calon Ini</button>` : ''}
+                    </div>
+                `;
+
+                realcountContainer.innerHTML += `
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <div class="flex items-center gap-3">
+                                <span class="w-7 h-7 rounded-lg ${idx === 0 ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'} font-black flex items-center justify-center text-xs border border-slate-200">${calon.no}</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">${calon.nama}</h4>
+                                    <p class="text-[11px] text-slate-400">Perolehan: ${calon.suara} Suara</p>
+                                </div>
+                            </div>
+                            <span class="text-base font-black ${idx === 0 ? 'text-red-600' : 'text-slate-700'}">${calon.persen}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200/60">
+                            <div class="${idx === 0 ? 'bg-gradient-to-r from-red-600 to-rose-600' : 'bg-slate-400'} h-2 rounded-full transition-all duration-1000" style="width: ${calon.persen}"></div>
+                        </div>
+                    </div>
+                `;
+
+                inputContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-red-50/50 rounded-xl border border-red-100">
+                        <span class="font-bold text-slate-800 text-xs">${calon.no}. ${calon.nama}</span>
+                        <input type="number" min="0" value="${calon.suara}" required class="w-28 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-red-800 bg-white text-xs outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
                 `;
             });
-            tbody.innerHTML = htmlFragment;
         }
 
-        // FUNGSI EKSPOR KE EXCEL BERDASARKAN DATA YANG DIFILTER
-        function exportToExcel() {
-            if (filteredData.length === 0) {
-                alert("Tidak ada data untuk diekspor!");
-                return;
-            }
-            
-            const exportRows = filteredData.map((row, index) => {
-                let details = getCoklitDetails(row);
-                return {
-                    "NO": index + 1,
-                    "DP-ID": getValue(row, 'DP-ID'),
-                    "NO. KK": row._parsedNkk,
-                    "NIK": row._parsedNik,
-                    "NAMA LENGKAP": row._parsedNama,
-                    "TEMPAT LAHIR": row._parsedTempatLahir,
-                    "TANGGAL LAHIR": row._parsedTglLahir,
-                    "UMUR (29 Okt 2026)": row._parsedUsia,
-                    "JENIS KELAMIN": row._parsedJk,
-                    "STATUS KAWIN": row._parsedSts,
-                    "HUBUNGAN KELUARGA": row._parsedHub,
-                    "AGAMA": getValue(row, 'AGAMA'),
-                    "ALAMAT": getValue(row, 'DUSUN/ALAMAT'),
-                    "RT KTP": row._parsedRt,
-                    "RT DOMISILI": row._parsedCoklit === '6' && row._parsedRtTujuan ? row._parsedRtTujuan : getValue(row, 'RT DOMISILI'),
-                    "KODE COKLIT": row._parsedCoklit,
-                    "KETERANGAN COKLIT": details.label
-                };
-            });
+        function renderTim(tipe) {
+            const container = document.getElementById(tipe === 'pps' ? 'grid-pps-container' : 'grid-bpd-container');
+            const dataList = tipe === 'pps' ? daftarPPS : daftarBPD;
+            container.innerHTML = '';
 
-            const worksheet = XLSX.utils.json_to_sheet(exportRows);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pemilih Pilkades");
-            XLSX.writeFile(workbook, "Data_Pemilih_Pilkades_Payo_Lebar_2026.xlsx");
-        }
-
-        // FUNGSI CETAK / PRINT SESUAI FILTER AKTIF (DENGAN PEMBATAS KK)
-        function cetakDataFiltered() {
-            if (filteredData.length === 0) {
-                alert("Tidak ada data yang sesuai dengan filter untuk dicetak!");
-                return;
-            }
-
-            let printWindow = window.open('', '_blank');
-            let htmlContent = `
-                <!DOCTYPE html>
-                <html lang="id">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Cetak Data Pemilih - Pilkades Payo Lebar 2026</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; font-size: 11px; color: #000; margin: 10px; }
-                        h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; font-size: 14px; }
-                        p { text-align: center; margin-top: 0; margin-bottom: 15px; font-size: 11px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                        th, td { border: 1px solid #333; padding: 5px 6px; text-align: left; }
-                        th { background-color: #f2f2f2; text-align: center; font-size: 10px; }
-                        td.center { text-align: center; }
-                        /* Garis Pembatas Antar KK saat Print */
-                        tr.nkk-group-border td { border-top: 2.5px solid #000 !important; }
-                    </style>
-                </head>
-                <body>
-                    <h2>Pemerintahan Desa Payo Lebar</h2>
-                    <p>Daftar Pemilih Sementara (DPS) Berdasarkan Filter Aktif - Pilkades Tahun 2026</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 30px;">NO</th>
-                                <th>DP-ID</th>
-                                <th>NO. KK</th>
-                                <th>NIK</th>
-                                <th>NAMA LENGKAP</th>
-                                <th>TEMPAT/TGL LAHIR</th>
-                                <th>UMUR</th>
-                                <th>JK</th>
-                                <th>STS</th>
-                                <th>ALAMAT</th>
-                                <th>RT</th>
-                                <th>COKLIT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            let lastNkk = null;
-            filteredData.forEach((row, index) => {
-                let isNewGroup = false;
-                if (index > 0 && row._parsedNkk !== lastNkk) {
-                    isNewGroup = true;
-                }
-                lastNkk = row._parsedNkk;
-
-                let details = getCoklitDetails(row);
-                htmlContent += `
-                    <tr class="${isNewGroup ? 'nkk-group-border' : ''}">
-                        <td class="center">${index + 1}</td>
-                        <td>${getValue(row, 'DP-ID')}</td>
-                        <td>${row._parsedNkk}</td>
-                        <td>${row._parsedNik}</td>
-                        <td><b>${row._parsedNama}</b></td>
-                        <td>${row._parsedTempatLahir}, ${row._parsedTglLahir}</td>
-                        <td class="center"><b>${row._parsedUsia}</b></td>
-                        <td class="center">${row._parsedJk}</td>
-                        <td class="center">${row._parsedSts}</td>
-                        <td>${getValue(row, 'DUSUN/ALAMAT')}</td>
-                        <td class="center">${row._parsedRt}</td>
-                        <td class="center">${details.code}</td>
-                    </tr>
+            dataList.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 text-red-800 flex items-center justify-center font-bold border border-slate-200 flex-shrink-0">
+                                <i class="fa-solid ${tipe === 'pps' ? 'fa-user' : 'fa-user-shield'}"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-xs text-slate-800 truncate">${item.nama}</h4>
+                                <p class="text-[11px] font-semibold text-red-700 truncate">${item.jabatan}</p>
+                                <p class="text-[10px] text-slate-400 font-medium">${item.kontak || '-'}</p>
+                            </div>
+                        </div>
+                        ${isPanitiaLoggedIn ? `
+                            <div class="flex items-center gap-1 flex-shrink-0">
+                                <button onclick="editAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 rounded-lg flex items-center justify-center text-xs border border-slate-200">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="hapusAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 rounded-lg flex items-center justify-center text-xs border border-slate-200">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
                 `;
             });
-
-            htmlContent += `
-                        </tbody>
-                    </table>
-                </body>
-                </html>
-            `;
-
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.focus();
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
         }
 
-        function toggleCoklitPanels() {
-            let val = document.getElementById('editCoklit').value;
-            let panelPisah = document.getElementById('panelPisahKK');
-            let panelPindah = document.getElementById('panelPindahDalam');
+        function renderSemuaData() {
+            renderCalon();
+            renderTim('pps');
+            renderTim('bpd');
+        }
+
+        function switchTab(viewName) {
+            const views = ['realcount', 'calon', 'pemilih', 'pps', 'bpd', 'dasarhukum', 'layanan', 'input'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.className = "menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent";
+            });
+
+            const activeBtn = document.getElementById(`nav-${viewName}`);
+            if (activeBtn) {
+                activeBtn.className = "menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-semibold shadow-lg shadow-red-950/50 border border-red-400/30 transition-all duration-200";
+            }
+        }
+
+        function toggleSubmenu(menuId, arrowId) {
+            document.getElementById(menuId).classList.toggle('hidden');
+            document.getElementById(arrowId).classList.toggle('rotate-180');
+        }
+
+        function pilihTahapan(namaTahapan) {
+            switchTab('pemilih');
+            document.getElementById('judul-tahapan-dpt').innerText = `Daftar Pemilih: ${namaTahapan}`;
+        }
+
+        function bukaModalLogin() {
+            document.getElementById('modalLogin').classList.remove('hidden');
+            document.getElementById('modalLogin').classList.add('flex');
+        }
+
+        function tutupModalLogin() {
+            document.getElementById('modalLogin').classList.add('hidden');
+            document.getElementById('modalLogin').classList.remove('flex');
+        }
+
+        function bukaModalEditCalon() {
+            document.getElementById('modalEditCalon').classList.remove('hidden');
+            document.getElementById('modalEditCalon').classList.add('flex');
+        }
+
+        function tutupModalEditCalon() {
+            document.getElementById('modalEditCalon').classList.add('hidden');
+            document.getElementById('modalEditCalon').classList.remove('flex');
+        }
+
+        function bukaModalAnggota(tipe, index = null) {
+            document.getElementById('input-anggota-tipe').value = tipe;
+            document.getElementById('input-anggota-index').value = index !== null ? index : '';
             
-            panelPisah.style.display = (val === '7') ? 'block' : 'none';
-            panelPindah.style.display = (val === '6') ? 'block' : 'none';
+            const title = document.getElementById('modal-anggota-title');
+            title.innerHTML = index !== null ? `<i class="fa-solid fa-user-pen text-red-700"></i> Edit Data ${tipe.toUpperCase()}` : `<i class="fa-solid fa-user-plus text-red-700"></i> Tambah Anggota ${tipe.toUpperCase()}`;
+
+            if (index !== null) {
+                const data = (tipe === 'pps' ? daftarPPS : daftarBPD)[index];
+                document.getElementById('input-nama-anggota').value = data.nama;
+                document.getElementById('input-jabatan-anggota').value = data.jabatan;
+                document.getElementById('input-kontak-anggota').value = data.kontak || '';
+            } else {
+                document.getElementById('input-nama-anggota').value = '';
+                document.getElementById('input-jabatan-anggota').value = '';
+                document.getElementById('input-kontak-anggota').value = '';
+            }
+
+            document.getElementById('modalAnggota').classList.remove('hidden');
+            document.getElementById('modalAnggota').classList.add('flex');
         }
 
-        function toggleAnggotaBaruForm() {
-            let chk = document.getElementById('checkTambahAnggota').checked;
-            let form = document.getElementById('formAnggotaBaru');
-            form.style.display = chk ? 'block' : 'none';
+        function tutupModalAnggota() {
+            document.getElementById('modalAnggota').classList.add('hidden');
+            document.getElementById('modalAnggota').classList.remove('flex');
         }
 
-        function recalcModalAge() {
-            let tglVal = document.getElementById('editTanggalLahir').value;
-            let age = calculateAgeToDate(tglVal, TARGET_DATE);
-            document.getElementById('editUmur').value = age;
+        function editAnggota(tipe, index) {
+            bukaModalAnggota(tipe, index);
         }
 
-        function openEditModal(index) {
-            const row = rawData[index];
-            if (!row) return;
-            document.getElementById('editRowIndex').value = index;
-            document.getElementById('editNama').value = row._parsedNama;
-            document.getElementById('editNik').value = row._parsedNik;
-            document.getElementById('editNkk').value = row._parsedNkk;
-            document.getElementById('editTempatLahir').value = row._parsedTempatLahir;
-            document.getElementById('editTanggalLahir').value = parseToStandardDateInput(row._parsedTglLahir);
-            document.getElementById('editJk').value = row._parsedJk;
-            document.getElementById('editUmur').value = row._parsedUsia;
-            document.getElementById('editSts').value = row._parsedSts;
-            document.getElementById('editHubungan').value = row._parsedHub || 'ANAK';
-            document.getElementById('editCoklit').value = row._parsedCoklit;
-            document.getElementById('editRt').value = row._parsedRt;
-            
-            document.getElementById('inputRtTujuanPindah').value = row._parsedRtTujuan || '';
-            document.getElementById('inputNkkBaru').value = '';
-            document.getElementById('inputAlamatTujuan').value = '';
-            document.getElementById('checkTambahAnggota').checked = false;
-            document.getElementById('formAnggotaBaru').style.display = 'none';
-            
-            toggleCoklitPanels();
-            new bootstrap.Modal(document.getElementById('editModal')).show();
+        function hapusAnggota(tipe, index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data anggota ini?")) {
+                if (tipe === 'pps') {
+                    daftarPPS.splice(index, 1);
+                } else {
+                    daftarBPD.splice(index, 1);
+                }
+                renderTim(tipe);
+            }
         }
 
-        function saveEditedData(e) {
+        function simpanAnggota(e) {
             e.preventDefault();
-            const index = parseInt(document.getElementById('editRowIndex').value);
-            if (isNaN(index) || !rawData[index]) return;
+            const tipe = document.getElementById('input-anggota-tipe').value;
+            const index = document.getElementById('input-anggota-index').value;
+            const nama = document.getElementById('input-nama-anggota').value;
+            const jabatan = document.getElementById('input-jabatan-anggota').value;
+            const kontak = document.getElementById('input-kontak-anggota').value;
 
-            let row = rawData[index];
-            row._parsedNama = document.getElementById('editNama').value;
-            row._parsedNik = document.getElementById('editNik').value;
-            row._parsedTempatLahir = document.getElementById('editTempatLahir').value;
-            row._parsedTglLahir = document.getElementById('editTanggalLahir').value;
-            row._parsedUsia = parseInt(document.getElementById('editUmur').value) || 0;
-            row._parsedJk = document.getElementById('editJk').value;
-            row._parsedSts = document.getElementById('editSts').value;
-            row._parsedHub = document.getElementById('editHubungan').value;
-            
-            let coklitVal = document.getElementById('editCoklit').value;
-            row._parsedCoklit = coklitVal;
-            row._parsedRt = document.getElementById('editRt').value;
+            const targetArray = tipe === 'pps' ? daftarPPS : daftarBPD;
 
-            if (coklitVal === '6') {
-                row._parsedRtTujuan = document.getElementById('inputRtTujuanPindah').value.trim();
-            } else if (coklitVal === '7') {
-                let nkkBaru = document.getElementById('inputNkkBaru').value.trim();
-                let alamatBaru = document.getElementById('inputAlamatTujuan').value.trim();
-                if (nkkBaru) row._parsedNkk = nkkBaru;
-                if (alamatBaru) row._parsedRt = alamatBaru;
-
-                if (document.getElementById('checkTambahAnggota').checked) {
-                    let aNama = document.getElementById('anNama').value;
-                    let aNik = document.getElementById('anNik').value;
-                    let aHub = document.getElementById('anHub').value;
-                    let aJk = document.getElementById('anJk').value;
-                    let aTgl = document.getElementById('anTglLahir').value;
-                    let aUsia = calculateAgeToDate(aTgl, TARGET_DATE);
-                    if (aNama && aNik) {
-                        let newAnggota = {
-                            ...row,
-                            _parsedNama: aNama,
-                            _parsedNik: aNik,
-                            _parsedNkk: row._parsedNkk,
-                            _parsedTempatLahir: row._parsedTempatLahir,
-                            _parsedTglLahir: aTgl,
-                            _parsedUsia: aUsia,
-                            _parsedJk: aJk,
-                            _parsedSts: guessStatus('', aUsia),
-                            _parsedHub: aHub,
-                            _parsedCoklit: '7'
-                        };
-                        rawData.push(newAnggota);
-                    }
-                }
+            if (index !== '') {
+                targetArray[index] = { nama, jabatan, kontak };
+            } else {
+                targetArray.push({ nama, jabatan, kontak });
             }
 
-            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-            applyFilter();
+            renderTim(tipe);
+            tutupModalAnggota();
+            alert("Data Anggota berhasil tersimpan!");
         }
 
-        function hapusPemilih(index) {
-            if (confirm('Hapus pemilih ini?')) {
-                rawData.splice(index, 1);
-                applyFilter();
+        function editCalonSpesifik(index) {
+            const c = daftarCalon[index];
+            document.getElementById('input-no-urut').value = c.no;
+            document.getElementById('input-nama-calon').value = c.nama;
+            document.getElementById('input-visi-calon').value = c.visi;
+            bukaModalEditCalon();
+        }
+
+        function simpanProfilCalon(e) {
+            e.preventDefault();
+            const no = document.getElementById('input-no-urut').value.padStart(2, '0');
+            const nama = document.getElementById('input-nama-calon').value;
+            const visi = document.getElementById('input-visi-calon').value;
+
+            const idx = daftarCalon.findIndex(c => c.no === no);
+            if (idx !== -1) {
+                daftarCalon[idx].nama = nama;
+                daftarCalon[idx].visi = visi;
+            } else {
+                daftarCalon.push({ no: no, nama: nama, visi: visi, suara: 0, persen: "0%" });
+                daftarCalon.sort((a,b) => parseInt(a.no) - parseInt(b.no));
+            }
+
+            renderCalon();
+            tutupModalEditCalon();
+            alert("Data Profil Calon Kades Berhasil Diperbarui!");
+        }
+
+        function aksesAksiPanitia(targetView) {
+            if (!isPanitiaLoggedIn) {
+                alert("Akses Terkunci! Silakan Login Panitia (P2KD) terlebih dahulu.");
+                bukaModalLogin();
+            } else {
+                switchTab(targetView);
             }
         }
 
-        function hapusPemilihDariModal() {
-            const index = parseInt(document.getElementById('editRowIndex').value);
-            if (!isNaN(index)) {
-                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-                hapusPemilih(index);
+        function prosesLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (u === "admin" && p === "123456") {
+                isPanitiaLoggedIn = true;
+                alert("Login Panitia Berhasil!");
+                tutupModalLogin();
+                
+                document.getElementById('lock-input').classList.add('hidden');
+                document.getElementById('lock-upload').classList.add('hidden');
+                
+                document.getElementById('btn-tambah-calon').classList.remove('hidden');
+                document.getElementById('btn-tambah-calon').classList.add('flex');
+                document.getElementById('btn-tambah-pps').classList.remove('hidden');
+                document.getElementById('btn-tambah-pps').classList.add('flex');
+                document.getElementById('btn-tambah-bpd').classList.remove('hidden');
+                document.getElementById('btn-tambah-bpd').classList.add('flex');
+
+                const btnAuth = document.getElementById('btn-auth');
+                btnAuth.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Logout Panitia`;
+                btnAuth.className = "w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl text-xs font-bold transition-all shadow-lg border border-slate-700";
+                btnAuth.onclick = () => location.reload();
+
+                renderSemuaData();
+            } else {
+                alert("Username atau Password Panitia salah!");
             }
         }
 
-        function resetFilter() {
-            document.getElementById('filterCari').value = '';
-            document.getElementById('filterJK').value = '';
-            document.getElementById('filterRT').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterCoklit').value = '';
-            applyFilter();
+        function simpanData(e) {
+            e.preventDefault();
+            alert("Hasil suara TPS berhasil tersimpan!");
+            switchTab('realcount');
         }
 
-        function initCharts() {
-            chartJKObj = new Chart(document.getElementById('chartJK'), {
-                type: 'doughnut',
-                data: { labels: ['Laki-Laki', 'Perempuan'], datasets: [{ data: [0, 0], backgroundColor: ['#3b82f6', '#ec4899'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-            chartStatusObj = new Chart(document.getElementById('chartStatus'), {
-                type: 'doughnut',
-                data: { labels: ['Sudah (S)', 'Belum (B)', 'Pernah (P)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-            chartUmurObj = new Chart(document.getElementById('chartUmur'), {
-                type: 'bar',
-                data: { labels: ['< 20th', '20-39th', '40-59th', '>= 60th'], datasets: [{ data: [0,0,0,0], backgroundColor: '#10b981' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-            chartCoklitObj = new Chart(document.getElementById('chartCoklit'), {
-                type: 'doughnut',
-                data: { labels: ['Memenuhi Syarat (MS)', 'Tidak Memenuhi (TMS)'], datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#dc2626'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-        }
-
-        function updateCharts() {
-            if (!chartJKObj) return;
-
-            let l = filteredData.filter(d => d._parsedJk === 'L').length;
-            let p = filteredData.filter(d => d._parsedJk === 'P').length;
-            chartJKObj.data.datasets[0].data = [l, p];
-            chartJKObj.update();
-
-            let s = filteredData.filter(d => d._parsedSts === 'S').length;
-            let b = filteredData.filter(d => d._parsedSts === 'B').length;
-            let pr = filteredData.filter(d => d._parsedSts === 'P').length;
-            chartStatusObj.data.datasets[0].data = [s, b, pr];
-            chartStatusObj.update();
-
-            let u20 = 0, u40 = 0, u60 = 0, uOld = 0;
-            filteredData.forEach(d => {
-                let u = parseInt(d._parsedUsia);
-                if (u < 20) u20++; else if (u < 40) u40++; else if (u < 60) u60++; else uOld++;
-            });
-            chartUmurObj.data.datasets[0].data = [u20, u40, u60, uOld];
-            chartUmurObj.update();
-
-            let msCount = filteredData.filter(d => getCoklitDetails(d).isMS).length;
-            let tnsCount = filteredData.length - msCount;
-            chartCoklitObj.data.datasets[0].data = [msCount, tnsCount];
-            chartCoklitObj.update();
-        }
+        renderSemuaData();
     </script>
 </body>
 </html>
