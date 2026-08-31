@@ -94,17 +94,13 @@
                                 <i class="fa-solid fa-user-shield text-amber-400 text-[10px]"></i> PENGAWAS BPD
                             </button>
                             <button id="nav-kpps1" onclick="switchTab('kpps1')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
-                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 01 (9 ORANG)
+                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 01
                             </button>
                             <button id="nav-kpps2" onclick="switchTab('kpps2')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
-                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 02 (9 ORANG)
+                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 02
                             </button>
                         </div>
                     </div>
-
-                    <button id="nav-dasarhukum" onclick="switchTab('dasarhukum')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <i class="fa-solid fa-scale-balanced w-5 text-red-300/80"></i> DASAR HUKUM
-                    </button>
 
                     <button id="nav-layanan" onclick="switchTab('layanan')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
                         <i class="fa-solid fa-headset w-5 text-red-300/80"></i> LAYANAN PUBLIK
@@ -392,12 +388,6 @@
                         </button>
                     </div>
                     <div id="grid-kpps2-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-
-                <!-- Dasar Hukum View -->
-                <div id="view-dasarhukum" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 uppercase">
-                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-scale-balanced text-red-600"></i> LANDASAN HUKUM PILKADES</h2>
-                    <p class="text-xs text-slate-500">Undang-Undang Nomor 6 Tahun 2014 tentang Desa & Permendagri Nomor 112 Tahun 2014.</p>
                 </div>
 
                 <!-- Layanan View -->
@@ -759,7 +749,7 @@
         }
 
         function switchTab(viewName) {
-            const views = ['realcount', 'calon', 'tahapan', 'pemilih', 'pps', 'bpd', 'kpps1', 'kpps2', 'dasarhukum', 'layanan'];
+            const views = ['realcount', 'calon', 'tahapan', 'pemilih', 'pps', 'bpd', 'kpps1', 'kpps2', 'layanan'];
             views.forEach(v => {
                 let el = document.getElementById(`view-${v}`);
                 if(el) el.classList.add('hidden');
@@ -920,3 +910,4 @@
     </script>
 </body>
 </html>
+```[cite: 1]
