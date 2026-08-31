@@ -109,15 +109,6 @@
                     <button id="nav-layanan" onclick="switchTab('layanan')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
                         <i class="fa-solid fa-headset w-5 text-red-300/80"></i> LAYANAN PUBLIK
                     </button>
-
-                    <div class="pt-2">
-                        <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/75">PANITIA PEMUNGUTAN SUARA (PPS)</p>
-                    </div>
-
-                    <button id="nav-input" onclick="aksesAksiPanitia('input')" class="menu-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <span class="flex items-center gap-3"><i class="fa-solid fa-file-invoice w-5 text-red-300/80"></i> INPUT SUARA TPS</span>
-                        <i id="lock-input" class="fa-solid fa-lock text-xs text-amber-400 bg-amber-400/10 p-1.5 rounded-lg border border-amber-400/20"></i>
-                    </button>
                 </nav>
             </div>
 
@@ -173,19 +164,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                             <p class="text-xs text-slate-400 font-medium uppercase">Total DPT Desa</p>
-                            <h3 class="text-2xl font-black text-slate-800 mt-0.5">1,450</h3>
+                            <h3 class="text-2xl font-black text-slate-800 mt-0.5">0</h3>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                             <p class="text-xs text-slate-400 font-medium uppercase">Suara Masuk</p>
-                            <h3 class="text-2xl font-black text-red-600 mt-0.5">1,120</h3>
+                            <h3 class="text-2xl font-black text-red-600 mt-0.5">0</h3>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                             <p class="text-xs text-slate-400 font-medium uppercase">Tidak Sah</p>
-                            <h3 class="text-2xl font-black text-rose-500 mt-0.5">24</h3>
+                            <h3 class="text-2xl font-black text-rose-500 mt-0.5">0</h3>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                             <p class="text-xs text-slate-400 font-medium uppercase">Progress TPS</p>
-                            <h3 class="text-2xl font-black text-amber-600 mt-0.5">2 / 2 TPS</h3>
+                            <h3 class="text-2xl font-black text-amber-600 mt-0.5">0 / 2 TPS</h3>
                         </div>
                     </div>
 
@@ -193,7 +184,9 @@
                         <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase">
                             <i class="fa-solid fa-chart-simple text-red-600"></i> HASIL PERHITUNGAN SUARA SEMENTARA (REAL-COUNT)
                         </h2>
-                        <div id="realcount-bars-container" class="space-y-5"></div>
+                        <div id="realcount-bars-container" class="space-y-5">
+                            <p class="text-xs text-slate-400 uppercase">Belum ada data suara dari Spreadsheet.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -213,7 +206,7 @@
                     <div id="grid-calon-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
 
-                <!-- Tahapan Pilkades Lengkap View (Tabel sesuai gambar) -->
+                <!-- Tahapan Pilkades Lengkap View -->
                 <div id="view-tahapan" class="hidden animate-fade-in space-y-6">
                     <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-4">
@@ -236,11 +229,9 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 uppercase font-medium">
-                                    <!-- 1. Persiapan -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">1</td><td colspan="3" class="p-3 border border-slate-300">PERSIAPAN</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Sosialisasi Tingkat Kabupaten</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Mei 2026</td></tr>
 
-                                    <!-- 2. Pembentukan Panitia -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">2</td><td colspan="3" class="p-3 border border-slate-300">PEMBENTUKAN PANITIA</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pembentukan Panitia Tk. Kecamatan</td><td class="p-3 border border-slate-300 text-center">10 Hari</td><td class="p-3 border border-slate-300 text-center">1-10 Juni 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. PPS</td><td class="p-3 border border-slate-300 text-center">10 Hari</td><td class="p-3 border border-slate-300 text-center">11-20 Juni 2026</td></tr>
@@ -249,34 +240,29 @@
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Pembentukan Petugas Linmas</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">1-5 Juli 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">f. Sosialisasi Rencana dan Tahapan Pilkades oleh Panitia Kabupaten</td><td class="p-3 border border-slate-300 text-center">14 Hari</td><td class="p-3 border border-slate-300 text-center">6-19 Juli 2026</td></tr>
 
-                                    <!-- 3. DPT Awal -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">3</td><td colspan="3" class="p-3 border border-slate-300">DPT AWAL DARI KPU KAB. SAROLANGUN</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penyampaian DPT awal dari KPU ke DPMD</td><td class="p-3 border border-slate-300 text-center">16 Hari</td><td class="p-3 border border-slate-300 text-center">20 Juli - 4 Agustus 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyerahan DPT awal dari PMD ke Camat</td><td class="p-3 border border-slate-300 text-center">9 Hari</td><td class="p-3 border border-slate-300 text-center">5-13 Agustus 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Penyerahan DPT awal dari Camat ke Pemerintah Desa</td><td class="p-3 border border-slate-300 text-center">4 Hari</td><td class="p-3 border border-slate-300 text-center">14-17 Agustus 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Penyerahan DPT awal dari Pemdes ke PPS</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">18-19 Agustus 2026</td></tr>
 
-                                    <!-- 4. DPS -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">4</td><td colspan="3" class="p-3 border border-slate-300">PENDATAAN DAFTAR PEMILIH SEMENTARA (DPS)</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pendataan, pencocokan dan penelitian oleh Pantarlih</td><td class="p-3 border border-slate-300 text-center">14 Hari</td><td class="p-3 border border-slate-300 text-center">20 Agust - 3 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyusunan dan perbaikan DPS hasil pendataan</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">4-6 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pencetakan dan Penetapan DPS oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">7 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Pengumuman dan tanggapan Masyarakat terhadap DPS</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">8-10 Sept 2026</td></tr>
 
-                                    <!-- 5. DPTam -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">5</td><td colspan="3" class="p-3 border border-slate-300">PENDATAAN DAFTAR PEMILIH TAMBAHAN (DPTAM)</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pendataan, dan pendaftaran DPTam</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">11-13 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyusunan dan perbaikan DPTam hasil pemutakhiran</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">14-16 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pencetakan dan Penetapan DPTam oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">17 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Pengumuman dan tanggapan Masyarakat terhadap DPTam</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">18-20 Sept 2026</td></tr>
 
-                                    <!-- 6. DPT -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">6</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN DAFTAR PEMILIH TETAP (DPT)</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan DPTam menjadi DPT oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pencetakan DPT oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">22 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pengumuman DPT oleh KPPS</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">23-25 Sept 2026</td></tr>
 
-                                    <!-- 7. Penjaringan Calon -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">7</td><td colspan="3" class="p-3 border border-slate-300">PENJARINGAN CALON KADES</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pengumuman dan Pendaftaran Bakal Calon</td><td class="p-3 border border-slate-300 text-center">9 Hari</td><td class="p-3 border border-slate-300 text-center">20-28 Juli 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Perpanjangan waktu pendaftaran jika calon tunggal</td><td class="p-3 border border-slate-300 text-center">15 Hari</td><td class="p-3 border border-slate-300 text-center">29 Juli-12 Agst 2026</td></tr>
@@ -285,32 +271,26 @@
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Pengumuman bakal calon yang telah memenuhi kelengkapan Administrasi</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">9-10 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">f. Jadwal khusus, (seleksi Tambahan/uji kompetensi jika Bakal calon lebih dari 5 (lima) orang</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">11-15 Sept 2026</td></tr>
 
-                                    <!-- 8. Penetapan Calon Kades -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">8</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN CALON KEPALA DESA</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan bakal calon Kepala Desa menjadi Calon Kepala Desa serta penetapan dan pengambilan Nomor Urut Calon</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">16-17 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pengumuman Calon Kepala Desa berdasarkan No. Urut</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">18 Sept 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Penyampaian Data (Photo dan CD) Calon Kepala Desa ke Dinas PMD Kab. Sarolangun</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">19-21 Sept 2026</td></tr>
 
-                                    <!-- 9. Pencetakan Surat Suara -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">9</td><td colspan="3" class="p-3 border border-slate-300">PENCETAKAN SURAT SUARA</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Persiapan Pencetakan Surat Suara</td><td class="p-3 border border-slate-300 text-center">29 Hari</td><td class="p-3 border border-slate-300 text-center">22 Sept - 20 Okt 2026</td></tr>
 
-                                    <!-- 10. Kampanye -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">10</td><td colspan="3" class="p-3 border border-slate-300">KAMPANYE</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Deklarasi/Penandatanganan Pernyataan Pilkades Damai</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Okt 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyampaian visi dan misi/Rapat/Pertemuan/dialog, melalui media masa (cetak/elektronik)</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">22-24 Okt 2026</td></tr>
 
-                                    <!-- 11. Masa Tenang -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">11</td><td colspan="3" class="p-3 border border-slate-300">MASA TENANG</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Masa tenang dan pembersihan alat peraga</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">25-27 Okt 2026</td></tr>
 
-                                    <!-- 12. Distribusi Alat Pemilihan -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">12</td><td colspan="3" class="p-3 border border-slate-300">DISTRIBUSI ALAT PEMILIHAN</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pembuatan TPS</td><td class="p-3 border border-slate-300 text-center" rowspan="3">1 Hari</td><td class="p-3 border border-slate-300 text-center" rowspan="3">28 Oktober 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Distribusi Surat Suara</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Serah terima Surat Suara dari Panitia Kabupaten/Tim Pemantau ke PPS, dan dari PPS ke KPPS langsung dimasukkan ke Kotak Suara dengan disaksikan oleh Panitia Kab./tim Pemantau, Kepala Desa dan BPD</td></tr>
 
-                                    <!-- 13. Pemungutan dan Penghitungan Suara -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">13</td><td colspan="3" class="p-3 border border-slate-300">PEMUNGUTAN DAN PENGHITUNGAN SURAT SUARA</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pemungutan dan Penghitungan Surat Suara di TPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">29 Oktober 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pleno Penghitungan Surat Suara</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">29 Oktober 2026</td></tr>
@@ -318,7 +298,6 @@
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Penyampaian Laporan BPD kepada Bupati melalui Camat untuk disahkan</td><td class="p-3 border border-slate-300 text-center">7 Hari</td><td class="p-3 border border-slate-300 text-center">3-9 Nov 2026</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Penyampaian hasil pemilihan Kepala Desa terpilih oleh Camat kepada Bupati untuk disahkan menjadi Kepala Desa</td><td class="p-3 border border-slate-300 text-center">7 Hari</td><td class="p-3 border border-slate-300 text-center">10-16 Nov 2026</td></tr>
 
-                                    <!-- 14. Penetapan Kepala Desa Terpilih -->
                                     <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">14</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN KEPALA DESA TERPILIH</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan Keputusan Bupati tentang Pengesahan Kepala Desa terpilih</td><td class="p-3 border border-slate-300 text-center">Maksimal 30 hari setelah menerima laporan dari BPD/Camat</td><td class="p-3 border border-slate-300 text-center">-</td></tr>
                                     <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Persiapan dan Pelantikan Kepala Desa terpilih</td><td class="p-3 border border-slate-300 text-center">Maksimal 30 hari terhitung sejak diterbitkannya SK Bupati</td><td class="p-3 border border-slate-300 text-center">-</td></tr>
@@ -427,31 +406,6 @@
                     <p class="text-xs text-slate-500">Sekretariat PPS Kantor Desa Payo Lebar, Kec. Singkut.</p>
                 </div>
 
-                <!-- Input View -->
-                <div id="view-input" class="hidden animate-fade-in max-w-2xl mx-auto bg-white/95 backdrop-blur-xs rounded-2xl shadow-lg border border-slate-200/80 overflow-hidden uppercase">
-                    <div class="bg-gradient-to-r from-red-950 to-red-900 text-white p-5 flex items-center justify-between">
-                        <div>
-                            <h2 class="font-black text-lg">INPUT HASIL SUARA TPS (FORM C1)</h2>
-                            <p class="text-xs text-red-200">Akses Terotorisasi Panitia Pemungutan Suara (PPS)</p>
-                        </div>
-                        <i class="fa-solid fa-file-signature text-2xl text-amber-400"></i>
-                    </div>
-                    <form onsubmit="simpanDataSuara(event)" class="p-6 space-y-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-2">PILIH TPS</label>
-                            <select required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none">
-                                <option value="">-- PILIH TPS --</option>
-                                <option value="TPS 01">TPS 01 - DUSUN I</option>
-                                <option value="TPS 02">TPS 02 - DUSUN II</option>
-                            </select>
-                        </div>
-                        <div id="form-input-calon-container" class="space-y-3 pt-2 border-t border-slate-100"></div>
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-red-700 to-rose-700 text-white rounded-xl font-bold uppercase">
-                            SIMPAN PEROLEHAN SUARA
-                        </button>
-                    </form>
-                </div>
-
             </div>
         </main>
     </div>
@@ -550,7 +504,7 @@
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">NAMA LENGKAP</label>
-                    <input type="text" id="input-nama-anggota" id="input-nama-pemilih" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <input type="text" id="input-nama-pemilih" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">TAHAPAN PEMILIH</label>
@@ -653,14 +607,13 @@
         function renderCalon() {
             const gridContainer = document.getElementById('grid-calon-container');
             const realcountContainer = document.getElementById('realcount-bars-container');
-            const inputContainer = document.getElementById('form-input-calon-container');
 
             gridContainer.innerHTML = '';
             realcountContainer.innerHTML = '';
-            inputContainer.innerHTML = '';
 
             if(databasePilkades.calon.length === 0) {
                 gridContainer.innerHTML = `<p class="text-xs text-slate-400 uppercase">Belum ada data calon.</p>`;
+                realcountContainer.innerHTML = `<p class="text-xs text-slate-400 uppercase">Belum ada data suara dari Spreadsheet.</p>`;
                 return;
             }
 
@@ -698,13 +651,6 @@
                         <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200/60">
                             <div class="bg-gradient-to-r from-red-600 to-rose-600 h-2 rounded-full" style="width: ${calon.persen || '0%'}"></div>
                         </div>
-                    </div>
-                `;
-
-                inputContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-3 bg-red-50/50 rounded-xl border border-red-100 uppercase">
-                        <span class="font-bold text-slate-800 text-xs">${nomorFormat}. ${calon.nama}</span>
-                        <input type="number" min="0" value="${calon.suara || 0}" data-id="${calon.no}" class="input-suara w-28 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-red-800 bg-white text-xs outline-none">
                     </div>
                 `;
             });
@@ -813,7 +759,7 @@
         }
 
         function switchTab(viewName) {
-            const views = ['realcount', 'calon', 'tahapan', 'pemilih', 'pps', 'bpd', 'kpps1', 'kpps2', 'dasarhukum', 'layanan', 'input'];
+            const views = ['realcount', 'calon', 'tahapan', 'pemilih', 'pps', 'bpd', 'kpps1', 'kpps2', 'dasarhukum', 'layanan'];
             views.forEach(v => {
                 let el = document.getElementById(`view-${v}`);
                 if(el) el.classList.add('hidden');
@@ -839,7 +785,6 @@
             if(document.getElementById('username').value === "admin" && document.getElementById('password').value === "123456") {
                 isPanitiaLoggedIn = true;
                 tutupModalLogin();
-                document.getElementById('lock-input').classList.add('hidden');
                 ['btn-tambah-calon', 'btn-tambah-pps', 'btn-tambah-bpd', 'btn-tambah-kpps1', 'btn-tambah-kpps2', 'btn-tambah-pemilih'].forEach(id => {
                     let btn = document.getElementById(id);
                     if(btn) btn.classList.replace('hidden', 'flex');
@@ -851,15 +796,6 @@
                 alert("LOGIN ADMIN PPS BERHASIL!");
             } else {
                 alert("USERNAME ATAU PASSWORD SALAH!");
-            }
-        }
-
-        function aksesAksiPanitia(targetView) {
-            if (!isPanitiaLoggedIn) {
-                alert("AKSES TERKUNCI! SILAKAN LOGIN SEBAGAI PANITIA PPS TERLEBIH DAHULU.");
-                bukaModalLogin();
-            } else {
-                switchTab(targetView);
             }
         }
 
@@ -980,12 +916,6 @@
                 databasePilkades.pemilih.splice(index, 1);
                 simpanKeGoogleDrive('pemilih', databasePilkades.pemilih);
             }
-        }
-
-        function simpanDataSuara(e) {
-            e.preventDefault();
-            alert("HASIL SUARA BERHASIL DIPERBARUI!");
-            switchTab('realcount');
         }
     </script>
 </body>
