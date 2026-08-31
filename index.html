@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi & Real-Count Pilkades Payo Lebar 2026</title>
+    <title>SISTEM INFORMASI & REAL-COUNT PILKADES PAYO LEBAR 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -32,7 +32,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased bg-pattern-dots" onload="mulaiJamRealtime()">
+<body class="bg-slate-100 font-sans text-slate-800 antialiased bg-pattern-dots" onload="inisialisasiSistem()">
 
     <div class="flex h-screen overflow-hidden">
         
@@ -43,94 +43,89 @@
                         <i class="fa-solid fa-check-to-slot text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="font-black text-base tracking-wide leading-tight bg-gradient-to-r from-white via-red-100 to-amber-200 bg-clip-text text-transparent">Pilkades Digital</h1>
-                        <p class="text-[11px] font-medium text-amber-300/80">Desa Payo Lebar 2026</p>
+                        <h1 class="font-black text-base tracking-wide leading-tight bg-gradient-to-r from-white via-red-100 to-amber-200 bg-clip-text text-transparent uppercase">PILKADES DIGITAL</h1>
+                        <p class="text-[11px] font-medium text-amber-300/80 uppercase">DESA PAYO LEBAR 2026</p>
                     </div>
                 </div>
 
                 <nav class="p-3.5 space-y-1.5 text-sm font-medium">
-                    <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/70">Menu Utama</p>
+                    <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/70">MENU UTAMA</p>
                     
                     <button id="nav-realcount" onclick="switchTab('realcount')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-semibold shadow-lg shadow-red-950/50 border border-red-400/30 transition-all duration-200">
-                        <i class="fa-solid fa-chart-line w-5 text-red-200"></i> Live Real-Count
+                        <i class="fa-solid fa-chart-line w-5 text-red-200"></i> LIVE REAL-COUNT
                     </button>
                     
                     <button id="nav-calon" onclick="switchTab('calon')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <i class="fa-solid fa-users w-5 text-red-300/80"></i> Profil Calon Kades
+                        <i class="fa-solid fa-users w-5 text-red-300/80"></i> PROFIL CALON KADES
+                    </button>
+
+                    <!-- Menu Tahapan Pilkades Langsung ke Tabel -->
+                    <button id="nav-tahapan" onclick="switchTab('tahapan')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
+                        <i class="fa-solid fa-timeline w-5 text-red-300/80"></i> JADWAL TAHAPAN PILKADES
                     </button>
 
                     <div>
                         <button onclick="toggleSubmenu('sub-pemilih', 'arrow-pemilih')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 transition-all duration-200 border border-transparent">
                             <span class="flex items-center gap-3">
-                                <i class="fa-solid fa-id-card w-5 text-red-300/80"></i> Data Pemilih
+                                <i class="fa-solid fa-id-card w-5 text-red-300/80"></i> DATA PEMILIH
                             </span>
                             <i id="arrow-pemilih" class="fa-solid fa-chevron-down text-xs text-amber-400 transition-transform duration-300"></i>
                         </button>
                         <div id="sub-pemilih" class="hidden pl-4 pr-1 py-1.5 space-y-1 mt-1 bg-red-950/70 rounded-xl border border-red-800/40 backdrop-blur-md">
-                            <button onclick="pilihTahapan('DPT Awal KPU', 'Selesai')" class="w-full text-left py-2 px-3 text-xs text-red-200/80 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
-                                <span>1. DPT Awal KPU</span>
-                                <span class="text-[9px] bg-red-900/80 text-red-200 px-1.5 py-0.5 rounded">Selesai</span>
-                            </button>
-                            <button onclick="pilihTahapan('DPS (Sementara)', 'Berjalan')" class="w-full text-left py-2 px-3 text-xs text-amber-300 hover:text-white hover:bg-red-800/50 rounded-lg flex items-center justify-between font-semibold">
-                                <span>2. DPS (Sementara)</span>
-                                <span class="text-[9px] bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 px-2 py-0.5 rounded-full font-bold">Aktif</span>
-                            </button>
-                            <button onclick="pilihTahapan('DPTam (Tambahan)', 'Mendatang')" class="w-full text-left py-2 px-3 text-xs text-red-300/50 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
-                                <span>3. DPTam (Tambahan)</span>
-                                <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Pending</span>
-                            </button>
-                            <button onclick="pilihTahapan('DPT (Tetap)', 'Penetapan Akhir')" class="w-full text-left py-2 px-3 text-xs text-red-300/50 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center justify-between">
-                                <span>4. DPT (Tetap)</span>
-                                <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Final</span>
-                            </button>
+                            <button onclick="pilihDataPemilih('DPT Awal KPU')" class="w-full text-left py-2 px-3 text-xs text-red-200/80 hover:text-white hover:bg-red-800/40 rounded-lg">1. DPT AWAL KPU</button>
+                            <button onclick="pilihDataPemilih('DPS (Sementara)')" class="w-full text-left py-2 px-3 text-xs text-amber-300 hover:text-white hover:bg-red-800/50 rounded-lg font-semibold">2. DPS (SEMENTARA)</button>
+                            <button onclick="pilihDataPemilih('DPTam (Tambahan)')" class="w-full text-left py-2 px-3 text-xs text-red-200/80 hover:text-white hover:bg-red-800/40 rounded-lg">3. DPTAM (TAMBAHAN)</button>
+                            <button onclick="pilihDataPemilih('DPT (Tetap)')" class="w-full text-left py-2 px-3 text-xs text-red-200/80 hover:text-white hover:bg-red-800/40 rounded-lg">4. DPT (TETAP)</button>
                         </div>
                     </div>
 
                     <div>
                         <button onclick="toggleSubmenu('sub-panitia', 'arrow-panitia')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 transition-all duration-200 border border-transparent">
                             <span class="flex items-center gap-3">
-                                <i class="fa-solid fa-sitemap w-5 text-red-300/80"></i> Panitia & Pengawas
+                                <i class="fa-solid fa-sitemap w-5 text-red-300/80"></i> PANITIA & PENGAWAS
                             </span>
                             <i id="arrow-panitia" class="fa-solid fa-chevron-down text-xs text-amber-400 transition-transform duration-300"></i>
                         </button>
                         <div id="sub-panitia" class="hidden pl-4 pr-1 py-1.5 space-y-1 mt-1 bg-red-950/70 rounded-xl border border-red-800/40 backdrop-blur-md">
                             <button id="nav-pps" onclick="switchTab('pps')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
-                                <i class="fa-solid fa-user-group text-amber-400 text-[10px]"></i> PPS (Panitia Pemungutan)
+                                <i class="fa-solid fa-user-group text-amber-400 text-[10px]"></i> PPS (PANITIA DESA)
                             </button>
                             <button id="nav-bpd" onclick="switchTab('bpd')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield text-amber-400 text-[10px]"></i> Pengawas BPD
+                                <i class="fa-solid fa-user-shield text-amber-400 text-[10px]"></i> PENGAWAS BPD
+                            </button>
+                            <button id="nav-kpps1" onclick="switchTab('kpps1')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
+                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 01 (9 ORANG)
+                            </button>
+                            <button id="nav-kpps2" onclick="switchTab('kpps2')" class="menu-btn w-full text-left py-2 px-3 text-xs text-red-100 hover:text-white hover:bg-red-800/40 rounded-lg flex items-center gap-2">
+                                <i class="fa-solid fa-users-rectangle text-amber-400 text-[10px]"></i> KPPS TPS 02 (9 ORANG)
                             </button>
                         </div>
                     </div>
 
                     <button id="nav-dasarhukum" onclick="switchTab('dasarhukum')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <i class="fa-solid fa-scale-balanced w-5 text-red-300/80"></i> Dasar Hukum
+                        <i class="fa-solid fa-scale-balanced w-5 text-red-300/80"></i> DASAR HUKUM
                     </button>
 
                     <button id="nav-layanan" onclick="switchTab('layanan')" class="menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <i class="fa-solid fa-headset w-5 text-red-300/80"></i> Layanan Public
+                        <i class="fa-solid fa-headset w-5 text-red-300/80"></i> LAYANAN PUBLIK
                     </button>
 
                     <div class="pt-2">
-                        <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/70">Panitia P2KD</p>
+                        <p class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-red-300/75">PANITIA PEMUNGUTAN SUARA (PPS)</p>
                     </div>
 
                     <button id="nav-input" onclick="aksesAksiPanitia('input')" class="menu-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <span class="flex items-center gap-3"><i class="fa-solid fa-file-invoice w-5 text-red-300/80"></i> Input Suara TPS</span>
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-file-invoice w-5 text-red-300/80"></i> INPUT SUARA TPS</span>
                         <i id="lock-input" class="fa-solid fa-lock text-xs text-amber-400 bg-amber-400/10 p-1.5 rounded-lg border border-amber-400/20"></i>
-                    </button>
-                    <button id="nav-upload" onclick="aksesAksiPanitia('upload')" class="menu-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent">
-                        <span class="flex items-center gap-3"><i class="fa-solid fa-camera w-5 text-red-300/80"></i> Upload Form C1</span>
-                        <i id="lock-upload" class="fa-solid fa-lock text-xs text-amber-400 bg-amber-400/10 p-1.5 rounded-lg border border-amber-400/20"></i>
                     </button>
                 </nav>
             </div>
 
             <div class="p-4 border-t border-red-800/40 bg-red-950/60 backdrop-blur-sm space-y-3 text-center">
-                <button onclick="bukaModalLogin()" id="btn-auth" class="w-full py-2.5 px-4 bg-gradient-to-r from-red-700 to-rose-700 hover:from-red-600 hover:to-rose-600 text-white rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-red-950/60 border border-red-400/30">
-                    <i class="fa-solid fa-user-shield text-amber-300"></i> Login Panitia (P2KD)
+                <button onclick="bukaModalLogin()" id="btn-auth" class="w-full py-2.5 px-4 bg-gradient-to-r from-red-700 to-rose-700 hover:from-red-600 hover:to-rose-600 text-white rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-red-950/60 border border-red-400/30 uppercase">
+                    <i class="fa-solid fa-user-shield text-amber-300"></i> LOGIN PANITIA (PPS)
                 </button>
-                <p class="text-[10px] text-red-200/60 font-medium">Panitia Pemilihan Desa (P2KD)<br>&copy; 2026 Payo Lebar</p>
+                <p class="text-[10px] text-red-200/60 font-medium uppercase">PANITIA PEMUNGUTAN SUARA (PPS)<br>&copy; 2026 PAYO LEBAR</p>
             </div>
         </aside>
 
@@ -148,14 +143,14 @@
                               <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                             </span>
                             <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 bg-red-950/80 border border-amber-400/30 px-3 py-0.5 rounded-full shadow-inner">
-                                Portal Publikasi Resmi KPU Desa
+                                PORTAL PUBLIKASI RESMI KPU DESA
                             </span>
                         </div>
-                        <h1 class="text-xl md:text-2xl font-black tracking-wide text-white drop-shadow-md">
+                        <h1 class="text-xl md:text-2xl font-black tracking-wide text-white drop-shadow-md uppercase">
                             PEMILIHAN KEPALA DESA PAYO LEBAR
                         </h1>
-                        <p class="text-xs font-medium text-red-200/90 flex items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-amber-400"></i> Kecamatan Singkut, Kabupaten Sarolangun — Tahun 2026
+                        <p class="text-xs font-medium text-red-200/90 flex items-center gap-2 uppercase">
+                            <i class="fa-solid fa-location-dot text-amber-400"></i> KECAMATAN SINGKUT, KABUPATEN SAROLANGUN — TAHUN 2026
                         </p>
                     </div>
 
@@ -163,8 +158,8 @@
                         <div class="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-300 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-clock text-base"></i>
                         </div>
-                        <div class="text-left text-xs">
-                            <p id="realtime-tanggal" class="font-bold text-white tracking-wide">Memuat Tanggal...</p>
+                        <div class="text-left text-xs uppercase">
+                            <p id="realtime-tanggal" class="font-bold text-white tracking-wide">MEMUAT TANGGAL...</p>
                             <p id="realtime-jam" class="text-[11px] text-amber-300 font-mono font-bold">00:00:00 WIB</p>
                         </div>
                     </div>
@@ -173,125 +168,286 @@
 
             <div class="p-6 space-y-6">
 
+                <!-- Realcount View -->
                 <div id="view-realcount" class="animate-fade-in space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                            <p class="text-xs text-slate-400 font-medium">Total DPT Desa</p>
+                            <p class="text-xs text-slate-400 font-medium uppercase">Total DPT Desa</p>
                             <h3 class="text-2xl font-black text-slate-800 mt-0.5">1,450</h3>
-                            <p class="text-[11px] text-slate-400 mt-1">Hak Pilih Terdaftar</p>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                            <p class="text-xs text-slate-400 font-medium">Suara Masuk (Sah & Tidak)</p>
+                            <p class="text-xs text-slate-400 font-medium uppercase">Suara Masuk</p>
                             <h3 class="text-2xl font-black text-red-600 mt-0.5">1,120</h3>
-                            <p class="text-[11px] text-red-600 font-semibold mt-1">77.2% Partisipasi Pemilih</p>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                            <p class="text-xs text-slate-400 font-medium">Suara Tidak Sah</p>
+                            <p class="text-xs text-slate-400 font-medium uppercase">Tidak Sah</p>
                             <h3 class="text-2xl font-black text-rose-500 mt-0.5">24</h3>
-                            <p class="text-[11px] text-slate-400 mt-1">Kerusakan / Salah Coblos</p>
                         </div>
                         <div class="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                            <p class="text-xs text-slate-400 font-medium">Progress Masuk TPS</p>
-                            <h3 class="text-2xl font-black text-amber-600 mt-0.5">3 / 3 TPS</h3>
-                            <p class="text-[11px] text-amber-600 font-semibold mt-1">100% data terverifikasi</p>
+                            <p class="text-xs text-slate-400 font-medium uppercase">Progress TPS</p>
+                            <h3 class="text-2xl font-black text-amber-600 mt-0.5">2 / 2 TPS</h3>
                         </div>
                     </div>
 
                     <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-                        <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-simple text-red-600"></i> Hasil Perhitungan Suara Sementara (Real-Count)
+                        <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase">
+                            <i class="fa-solid fa-chart-simple text-red-600"></i> HASIL PERHITUNGAN SUARA SEMENTARA (REAL-COUNT)
                         </h2>
                         <div id="realcount-bars-container" class="space-y-5"></div>
                     </div>
                 </div>
 
+                <!-- Calon View -->
                 <div id="view-calon" class="hidden animate-fade-in space-y-6">
                     <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
                         <div>
-                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-users text-red-600"></i> Daftar Pasangan Calon Kades
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2 uppercase">
+                                <i class="fa-solid fa-users text-red-600"></i> DAFTAR PASANGAN CALON KADES
                             </h2>
-                            <p class="text-xs text-slate-500">Profil resmi Calon Kepala Desa Payo Lebar Tahun 2026 (Data tersimpan di browser)</p>
+                            <p class="text-xs text-slate-500 uppercase">Terhubung langsung dengan database sistem</p>
                         </div>
-                        <button id="btn-tambah-calon" onclick="bukaModalEditCalon()" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
+                        <button id="btn-tambah-calon" onclick="bukaModalEditCalon()" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm uppercase">
                             <i class="fa-solid fa-plus"></i> Tambah / Edit Calon
                         </button>
                     </div>
-
                     <div id="grid-calon-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
 
-                <div id="view-pemilih" class="hidden animate-fade-in space-y-6">
+                <!-- Tahapan Pilkades Lengkap View (Tabel sesuai gambar) -->
+                <div id="view-tahapan" class="hidden animate-fade-in space-y-6">
                     <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-                        <h2 class="text-lg font-black text-slate-800" id="judul-tahapan-dpt">Daftar Pemilih Sementara (DPS)</h2>
-                        <div class="flex gap-3">
-                            <input type="text" placeholder="Cari NIK / Nama Pemilih..." class="flex-1 border border-slate-200 p-2.5 rounded-xl text-sm bg-slate-50 outline-none">
-                            <button class="bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm">Cari</button>
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-4">
+                            <div>
+                                <h2 class="text-lg font-black text-slate-800 uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-timeline text-red-600"></i> TAHAPAN PILKADES DESA PAYO LEBAR TAHUN 2026
+                                </h2>
+                                <p class="text-xs text-slate-500 uppercase">Jadwal lengkap uraian kegiatan, waktu, dan tanggal pelaksanaan</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto pt-2">
+                            <table class="w-full text-left text-xs border-collapse border border-slate-300">
+                                <thead>
+                                    <tr class="bg-red-950 text-white border-b uppercase font-bold text-center">
+                                        <th class="p-3 border border-slate-300 w-12">NO</th>
+                                        <th class="p-3 border border-slate-300 text-left">URAIAN KEGIATAN</th>
+                                        <th class="p-3 border border-slate-300 w-28">WAKTU</th>
+                                        <th class="p-3 border border-slate-300 w-48">TANGGAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 uppercase font-medium">
+                                    <!-- 1. Persiapan -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">1</td><td colspan="3" class="p-3 border border-slate-300">PERSIAPAN</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Sosialisasi Tingkat Kabupaten</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Mei 2026</td></tr>
+
+                                    <!-- 2. Pembentukan Panitia -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">2</td><td colspan="3" class="p-3 border border-slate-300">PEMBENTUKAN PANITIA</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pembentukan Panitia Tk. Kecamatan</td><td class="p-3 border border-slate-300 text-center">10 Hari</td><td class="p-3 border border-slate-300 text-center">1-10 Juni 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. PPS</td><td class="p-3 border border-slate-300 text-center">10 Hari</td><td class="p-3 border border-slate-300 text-center">11-20 Juni 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. KPPS</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">21-26 Juni 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Perekrutan Pantarlih</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">26-30 Juni 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Pembentukan Petugas Linmas</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">1-5 Juli 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">f. Sosialisasi Rencana dan Tahapan Pilkades oleh Panitia Kabupaten</td><td class="p-3 border border-slate-300 text-center">14 Hari</td><td class="p-3 border border-slate-300 text-center">6-19 Juli 2026</td></tr>
+
+                                    <!-- 3. DPT Awal -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">3</td><td colspan="3" class="p-3 border border-slate-300">DPT AWAL DARI KPU KAB. SAROLANGUN</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penyampaian DPT awal dari KPU ke DPMD</td><td class="p-3 border border-slate-300 text-center">16 Hari</td><td class="p-3 border border-slate-300 text-center">20 Juli - 4 Agustus 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyerahan DPT awal dari PMD ke Camat</td><td class="p-3 border border-slate-300 text-center">9 Hari</td><td class="p-3 border border-slate-300 text-center">5-13 Agustus 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Penyerahan DPT awal dari Camat ke Pemerintah Desa</td><td class="p-3 border border-slate-300 text-center">4 Hari</td><td class="p-3 border border-slate-300 text-center">14-17 Agustus 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Penyerahan DPT awal dari Pemdes ke PPS</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">18-19 Agustus 2026</td></tr>
+
+                                    <!-- 4. DPS -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">4</td><td colspan="3" class="p-3 border border-slate-300">PENDATAAN DAFTAR PEMILIH SEMENTARA (DPS)</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pendataan, pencocokan dan penelitian oleh Pantarlih</td><td class="p-3 border border-slate-300 text-center">14 Hari</td><td class="p-3 border border-slate-300 text-center">20 Agust - 3 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyusunan dan perbaikan DPS hasil pendataan</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">4-6 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pencetakan dan Penetapan DPS oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">7 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Pengumuman dan tanggapan Masyarakat terhadap DPS</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">8-10 Sept 2026</td></tr>
+
+                                    <!-- 5. DPTam -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">5</td><td colspan="3" class="p-3 border border-slate-300">PENDATAAN DAFTAR PEMILIH TAMBAHAN (DPTAM)</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pendataan, dan pendaftaran DPTam</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">11-13 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyusunan dan perbaikan DPTam hasil pemutakhiran</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">14-16 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pencetakan dan Penetapan DPTam oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">17 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Pengumuman dan tanggapan Masyarakat terhadap DPTam</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">18-20 Sept 2026</td></tr>
+
+                                    <!-- 6. DPT -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">6</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN DAFTAR PEMILIH TETAP (DPT)</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan DPTam menjadi DPT oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pencetakan DPT oleh PPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">22 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Pengumuman DPT oleh KPPS</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">23-25 Sept 2026</td></tr>
+
+                                    <!-- 7. Penjaringan Calon -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">7</td><td colspan="3" class="p-3 border border-slate-300">PENJARINGAN CALON KADES</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pengumuman dan Pendaftaran Bakal Calon</td><td class="p-3 border border-slate-300 text-center">9 Hari</td><td class="p-3 border border-slate-300 text-center">20-28 Juli 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Perpanjangan waktu pendaftaran jika calon tunggal</td><td class="p-3 border border-slate-300 text-center">15 Hari</td><td class="p-3 border border-slate-300 text-center">29 Juli-12 Agst 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Perpanjangan waktu pendaftaran jika masih calon tunggal</td><td class="p-3 border border-slate-300 text-center">10 Hari</td><td class="p-3 border border-slate-300 text-center">13-22 Agst 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Penelitian kelengkapan dan keabsahan berkas pendaftaran disertai klarifikasi</td><td class="p-3 border border-slate-300 text-center">17 Hari</td><td class="p-3 border border-slate-300 text-center">23 Agst-8 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Pengumuman bakal calon yang telah memenuhi kelengkapan Administrasi</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">9-10 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">f. Jadwal khusus, (seleksi Tambahan/uji kompetensi jika Bakal calon lebih dari 5 (lima) orang</td><td class="p-3 border border-slate-300 text-center">5 Hari</td><td class="p-3 border border-slate-300 text-center">11-15 Sept 2026</td></tr>
+
+                                    <!-- 8. Penetapan Calon Kades -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">8</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN CALON KEPALA DESA</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan bakal calon Kepala Desa menjadi Calon Kepala Desa serta penetapan dan pengambilan Nomor Urut Calon</td><td class="p-3 border border-slate-300 text-center">2 Hari</td><td class="p-3 border border-slate-300 text-center">16-17 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pengumuman Calon Kepala Desa berdasarkan No. Urut</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">18 Sept 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Penyampaian Data (Photo dan CD) Calon Kepala Desa ke Dinas PMD Kab. Sarolangun</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">19-21 Sept 2026</td></tr>
+
+                                    <!-- 9. Pencetakan Surat Suara -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">9</td><td colspan="3" class="p-3 border border-slate-300">PENCETAKAN SURAT SUARA</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Persiapan Pencetakan Surat Suara</td><td class="p-3 border border-slate-300 text-center">29 Hari</td><td class="p-3 border border-slate-300 text-center">22 Sept - 20 Okt 2026</td></tr>
+
+                                    <!-- 10. Kampanye -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">10</td><td colspan="3" class="p-3 border border-slate-300">KAMPANYE</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Deklarasi/Penandatanganan Pernyataan Pilkades Damai</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">21 Okt 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Penyampaian visi dan misi/Rapat/Pertemuan/dialog, melalui media masa (cetak/elektronik)</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">22-24 Okt 2026</td></tr>
+
+                                    <!-- 11. Masa Tenang -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">11</td><td colspan="3" class="p-3 border border-slate-300">MASA TENANG</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">- Masa tenang dan pembersihan alat peraga</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">25-27 Okt 2026</td></tr>
+
+                                    <!-- 12. Distribusi Alat Pemilihan -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">12</td><td colspan="3" class="p-3 border border-slate-300">DISTRIBUSI ALAT PEMILIHAN</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pembuatan TPS</td><td class="p-3 border border-slate-300 text-center" rowspan="3">1 Hari</td><td class="p-3 border border-slate-300 text-center" rowspan="3">28 Oktober 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Distribusi Surat Suara</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Serah terima Surat Suara dari Panitia Kabupaten/Tim Pemantau ke PPS, dan dari PPS ke KPPS langsung dimasukkan ke Kotak Suara dengan disaksikan oleh Panitia Kab./tim Pemantau, Kepala Desa dan BPD</td></tr>
+
+                                    <!-- 13. Pemungutan dan Penghitungan Suara -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">13</td><td colspan="3" class="p-3 border border-slate-300">PEMUNGUTAN DAN PENGHITUNGAN SURAT SUARA</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Pemungutan dan Penghitungan Surat Suara di TPS</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">29 Oktober 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Pleno Penghitungan Surat Suara</td><td class="p-3 border border-slate-300 text-center">1 Hari</td><td class="p-3 border border-slate-300 text-center">29 Oktober 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">c. Penyerahan Penghitungan Suara oleh PPS ke BPD untuk disahkan</td><td class="p-3 border border-slate-300 text-center">3 Hari</td><td class="p-3 border border-slate-300 text-center">30 Okt - 2 Nov 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">d. Penyampaian Laporan BPD kepada Bupati melalui Camat untuk disahkan</td><td class="p-3 border border-slate-300 text-center">7 Hari</td><td class="p-3 border border-slate-300 text-center">3-9 Nov 2026</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">e. Penyampaian hasil pemilihan Kepala Desa terpilih oleh Camat kepada Bupati untuk disahkan menjadi Kepala Desa</td><td class="p-3 border border-slate-300 text-center">7 Hari</td><td class="p-3 border border-slate-300 text-center">10-16 Nov 2026</td></tr>
+
+                                    <!-- 14. Penetapan Kepala Desa Terpilih -->
+                                    <tr class="bg-slate-100 font-bold"><td class="p-3 border border-slate-300 text-center">14</td><td colspan="3" class="p-3 border border-slate-300">PENETAPAN KEPALA DESA TERPILIH</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">a. Penetapan Keputusan Bupati tentang Pengesahan Kepala Desa terpilih</td><td class="p-3 border border-slate-300 text-center">Maksimal 30 hari setelah menerima laporan dari BPD/Camat</td><td class="p-3 border border-slate-300 text-center">-</td></tr>
+                                    <tr><td class="p-3 border border-slate-300 text-center"></td><td class="p-3 border border-slate-300">b. Persiapan dan Pelantikan Kepala Desa terpilih</td><td class="p-3 border border-slate-300 text-center">Maksimal 30 hari terhitung sejak diterbitkannya SK Bupati</td><td class="p-3 border border-slate-300 text-center">-</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
+                <!-- Pemilih View -->
+                <div id="view-pemilih" class="hidden animate-fade-in space-y-6">
+                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 class="text-lg font-black text-slate-800 uppercase" id="judul-tahapan-dpt">DAFTAR PEMILIH</h2>
+                            <button id="btn-tambah-pemilih" onclick="bukaModalPemilih()" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs items-center gap-2 self-start uppercase">
+                                <i class="fa-solid fa-user-plus"></i> Tambah Data Pemilih
+                            </button>
+                        </div>
+                        <div class="flex gap-3">
+                            <input type="text" id="cari-pemilih-input" onkeyup="filterPemilih()" placeholder="CARI NIK / NAMA PEMILIH..." class="flex-1 border border-slate-200 p-2.5 rounded-xl text-sm bg-slate-50 outline-none uppercase">
+                        </div>
+                        <div class="overflow-x-auto pt-2">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 border-b uppercase font-bold">
+                                        <th class="p-3">NIK</th>
+                                        <th class="p-3">NAMA LENGKAP</th>
+                                        <th class="p-3">TAHAPAN</th>
+                                        <th class="p-3">KETERANGAN</th>
+                                        <th class="p-3 text-center aksi-kolom hidden">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-pemilih-body">
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400 uppercase">Memuat data pemilih...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PPS View -->
                 <div id="view-pps" class="hidden animate-fade-in space-y-6">
                     <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
                         <div>
-                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-user-group text-red-600"></i> Panitia Pemungutan Suara (PPS)
-                            </h2>
-                            <p class="text-xs text-slate-500">Struktur Penyelenggara Pemilihan Desa Payo Lebar</p>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2 uppercase"><i class="fa-solid fa-user-group text-red-600"></i> PANITIA PEMUNGUTAN SUARA (PPS)</h2>
+                            <p class="text-xs text-slate-500 uppercase">Struktur Penyelenggara Tingkat Desa</p>
                         </div>
-                        <button id="btn-tambah-pps" onclick="bukaModalAnggota('pps')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-user-plus"></i> Tambah Panitia PPS
+                        <button id="btn-tambah-pps" onclick="bukaModalAnggota('pps')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs items-center gap-2 uppercase">
+                            <i class="fa-solid fa-user-plus"></i> Tambah PPS
                         </button>
                     </div>
                     <div id="grid-pps-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
+                <!-- BPD View -->
                 <div id="view-bpd" class="hidden animate-fade-in space-y-6">
                     <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
                         <div>
-                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield text-red-600"></i> Pengawas BPD (Badan Permusyawaratan Desa)
-                            </h2>
-                            <p class="text-xs text-slate-500">Tim Pengawas Independen Pilkades Payo Lebar</p>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2 uppercase"><i class="fa-solid fa-user-shield text-red-600"></i> PENGAWAS BPD</h2>
+                            <p class="text-xs text-slate-500 uppercase">Tim Pengawas Independen</p>
                         </div>
-                        <button id="btn-tambah-bpd" onclick="bukaModalAnggota('bpd')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs hover:from-red-600 transition items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-user-plus"></i> Tambah Pengawas BPD
+                        <button id="btn-tambah-bpd" onclick="bukaModalAnggota('bpd')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs items-center gap-2 uppercase">
+                            <i class="fa-solid fa-user-plus"></i> Tambah BPD
                         </button>
                     </div>
                     <div id="grid-bpd-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <div id="view-dasarhukum" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-scale-balanced text-red-600"></i> Landasan Hukum Pilkades</h2>
-                    <p class="text-xs text-slate-500">UU No. 6/2014 & Permendagri No. 112/2014</p>
+                <!-- KPPS 1 View -->
+                <div id="view-kpps1" class="hidden animate-fade-in space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2 uppercase"><i class="fa-solid fa-users-rectangle text-red-600"></i> KPPS TPS 01 (9 ORANG)</h2>
+                            <p class="text-xs text-slate-500 uppercase">Kelompok Penyelenggara Pemungutan Suara TPS 01</p>
+                        </div>
+                        <button id="btn-tambah-kpps1" onclick="bukaModalAnggota('kpps1')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs items-center gap-2 uppercase">
+                            <i class="fa-solid fa-user-plus"></i> Tambah KPPS 1
+                        </button>
+                    </div>
+                    <div id="grid-kpps1-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <div id="view-layanan" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-headset text-red-600"></i> Pusat Layanan Public</h2>
-                    <p class="text-xs text-slate-500">Kantor Desa Payo Lebar, Kec. Singkut</p>
+                <!-- KPPS 2 View -->
+                <div id="view-kpps2" class="hidden animate-fade-in space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2 uppercase"><i class="fa-solid fa-users-rectangle text-red-600"></i> KPPS TPS 02 (9 ORANG)</h2>
+                            <p class="text-xs text-slate-500 uppercase">Kelompok Penyelenggara Pemungutan Suara TPS 02</p>
+                        </div>
+                        <button id="btn-tambah-kpps2" onclick="bukaModalAnggota('kpps2')" class="hidden bg-gradient-to-r from-red-700 to-rose-700 text-white px-4 py-2 rounded-xl font-bold text-xs items-center gap-2 uppercase">
+                            <i class="fa-solid fa-user-plus"></i> Tambah KPPS 2
+                        </button>
+                    </div>
+                    <div id="grid-kpps2-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <div id="view-input" class="hidden animate-fade-in max-w-2xl mx-auto bg-white/95 backdrop-blur-xs rounded-2xl shadow-lg border border-slate-200/80 overflow-hidden">
+                <!-- Dasar Hukum View -->
+                <div id="view-dasarhukum" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 uppercase">
+                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-scale-balanced text-red-600"></i> LANDASAN HUKUM PILKADES</h2>
+                    <p class="text-xs text-slate-500">Undang-Undang Nomor 6 Tahun 2014 tentang Desa & Permendagri Nomor 112 Tahun 2014.</p>
+                </div>
+
+                <!-- Layanan View -->
+                <div id="view-layanan" class="hidden animate-fade-in bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 uppercase">
+                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-headset text-red-600"></i> PUSAT LAYANAN PUBLIK</h2>
+                    <p class="text-xs text-slate-500">Sekretariat PPS Kantor Desa Payo Lebar, Kec. Singkut.</p>
+                </div>
+
+                <!-- Input View -->
+                <div id="view-input" class="hidden animate-fade-in max-w-2xl mx-auto bg-white/95 backdrop-blur-xs rounded-2xl shadow-lg border border-slate-200/80 overflow-hidden uppercase">
                     <div class="bg-gradient-to-r from-red-950 to-red-900 text-white p-5 flex items-center justify-between">
                         <div>
-                            <h2 class="font-black text-lg">Input Hasil Suara TPS (Form C1)</h2>
-                            <p class="text-xs text-red-200">Akses Terotorisasi Panitia P2KD</p>
+                            <h2 class="font-black text-lg">INPUT HASIL SUARA TPS (FORM C1)</h2>
+                            <p class="text-xs text-red-200">Akses Terotorisasi Panitia Pemungutan Suara (PPS)</p>
                         </div>
                         <i class="fa-solid fa-file-signature text-2xl text-amber-400"></i>
                     </div>
-                    <form onsubmit="simpanData(event)" class="p-6 space-y-5">
+                    <form onsubmit="simpanDataSuara(event)" class="p-6 space-y-5">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-2">Pilih TPS</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-2">PILIH TPS</label>
                             <select required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none">
-                                <option value="">-- Pilih TPS --</option>
-                                <option value="TPS 01">TPS 01 - Dusun I</option>
-                                <option value="TPS 02">TPS 02 - Dusun II</option>
-                                <option value="TPS 03">TPS 03 - Dusun III</option>
+                                <option value="">-- PILIH TPS --</option>
+                                <option value="TPS 01">TPS 01 - DUSUN I</option>
+                                <option value="TPS 02">TPS 02 - DUSUN II</option>
                             </select>
                         </div>
                         <div id="form-input-calon-container" class="space-y-3 pt-2 border-t border-slate-100"></div>
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-red-700 to-rose-700 text-white rounded-xl font-bold">
-                            Simpan Hasil Perhitungan
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-red-700 to-rose-700 text-white rounded-xl font-bold uppercase">
+                            SIMPAN PEROLEHAN SUARA
                         </button>
                     </form>
                 </div>
@@ -300,84 +456,142 @@
         </main>
     </div>
 
+    <!-- Modal Login -->
     <div id="modalLogin" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in uppercase">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-shield text-red-700"></i> Otorisasi Akses Panitia</h3>
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-shield text-red-700"></i> OTORISASI AKSES PPS</h3>
                 <button onclick="tutupModalLogin()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
             </div>
             <form onsubmit="prosesLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username Panitia</label>
-                    <input type="text" id="username" required placeholder="Masukkan username" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">USERNAME</label>
+                    <input type="text" id="username" required placeholder="admin" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none normal-case">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">PASSWORD</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none normal-case">
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm">
-                    Masuk Mode Admin
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm uppercase">
+                    MASUK MODE ADMIN PPS
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Modal Edit Calon Kades -->
+    <!-- Modal Edit Calon -->
     <div id="modalEditCalon" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg space-y-4 border border-slate-100 animate-fade-in">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg space-y-4 border border-slate-100 animate-fade-in uppercase">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-pen text-red-700"></i> Form Update Data Calon Kades</h3>
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-pen text-red-700"></i> FORM DATA CALON KADES</h3>
                 <button onclick="tutupModalEditCalon()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
             </div>
             <form onsubmit="simpanProfilCalon(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nomor Urut</label>
-                    <input type="number" id="input-no-urut" min="1" max="99" required placeholder="Contoh: 1" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <label class="block font-semibold text-slate-700 mb-1">NOMOR URUT</label>
+                    <input type="number" id="input-no-urut" min="1" max="99" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
-                    <input type="text" id="input-nama-calon" required placeholder="Contoh: H. Ahmad Dahlan, S.Pd." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <label class="block font-semibold text-slate-700 mb-1">NAMA LENGKAP & GELAR</label>
+                    <input type="text" id="input-nama-calon" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Visi Utama</label>
-                    <textarea id="input-visi-calon" rows="3" required placeholder="Tuliskan visi singkat calon..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50"></textarea>
+                    <label class="block font-semibold text-slate-700 mb-1">VISI UTAMA</label>
+                    <textarea id="input-visi-calon" rows="3" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 normal-case"></textarea>
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md">
-                    Simpan & Perbarui Data
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md uppercase">
+                    SIMPAN PERUBAHAN
                 </button>
             </form>
         </div>
     </div>
 
+    <!-- Modal Anggota Tim -->
     <div id="modalAnggota" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in uppercase">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 id="modal-anggota-title" class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-gear text-red-700"></i> Form Data Anggota</h3>
+                <h3 id="modal-anggota-title" class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-user-gear text-red-700"></i> FORM ANGGOTA</h3>
                 <button onclick="tutupModalAnggota()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
             </div>
-            <form onsubmit="simpanAnggota(event)" class="space-y-3 text-xs">
+            <form onsubmit="simpanAnggotaTim(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="input-anggota-index">
                 <input type="hidden" id="input-anggota-tipe">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="input-nama-anggota" required placeholder="Masukkan nama lengkap" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <label class="block font-semibold text-slate-700 mb-1">NAMA LENGKAP</label>
+                    <input type="text" id="input-nama-anggota" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Jabatan / Peran</label>
-                    <input type="text" id="input-jabatan-anggota" required placeholder="Contoh: Ketua / Anggota Divisi Logistik" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <label class="block font-semibold text-slate-700 mb-1">JABATAN / PERAN</label>
+                    <input type="text" id="input-jabatan-anggota" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nomor Kontak / WA</label>
-                    <input type="text" id="input-kontak-anggota" placeholder="Contoh: 081234567890" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                    <label class="block font-semibold text-slate-700 mb-1">NOMOR KONTAK / WA</label>
+                    <input type="text" id="input-kontak-anggota" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 normal-case">
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md">
-                    Simpan Data Anggota
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md uppercase">
+                    SIMPAN DATA
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Data Pemilih -->
+    <div id="modalPemilih" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 border border-slate-100 animate-fade-in uppercase">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i class="fa-solid fa-id-card text-red-700"></i> FORM DATA PEMILIH</h3>
+                <button onclick="tutupModalPemilih()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="simpanDataPemilih(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="input-pemilih-index">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">NIK</label>
+                    <input type="text" id="input-nik-pemilih" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 font-mono normal-case">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">NAMA LENGKAP</label>
+                    <input type="text" id="input-nama-anggota" id="input-nama-pemilih" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">TAHAPAN PEMILIH</label>
+                    <select id="input-tahapan-pemilih" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 outline-none">
+                        <option value="DPT Awal KPU">DPT AWAL KPU</option>
+                        <option value="DPS (Sementara)">DPS (SEMENTARA)</option>
+                        <option value="DPTam (Tambahan)">DPTAM (TAMBAHAN)</option>
+                        <option value="DPT (Tetap)">DPT (TETAP)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">KETERANGAN (CONTOH: TPS 01 / RT 02)</label>
+                    <input type="text" id="input-keterangan-pemilih" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-red-700 to-rose-700 text-white font-bold rounded-xl text-sm shadow-md uppercase">
+                    SIMPAN DATA
                 </button>
             </form>
         </div>
     </div>
 
     <script>
+        const WEB_APP_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_SCRIPT_ANDA_DI_SINI";
+
+        let databasePilkades = {
+            calon: [],
+            pps: [],
+            bpd: [],
+            kpps1: [],
+            kpps2: [],
+            pemilih: []
+        };
+
+        let isPanitiaLoggedIn = false;
+        let tahapanPemilihAktif = 'DPS (Sementara)';
+
+        function inisialisasiSistem() {
+            mulaiJamRealtime();
+            muatDataDariGoogleDrive();
+        }
+
         function mulaiJamRealtime() {
             updateWaktu();
             setInterval(updateWaktu, 1000);
@@ -385,50 +599,56 @@
 
         function updateWaktu() {
             const now = new Date();
-            const opsiTanggal = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const formatTanggal = now.toLocaleDateString('id-ID', opsiTanggal);
-            const jam = String(now.getHours()).padStart(2, '0');
-            const menit = String(now.getMinutes()).padStart(2, '0');
-            const detik = String(now.getSeconds()).padStart(2, '0');
-            const formatJam = `${jam}:${menit}:${detik} WIB`;
-
-            const elTgl = document.getElementById('realtime-tanggal');
-            const elJam = document.getElementById('realtime-jam');
-
-            if (elTgl) elTgl.innerText = formatTanggal;
-            if (elJam) elJam.innerText = formatJam;
+            const formatTanggal = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+            const formatJam = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} WIB`;
+            if (document.getElementById('realtime-tanggal')) document.getElementById('realtime-tanggal').innerText = formatTanggal;
+            if (document.getElementById('realtime-jam')) document.getElementById('realtime-jam').innerText = formatJam;
         }
 
-        let isPanitiaLoggedIn = false;
+        async function muatDataDariGoogleDrive() {
+            if (WEB_APP_URL.includes("MASUKKAN_URL")) {
+                console.warn("URL Web App Google Sheets belum dipasang!");
+                return;
+            }
+            try {
+                let response = await fetch(WEB_APP_URL);
+                let result = await response.json();
+                databasePilkades = result;
+                renderSemuaTampilan();
+            } catch (error) {
+                console.error("Gagal memuat data:", error);
+            }
+        }
 
-        // Data awal Calon Kades
-        let defaultCalon = [
-            { no: "1", nama: "H. Ahmad Dahlan, S.Pd.", visi: "Mewujudkan Desa Payo Lebar yang Sejahtera, Transparan, dan Berbasis Teknologi Informasi.", suara: 420, persen: "37.5%" },
-            { no: "2", nama: "Bambang Subianto", visi: "Pemerataan Pembangunan Infrastruktur dan Pemberdayaan Ekonomi Pertanian Desa.", suara: 310, persen: "27.6%" },
-            { no: "3", nama: "H. Suryadi, S.E.", visi: "Penguatan Badan Usaha Milik Desa (BUMDes) dan Kemandirian Ekonomi Pemuda.", suara: 200, persen: "17.8%" },
-            { no: "4", nama: "Dra. Hj. Nurjanah", visi: "Peningkatan Pelayanan Kesehatan, Pendidikan Anak, dan Kesejahteraan Perempuan.", suara: 110, persen: "9.8%" },
-            { no: "5", nama: "M. Ridwan Al-Faruq", visi: "Tata Kelola Pemerintahan Desa yang Bersih, Religius, dan Bebas Pungutan Liar.", suara: 80, persen: "7.1%" }
-        ];
+        async function simpanKeGoogleDrive(tabName, dataArray) {
+            if (WEB_APP_URL.includes("MASUKKAN_URL")) {
+                alert("Harap masukkan URL Web App Google Script terlebih dahulu di dalam kode JS.");
+                return;
+            }
+            try {
+                let response = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ tab: tabName, data: dataArray })
+                });
+                let res = await response.json();
+                if(res.status === "success") {
+                    alert("Data berhasil disinkronkan!");
+                    muatDataDariGoogleDrive();
+                }
+            } catch (error) {
+                alert("Terjadi kesalahan saat menyimpan data.");
+                console.error(error);
+            }
+        }
 
-        // Ambil data dari LocalStorage browser jika ada, atau gunakan default
-        let daftarCalon = JSON.parse(localStorage.getItem('pilkades_calon')) || defaultCalon;
-
-        let daftarPPS = [
-            { nama: "Heryanto, S.ST", jabatan: "Ketua PPS", kontak: "0821-7788-9900" },
-            { nama: "Siti Rahmawati", jabatan: "Divisi Teknis & Penyelenggaraan", kontak: "0852-1122-3344" },
-            { nama: "Andi Saputra", jabatan: "Divisi Data & Pemutakhiran", kontak: "0813-4455-6677" },
-            { nama: "Nur Hidayah, A.Md", jabatan: "Divisi Keuangan & Logistik", kontak: "0812-9900-1122" },
-            { nama: "Budi Santoso", jabatan: "Anggota Divisi Hubmas", kontak: "0853-3344-5566" }
-        ];
-
-        let daftarBPD = [
-            { nama: "Drs. M. Ali Akbar", jabatan: "Ketua Pengawas BPD", kontak: "0811-1234-5678" },
-            { nama: "H. Ahmad Fauzi", jabatan: "Wakil Ketua BPD", kontak: "0812-2345-6789" },
-            { nama: "Mustofa, S.P.", jabatan: "Sekretaris Pengawas", kontak: "0813-3456-7890" },
-            { nama: "Zulkifli Mansur", jabatan: "Pengawas Wilayah Dusun I", kontak: "0814-4567-8901" },
-            { nama: "Rahmat Hidayat", jabatan: "Pengawas Wilayah Dusun II", kontak: "0815-5678-9012" },
-            { nama: "Suryani, S.Pd", jabatan: "Pengawas Wilayah Dusun III", kontak: "0816-6789-0123" }
-        ];
+        function renderSemuaTampilan() {
+            renderCalon();
+            renderTim('pps');
+            renderTim('bpd');
+            renderTim('kpps1');
+            renderTim('kpps2');
+            renderPemilih(tahapanPemilihAktif);
+        }
 
         function renderCalon() {
             const gridContainer = document.getElementById('grid-calon-container');
@@ -439,80 +659,84 @@
             realcountContainer.innerHTML = '';
             inputContainer.innerHTML = '';
 
-            daftarCalon.forEach((calon, idx) => {
+            if(databasePilkades.calon.length === 0) {
+                gridContainer.innerHTML = `<p class="text-xs text-slate-400 uppercase">Belum ada data calon.</p>`;
+                return;
+            }
+
+            databasePilkades.calon.forEach((calon, idx) => {
                 let nomorFormat = String(calon.no).padStart(2, '0');
                 gridContainer.innerHTML += `
-                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                    <div class="bg-white/90 backdrop-blur-xs p-6 rounded-2xl border border-slate-200/85 shadow-sm space-y-4 uppercase">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl ${idx === 0 ? 'bg-red-100 text-red-800 border-red-200' : 'bg-slate-100 text-slate-800 border-slate-200'} flex items-center justify-center font-black text-2xl border flex-shrink-0">
-                                ${nomorFormat}
-                            </div>
+                            <div class="w-16 h-16 rounded-2xl bg-red-50 text-red-800 border border-red-200 flex items-center justify-center font-black text-2xl flex-shrink-0">${nomorFormat}</div>
                             <div class="overflow-hidden">
                                 <h3 class="text-base font-black text-slate-800 truncate">${calon.nama}</h3>
-                                <p class="text-xs text-slate-400">Calon Kepala Desa Nomor Urut ${nomorFormat}</p>
+                                <p class="text-xs text-slate-400">Nomor Urut ${nomorFormat}</p>
                             </div>
                         </div>
                         <div class="p-4 bg-slate-50/80 rounded-xl border border-slate-100 text-xs space-y-1.5">
                             <p class="font-bold text-slate-700">Visi Utama:</p>
-                            <p class="text-slate-600 italic">"${calon.visi}"</p>
+                            <p class="text-slate-600 italic normal-case">"${calon.visi}"</p>
                         </div>
-                        ${isPanitiaLoggedIn ? `<button onclick="editCalonSpesifik(${idx})" class="w-full py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 rounded-lg text-xs font-bold border border-slate-200 transition">Edit Data Calon Ini</button>` : ''}
+                        ${isPanitiaLoggedIn ? `<button onclick="editCalon(${idx})" class="w-full py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 rounded-lg text-xs font-bold border border-slate-200 transition">Edit Calon Ini</button>` : ''}
                     </div>
                 `;
 
                 realcountContainer.innerHTML += `
-                    <div>
+                    <div class="uppercase">
                         <div class="flex justify-between items-center mb-1.5">
                             <div class="flex items-center gap-3">
-                                <span class="w-7 h-7 rounded-lg ${idx === 0 ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'} font-black flex items-center justify-center text-xs border border-slate-200">${nomorFormat}</span>
+                                <span class="w-7 h-7 rounded-lg bg-red-100 text-red-800 font-black flex items-center justify-center text-xs border border-slate-200">${nomorFormat}</span>
                                 <div>
                                     <h4 class="font-bold text-slate-800 text-sm">${calon.nama}</h4>
-                                    <p class="text-[11px] text-slate-400">Perolehan: ${calon.suara} Suara</p>
+                                    <p class="text-[11px] text-slate-400">Perolehan: ${calon.suara || 0} Suara</p>
                                 </div>
                             </div>
-                            <span class="text-base font-black ${idx === 0 ? 'text-red-600' : 'text-slate-700'}">${calon.persen}</span>
+                            <span class="text-base font-black text-red-600">${calon.persen || '0%'}</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200/60">
-                            <div class="${idx === 0 ? 'bg-gradient-to-r from-red-600 to-rose-600' : 'bg-slate-400'} h-2 rounded-full transition-all duration-1000" style="width: ${calon.persen}"></div>
+                            <div class="bg-gradient-to-r from-red-600 to-rose-600 h-2 rounded-full" style="width: ${calon.persen || '0%'}"></div>
                         </div>
                     </div>
                 `;
 
                 inputContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-3 bg-red-50/50 rounded-xl border border-red-100">
+                    <div class="flex items-center justify-between p-3 bg-red-50/50 rounded-xl border border-red-100 uppercase">
                         <span class="font-bold text-slate-800 text-xs">${nomorFormat}. ${calon.nama}</span>
-                        <input type="number" min="0" value="${calon.suara}" required class="w-28 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-red-800 bg-white text-xs outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="number" min="0" value="${calon.suara || 0}" data-id="${calon.no}" class="input-suara w-28 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-red-800 bg-white text-xs outline-none">
                     </div>
                 `;
             });
         }
 
         function renderTim(tipe) {
-            const container = document.getElementById(tipe === 'pps' ? 'grid-pps-container' : 'grid-bpd-container');
-            const dataList = tipe === 'pps' ? daftarPPS : daftarBPD;
+            const container = document.getElementById(`grid-${tipe}-container`);
+            const dataList = databasePilkades[tipe] || [];
             container.innerHTML = '';
+
+            if(dataList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 col-span-3 uppercase">Belum ada data anggota.</p>`;
+                return;
+            }
 
             dataList.forEach((item, index) => {
                 container.innerHTML += `
-                    <div class="bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-3">
+                    <div class="bg-white/90 backdrop-blur-xs p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-3 uppercase">
                         <div class="flex items-center gap-3 overflow-hidden">
                             <div class="w-10 h-10 rounded-xl bg-slate-100 text-red-800 flex items-center justify-center font-bold border border-slate-200 flex-shrink-0">
-                                <i class="fa-solid ${tipe === 'pps' ? 'fa-user' : 'fa-user-shield'}"></i>
+                                <i class="fa-solid fa-user"></i>
                             </div>
                             <div class="overflow-hidden">
                                 <h4 class="font-bold text-xs text-slate-800 truncate">${item.nama}</h4>
                                 <p class="text-[11px] font-semibold text-red-700 truncate">${item.jabatan}</p>
-                                <p class="text-[10px] text-slate-400 font-medium">${item.kontak || '-'}</p>
+                                <p class="text-[10px] text-slate-400 normal-case">${item.kontak || '-'}</p>
                             </div>
                         </div>
                         ${isPanitiaLoggedIn ? `
                             <div class="flex items-center gap-1 flex-shrink-0">
-                                <button onclick="editAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 rounded-lg flex items-center justify-center text-xs border border-slate-200">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button onclick="hapusAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 rounded-lg flex items-center justify-center text-xs border border-slate-200">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                                <button onclick="editAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-amber-100 text-slate-600 rounded-lg flex items-center justify-center text-xs border"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="hapusAnggota('${tipe}', ${index})" class="w-7 h-7 bg-slate-100 hover:bg-rose-100 text-slate-600 rounded-lg flex items-center justify-center text-xs border"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         ` : ''}
                     </div>
@@ -520,30 +744,81 @@
             });
         }
 
-        function renderSemuaData() {
-            renderCalon();
-            renderTim('pps');
-            renderTim('bpd');
+        function renderPemilih(namaTahapan) {
+            tahapanPemilihAktif = namaTahapan;
+            document.getElementById('judul-tahapan-dpt').innerText = `DAFTAR PEMILIH: ${namaTahapan}`.toUpperCase();
+            
+            const tbody = document.getElementById('tabel-pemilih-body');
+            tbody.innerHTML = '';
+            
+            let data = databasePilkades.pemilih || [];
+            let hasil = data.filter(p => p.tahapan === namaTahapan);
+
+            let kolomAksi = document.querySelectorAll('.aksi-kolom');
+            kolomAksi.forEach(el => {
+                if(isPanitiaLoggedIn) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+
+            if(hasil.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 uppercase">Belum ada data pemilih untuk ${namaTahapan}.</td></tr>`;
+                return;
+            }
+
+            hasil.forEach((p) => {
+                let realIndex = databasePilkades.pemilih.findIndex(item => item === p);
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50 uppercase">
+                        <td class="p-3 font-mono normal-case">${p.nik}</td>
+                        <td class="p-3 font-bold text-slate-800">${p.nama}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 bg-red-50 text-red-700 rounded-md font-semibold">${p.tahapan}</span></td>
+                        <td class="p-3 text-slate-500">${p.keterangan || '-'}</td>
+                        <td class="p-3 text-center aksi-kolom ${isPanitiaLoggedIn ? '' : 'hidden'}">
+                            <button onclick="editPemilih(${realIndex})" class="px-2 py-1 bg-slate-100 hover:bg-amber-100 text-slate-700 rounded-md text-xs border mr-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="hapusPemilih(${realIndex})" class="px-2 py-1 bg-slate-100 hover:bg-rose-100 text-slate-700 rounded-md text-xs border"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterPemilih() {
+            let keyword = document.getElementById('cari-pemilih-input').value.toLowerCase();
+            let tbody = document.getElementById('tabel-pemilih-body');
+            tbody.innerHTML = '';
+            
+            let data = databasePilkades.pemilih || [];
+            let hasil = data.filter(p => p.tahapan === tahapanPemilihAktif && (p.nama.toLowerCase().includes(keyword) || String(p.nik).includes(keyword)));
+
+            if(hasil.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 uppercase">Pencarian tidak ditemukan.</td></tr>`;
+                return;
+            }
+
+            hasil.forEach((p) => {
+                let realIndex = databasePilkades.pemilih.findIndex(item => item === p);
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50 uppercase">
+                        <td class="p-3 font-mono normal-case">${p.nik}</td>
+                        <td class="p-3 font-bold text-slate-800">${p.nama}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 bg-red-50 text-red-700 rounded-md font-semibold">${p.tahapan}</span></td>
+                        <td class="p-3 text-slate-500">${p.keterangan || '-'}</td>
+                        <td class="p-3 text-center aksi-kolom ${isPanitiaLoggedIn ? '' : 'hidden'}">
+                            <button onclick="editPemilih(${realIndex})" class="px-2 py-1 bg-slate-100 hover:bg-amber-100 text-slate-700 rounded-md text-xs border mr-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="hapusPemilih(${realIndex})" class="px-2 py-1 bg-slate-100 hover:bg-rose-100 text-slate-700 rounded-md text-xs border"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
         }
 
         function switchTab(viewName) {
-            const views = ['realcount', 'calon', 'pemilih', 'pps', 'bpd', 'dasarhukum', 'layanan', 'input'];
+            const views = ['realcount', 'calon', 'tahapan', 'pemilih', 'pps', 'bpd', 'kpps1', 'kpps2', 'dasarhukum', 'layanan', 'input'];
             views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) el.classList.add('hidden');
+                let el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
             });
-
-            const targetView = document.getElementById(`view-${viewName}`);
-            if (targetView) targetView.classList.remove('hidden');
-
-            document.querySelectorAll('.menu-btn').forEach(btn => {
-                btn.className = "menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-100/80 hover:text-white hover:bg-red-800/40 hover:translate-x-1 transition-all duration-200 border border-transparent";
-            });
-
-            const activeBtn = document.getElementById(`nav-${viewName}`);
-            if (activeBtn) {
-                activeBtn.className = "menu-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-semibold shadow-lg shadow-red-950/50 border border-red-400/30 transition-all duration-200";
-            }
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
         }
 
         function toggleSubmenu(menuId, arrowId) {
@@ -551,175 +826,167 @@
             document.getElementById(arrowId).classList.toggle('rotate-180');
         }
 
-        function pilihTahapan(namaTahapan) {
+        function pilihDataPemilih(namaTahapan) {
             switchTab('pemilih');
-            document.getElementById('judul-tahapan-dpt').innerText = `Daftar Pemilih: ${namaTahapan}`;
+            renderPemilih(namaTahapan);
         }
 
-        function bukaModalLogin() {
-            document.getElementById('modalLogin').classList.remove('hidden');
-            document.getElementById('modalLogin').classList.add('flex');
-        }
+        function bukaModalLogin() { document.getElementById('modalLogin').classList.replace('hidden', 'flex'); }
+        function tutupModalLogin() { document.getElementById('modalLogin').classList.replace('flex', 'hidden'); }
 
-        function tutupModalLogin() {
-            document.getElementById('modalLogin').classList.add('hidden');
-            document.getElementById('modalLogin').classList.remove('flex');
-        }
-
-        function bukaModalEditCalon() {
-            document.getElementById('input-no-urut').value = '';
-            document.getElementById('input-nama-calon').value = '';
-            document.getElementById('input-visi-calon').value = '';
-            document.getElementById('modalEditCalon').classList.remove('hidden');
-            document.getElementById('modalEditCalon').classList.add('flex');
-        }
-
-        function tutupModalEditCalon() {
-            document.getElementById('modalEditCalon').classList.add('hidden');
-            document.getElementById('modalEditCalon').classList.remove('flex');
-        }
-
-        function editCalonSpesifik(index) {
-            const c = daftarCalon[index];
-            document.getElementById('input-no-urut').value = c.no;
-            document.getElementById('input-nama-calon').value = c.nama;
-            document.getElementById('input-visi-calon').value = c.visi;
-            bukaModalEditCalon();
-        }
-
-        function simpanProfilCalon(e) {
+        function prosesLogin(e) {
             e.preventDefault();
-            const no = document.getElementById('input-no-urut').value.trim();
-            const nama = document.getElementById('input-nama-calon').value.trim();
-            const visi = document.getElementById('input-visi-calon').value.trim();
-
-            let idx = daftarCalon.findIndex(c => String(c.no) === String(no));
-            if (idx !== -1) {
-                daftarCalon[idx].nama = nama;
-                daftarCalon[idx].visi = visi;
+            if(document.getElementById('username').value === "admin" && document.getElementById('password').value === "123456") {
+                isPanitiaLoggedIn = true;
+                tutupModalLogin();
+                document.getElementById('lock-input').classList.add('hidden');
+                ['btn-tambah-calon', 'btn-tambah-pps', 'btn-tambah-bpd', 'btn-tambah-kpps1', 'btn-tambah-kpps2', 'btn-tambah-pemilih'].forEach(id => {
+                    let btn = document.getElementById(id);
+                    if(btn) btn.classList.replace('hidden', 'flex');
+                });
+                let btnAuth = document.getElementById('btn-auth');
+                btnAuth.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> LOGOUT PPS`;
+                btnAuth.onclick = () => location.reload();
+                renderSemuaTampilan();
+                alert("LOGIN ADMIN PPS BERHASIL!");
             } else {
-                daftarCalon.push({ no: no, nama: nama, visi: visi, suara: 0, persen: "0%" });
-                daftarCalon.sort((a,b) => parseInt(a.no) - parseInt(b.no));
+                alert("USERNAME ATAU PASSWORD SALAH!");
             }
-
-            // Simpan otomatis ke LocalStorage browser supaya tidak hilang saat direfresh di GitHub Pages
-            localStorage.setItem('pilkades_calon', JSON.stringify(daftarCalon));
-
-            renderCalon();
-            tutupModalEditCalon();
-            alert("Data Profil Calon Kades Berhasil Disimpan!");
-        }
-
-        function bukaModalAnggota(tipe, index = null) {
-            document.getElementById('input-anggota-tipe').value = tipe;
-            document.getElementById('input-anggota-index').value = index !== null ? index : '';
-            
-            const title = document.getElementById('modal-anggota-title');
-            title.innerHTML = index !== null ? `<i class="fa-solid fa-user-pen text-red-700"></i> Edit Data ${tipe.toUpperCase()}` : `<i class="fa-solid fa-user-plus text-red-700"></i> Tambah Anggota ${tipe.toUpperCase()}`;
-
-            if (index !== null) {
-                const data = (tipe === 'pps' ? daftarPPS : daftarBPD)[index];
-                document.getElementById('input-nama-anggota').value = data.nama;
-                document.getElementById('input-jabatan-anggota').value = data.jabatan;
-                document.getElementById('input-kontak-anggota').value = data.kontak || '';
-            } else {
-                document.getElementById('input-nama-anggota').value = '';
-                document.getElementById('input-jabatan-anggota').value = '';
-                document.getElementById('input-kontak-anggota').value = '';
-            }
-
-            document.getElementById('modalAnggota').classList.remove('hidden');
-            document.getElementById('modalAnggota').classList.add('flex');
-        }
-
-        function tutupModalAnggota() {
-            document.getElementById('modalAnggota').classList.add('hidden');
-            document.getElementById('modalAnggota').classList.remove('flex');
-        }
-
-        function editAnggota(tipe, index) {
-            bukaModalAnggota(tipe, index);
-        }
-
-        function hapusAnggota(tipe, index) {
-            if (confirm("Apakah Anda yakin ingin menghapus data anggota ini?")) {
-                if (tipe === 'pps') {
-                    daftarPPS.splice(index, 1);
-                } else {
-                    daftarBPD.splice(index, 1);
-                }
-                renderTim(tipe);
-            }
-        }
-
-        function simpanAnggota(e) {
-            e.preventDefault();
-            const tipe = document.getElementById('input-anggota-tipe').value;
-            const index = document.getElementById('input-anggota-index').value;
-            const nama = document.getElementById('input-nama-anggota').value;
-            const jabatan = document.getElementById('input-jabatan-anggota').value;
-            const kontak = document.getElementById('input-kontak-anggota').value;
-
-            const targetArray = tipe === 'pps' ? daftarPPS : daftarBPD;
-
-            if (index !== '') {
-                targetArray[index] = { nama, jabatan, kontak };
-            } else {
-                targetArray.push({ nama, jabatan, kontak });
-            }
-
-            renderTim(tipe);
-            tutupModalAnggota();
-            alert("Data Anggota berhasil tersimpan!");
         }
 
         function aksesAksiPanitia(targetView) {
             if (!isPanitiaLoggedIn) {
-                alert("Akses Terkunci! Silakan Login Panitia (P2KD) terlebih dahulu.");
+                alert("AKSES TERKUNCI! SILAKAN LOGIN SEBAGAI PANITIA PPS TERLEBIH DAHULU.");
                 bukaModalLogin();
             } else {
                 switchTab(targetView);
             }
         }
 
-        function prosesLogin(e) {
+        function bukaModalEditCalon() {
+            document.getElementById('input-no-urut').value = '';
+            document.getElementById('input-nama-calon').value = '';
+            document.getElementById('input-visi-calon').value = '';
+            document.getElementById('modalEditCalon').classList.replace('hidden', 'flex');
+        }
+        function tutupModalEditCalon() { document.getElementById('modalEditCalon').classList.replace('flex', 'hidden'); }
+
+        function simpanProfilCalon(e) {
             e.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+            let no = document.getElementById('input-no-urut').value;
+            let nama = document.getElementById('input-nama-calon').value;
+            let visi = document.getElementById('input-visi-calon').value;
 
-            if (u === "admin" && p === "123456") {
-                isPanitiaLoggedIn = true;
-                alert("Login Panitia Berhasil!");
-                tutupModalLogin();
-                
-                document.getElementById('lock-input').classList.add('hidden');
-                document.getElementById('lock-upload').classList.add('hidden');
-                
-                document.getElementById('btn-tambah-calon').classList.remove('hidden');
-                document.getElementById('btn-tambah-calon').classList.add('flex');
-                document.getElementById('btn-tambah-pps').classList.remove('hidden');
-                document.getElementById('btn-tambah-pps').classList.add('flex');
-                document.getElementById('btn-tambah-bpd').classList.remove('hidden');
-                document.getElementById('btn-tambah-bpd').classList.add('flex');
-
-                const btnAuth = document.getElementById('btn-auth');
-                btnAuth.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Logout Panitia`;
-                btnAuth.className = "w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl text-xs font-bold transition-all shadow-lg border border-slate-700";
-                btnAuth.onclick = () => location.reload();
-
-                renderSemuaData();
+            let index = databasePilkades.calon.findIndex(c => String(c.no) === String(no));
+            if(index !== -1) {
+                databasePilkades.calon[index].nama = nama;
+                databasePilkades.calon[index].visi = visi;
             } else {
-                alert("Username atau Password Panitia salah!");
+                databasePilkades.calon.push({ no, nama, visi, suara: 0, persen: "0%" });
+            }
+            simpanKeGoogleDrive('calon', databasePilkades.calon);
+            tutupModalEditCalon();
+        }
+
+        function editCalon(idx) {
+            let c = databasePilkades.calon[idx];
+            document.getElementById('input-no-urut').value = c.no;
+            document.getElementById('input-nama-calon').value = c.nama;
+            document.getElementById('input-visi-calon').value = c.visi;
+            document.getElementById('modalEditCalon').classList.replace('hidden', 'flex');
+        }
+
+        function bukaModalAnggota(tipe, index = null) {
+            document.getElementById('input-anggota-tipe').value = tipe;
+            document.getElementById('input-anggota-index').value = index !== null ? index : '';
+            if(index !== null) {
+                let item = databasePilkades[tipe][index];
+                document.getElementById('input-nama-anggota').value = item.nama;
+                document.getElementById('input-jabatan-anggota').value = item.jabatan;
+                document.getElementById('input-kontak-anggota').value = item.kontak || '';
+            } else {
+                document.getElementById('input-nama-anggota').value = '';
+                document.getElementById('input-jabatan-anggota').value = '';
+                document.getElementById('input-kontak-anggota').value = '';
+            }
+            document.getElementById('modalAnggota').classList.replace('hidden', 'flex');
+        }
+        function tutupModalAnggota() { document.getElementById('modalAnggota').classList.replace('flex', 'hidden'); }
+
+        function simpanAnggotaTim(e) {
+            e.preventDefault();
+            let tipe = document.getElementById('input-anggota-tipe').value;
+            let index = document.getElementById('input-anggota-index').value;
+            let nama = document.getElementById('input-nama-anggota').value;
+            let jabatan = document.getElementById('input-jabatan-anggota').value;
+            let kontak = document.getElementById('input-kontak-anggota').value;
+
+            if(index !== '') {
+                databasePilkades[tipe][index] = { nama, jabatan, kontak };
+            } else {
+                databasePilkades[tipe].push({ nama, jabatan, kontak });
+            }
+            simpanKeGoogleDrive(tipe, databasePilkades[tipe]);
+            tutupModalAnggota();
+        }
+
+        function editAnggota(tipe, index) { bukaModalAnggota(tipe, index); }
+        function hapusAnggota(tipe, index) {
+            if(confirm("YAKIN INGIN MENGHAPUS ANGGOTA INI?")) {
+                databasePilkades[tipe].splice(index, 1);
+                simpanKeGoogleDrive(tipe, databasePilkades[tipe]);
             }
         }
 
-        function simpanData(e) {
+        function bukaModalPemilih(index = null) {
+            document.getElementById('input-pemilih-index').value = index !== null ? index : '';
+            document.getElementById('input-tahapan-pemilih').value = tahapanPemilihAktif;
+            if(index !== null) {
+                let p = databasePilkades.pemilih[index];
+                document.getElementById('input-nik-pemilih').value = p.nik;
+                document.getElementById('input-nama-pemilih').value = p.nama;
+                document.getElementById('input-tahapan-pemilih').value = p.tahapan;
+                document.getElementById('input-keterangan-pemilih').value = p.keterangan || '';
+            } else {
+                document.getElementById('input-nik-pemilih').value = '';
+                document.getElementById('input-nama-pemilih').value = '';
+                document.getElementById('input-keterangan-pemilih').value = '';
+            }
+            document.getElementById('modalPemilih').classList.replace('hidden', 'flex');
+        }
+        function tutupModalPemilih() { document.getElementById('modalPemilih').classList.replace('flex', 'hidden'); }
+
+        function simpanDataPemilih(e) {
             e.preventDefault();
-            alert("Hasil suara TPS berhasil tersimpan!");
-            switchTab('realcount');
+            let index = document.getElementById('input-pemilih-index').value;
+            let nik = document.getElementById('input-nik-pemilih').value;
+            let nama = document.getElementById('input-nama-pemilih').value;
+            let tahapan = document.getElementById('input-tahapan-pemilih').value;
+            let keterangan = document.getElementById('input-keterangan-pemilih').value;
+
+            if(index !== '') {
+                databasePilkades.pemilih[index] = { nik, nama, tahapan, keterangan };
+            } else {
+                databasePilkades.pemilih.push({ nik, nama, tahapan, keterangan });
+            }
+            tahapanPemilihAktif = tahapan;
+            simpanKeGoogleDrive('pemilih', databasePilkades.pemilih);
+            tutupModalPemilih();
         }
 
-        renderSemuaData();
+        function editPemilih(index) { bukaModalPemilih(index); }
+        function hapusPemilih(index) {
+            if(confirm("YAKIN INGIN MENGHAPUS DATA PEMILIH INI?")) {
+                databasePilkades.pemilih.splice(index, 1);
+                simpanKeGoogleDrive('pemilih', databasePilkades.pemilih);
+            }
+        }
+
+        function simpanDataSuara(e) {
+            e.preventDefault();
+            alert("HASIL SUARA BERHASIL DIPERBARUI!");
+            switchTab('realcount');
+        }
     </script>
 </body>
 </html>
